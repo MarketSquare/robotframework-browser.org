@@ -74,7 +74,7 @@ export default {
             ]
           }
         },
-	/*        {
+       {
           title: "Examples",
           text_block: false,
           tab_box: false,
@@ -83,7 +83,7 @@ export default {
             //Different component, TODO: implement in reproducible component
           }
         },
-	*/
+	
 	/*
         {
           title: "Documentation",
