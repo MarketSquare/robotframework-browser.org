@@ -1,0 +1,384 @@
+:root {
+    --main-color:#EF5350;
+}
+
+
+@font-face {
+  font-family: 'OCRA';
+  src: url('../../assets/fonts/OCRA.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.robocon-banner {
+  background-color: #000;
+  color: white;
+  margin: 1rem;
+  padding: 1rem;
+  font-family: "OCRA";
+}
+
+@media only screen and (max-width: 997px) and (min-width: 768px) {
+  .robocon-banner {
+    margin-left: 4rem;
+  }
+}
+
+.robocon-banner h1 {
+  font-size: 5rem;
+  margin: 0;
+  color: #20f73f;
+}
+
+.robocon-banner h2 {
+  display: inline-block;
+  font-size: 2.5rem;
+  margin: 0;
+  color: #20f73f;
+}
+
+.robocon-banner a, .robocon-banner a:hover {
+  color: #20f73f;
+}
+
+body {
+  background-color: #fff;
+  font-family: Georgia;
+  font-size: 1.2rem;
+  ;
+  text-align: left;
+  overflow-x: hidden;
+}
+
+#header-robologo {
+  padding: 0;
+}
+
+.b-card-body p a {
+  color: #fff;
+}
+
+.footer-content {
+  color: #000;
+  text-align: center;
+  margin: 50px;
+}
+
+footer {
+  background-color: var(--main-color);
+}
+
+footer h2 {
+  color: #fff;
+}
+
+a {
+  text-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
+}
+
+a:hover {
+  color: #000;
+}
+
+header a.nav-link:hover {
+  color: #fff;
+}
+
+p {
+  font-family: Georgia;
+  margin-bottom: 1rem;
+}
+
+header ul {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-brand {
+  font-family: "OCRA";
+  margin-right: 0;
+  letter-spacing: 0.05em;
+  font-weight: normal;
+}
+
+code {
+  font-family: "Courier";
+  color: black;
+  padding: 4px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+section {
+  margin-bottom: 50px;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--main-color);
+}
+
+h1,
+h2,
+h3,
+div.card-header {
+  font-family: "OCRA";
+  text-transform: uppercase;
+  text-align: left;
+}
+
+h1 {
+  font-size: 1.8rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+}
+
+h3 {
+  font-size: 2rem;
+  margin-top: 3rem;
+}
+
+h1.main-header {
+  text-align: center;
+  font-size: 8vw;
+
+  line-height: 0.9;
+  color: #000;
+}
+
+h1.main-header::first-line {
+  color: #fff;
+}
+
+.main-header-container {
+  margin: 10px auto;
+  padding-bottom: 50px;
+}
+
+.header {
+  background-color: var(--main-color);
+  margin: 0;
+  padding-top: 50px;
+}
+
+.white-box {
+  font-family: Georgia;
+  color: #000;
+  background-color: #fff;
+  padding: 10px;
+  margin: 6px;
+  -webkit-border-radius: 5px 5px 5px 5px;
+  -moz-border-radius: 5px 5px 5px 5px;
+  border-radius: 5px 5px 5px 5px;
+  display: table;
+  min-width: 200px;
+  margin: 0 auto;
+}
+
+small.info {
+  margin: 0 auto;
+  display: block;
+}
+
+small.info::after {
+  content: "  ••••••••••••••"
+}
+
+.card.feature-box {
+  background-color: var(--main-color);
+  color: #fff;
+}
+
+#nav_collapse .nav-item a {
+  font-family: "OCRA";
+  color: #fff;
+  font-weight: normal;
+}
+
+a {
+  font-weight: bold;
+}
+
+#nav_collapse .nav-item a.active,
+a {
+  color: var(--main-color);
+}
+
+hr {
+  border-style: dashed;
+  border-color: #fff;
+  border-width: 3px 0 0 0;
+}
+
+.navbar-brand h1 {
+  font-family: "OCRA";
+  text-transform: uppercase;
+  margin: 20px 0;
+  padding: 0;
+  padding-bottom: 20px;
+  white-space: pre-line;
+  line-height: 0.9;
+  color: var(--main-color);
+}
+
+.navbar-brand .img-fluid {
+  margin: 0;
+  padding: 35% 20%;
+  width: 150px;
+}
+
+#navigation.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 180px;
+  text-align: center;
+  height: 100vh;
+  text-transform: uppercase
+}
+
+#navigation.sidebar {
+  background-color: rgb(0, 0, 0);
+}
+
+#navigation .nav-item.active a.nav-link {
+  color: var(--main-color);
+}
+
+#navigation .nav-item a.nav-link:hover {
+  color: var(--main-color);
+}
+
+#navigation .nav-item a.nav-link {
+  font-family: 'OCRA';
+  color: #fff;
+  text-align: left;
+  font-size: 0.8rem;
+  padding-left: 16%;
+}
+
+#navigation-collapsed {
+  background-color: rgb(0, 0, 0);
+  text-align: center;
+}
+
+#nav_collapse .nav-item a {
+  color: #fff;
+  text-transform: uppercase
+}
+
+#nav_collapse .nav-item a:hover {
+  color: var(--main-color);
+  text-decoration: none;
+}
+
+.nav-pills .nav-link {
+  border-radius: 0;
+  font-family: OCRA;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.nav-pills li a {
+  color: var(--main-color);
+  padding: 0.3rem 0.5rem;
+  font-size: 1rem;
+  background: none;
+  margin-right: 4px;
+  border: 1px solid --main-color;
+}
+
+.nav-pills li:last-child a {
+  margin-right: 0;
+}
+
+.nav-pills li.nav-item .nav-link.active {
+  color: #fff;
+  border: 1px solid --main-color;
+  border-radius: 0;
+  background: var(--main-color);
+}
+
+.card {
+  padding: 30px;
+  color: #666;
+  line-height: 1.1rem;
+  font-family: Georgia;
+  border-radius: 0;
+  border: none;
+  background-color: #e7e7e7;
+  height: 100%;
+  -webkit-border-radius: 5px 5px 5px 5px;
+  -moz-border-radius: 5px 5px 5px 5px;
+  border-radius: 5px 5px 5px 5px;
+}
+
+.card.example {
+  background: #212121;
+}
+
+.card-header {
+  font-family: "OCRA";
+  color: #fff;
+  font-size: 1.7rem;
+  text-align: left;
+  border: none;
+  margin: 0;
+  padding: 0;
+  padding-top: 5px;
+  padding-bottom: 30px;
+  background: none;
+}
+
+.card-body {
+  padding: 5px;
+  font-family: Georgia;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.card-body p {
+  margin-top: 10px;
+}
+
+.card a {
+  color: var(--main-color);
+}
+
+.link {
+  font-family: Courier;
+}
+
+th {
+  display: none;
+}
+
+table {
+  margin: 30px 0;
+  font-size: 1rem;
+}
+
+.textblock-right {
+  border-top: solid 1px #000;
+}
+
+.textblock-left {
+  border-top: 1px solid --main-color;
+}
+
+@media (max-width: 992px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+}
