@@ -45,7 +45,7 @@ export default {
             }
           }
         },
-
+/*
         {
           title: "Architecture",
           text_block: false,
