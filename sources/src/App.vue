@@ -20,8 +20,37 @@
 import PageBlock from "@/components/PageBlock.vue";
 import marked from 'marked';
 
-const introText = marked(`Robot Framework deserves a browser automation solution that's designed for the 2020s. \n\n Browser library powered by [Playwright](https://playwright.dev/) provides.\n\n 🚀 Speed, ✅ reliability and 🔬 visibility. \n\n
-    \n- Conscise assertions. \n- Precise and fast browser window and tab control. \n- Chainable selector strategies. \n- Good shadow DOM support.\n- Easy mobile device descriptors. \n- Sending HTTP requests. \n\n \n\n See [keyword documentation](https://marketsquare.github.io/robotframework-browser/Browser.html). \n\n Get it now with \`pip install robotframework-browser && rfbrowser init\` \n\n Join us for discussion and support at the [robotframework slack](https://robotframework-slack-invite.herokuapp.com) and [our github issues](https://github.com/MarketSquare/robotframework-browser/issues). \n\n Use. Benefit. Contribute. Lets make the best Browser library.`)
+const introText = marked(`
+Robot Framework deserves a browser automation solution that's designed for the 2020s.
+
+Browser library powered by <a href="https://playwright.dev/" target="_blank">Playwright</a> provides.
+
+🚀 Speed, ✅ reliability and 🔬 visibility. 
+
+
+- Conscise assertions. 
+- Precise and fast browser window and tab control. 
+- Chainable selector strategies. 
+- Good shadow DOM support.
+- Easy mobile device descriptors. 
+- Sending HTTP requests. 
+
+
+See <a href="https://marketsquare.github.io/robotframework-browser/Browser.html" target="_blank">keyword documentation</a> and our <a href="https://github.com/MarketSquare/robotframework-browser#robotframework-browser" target="_blank">project on Github</a>.
+
+
+Get it now!
+
+
+ 1. Install <a href="https://nodejs.org/en/download/" target="_blank">Node.js®</a>
+ 1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
+        > pip install robotframework-browser
+ 1. Initialize the Browser library:
+        > rfbrowser init
+
+Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">robotframework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>. 
+
+Use. Benefit. Contribute. Lets make the best Browser library.`)
 
 export default {
   components: {
@@ -303,6 +332,20 @@ export default {
               }
             ]
           }
+        },
+        {
+          title: "Keyword Docs",
+          text_block: true,
+          tab_box: false,
+          url: 'https://marketsquare.github.io/robotframework-browser/Browser.html',
+          feature_box: false
+        },
+        {
+          title: "Github Project",
+          text_block: true,
+          tab_box: false,
+          url: 'https://github.com/MarketSquare/robotframework-browser#robotframework-browser',
+          feature_box: false
         },
         {
           title: "Robot Framework",
