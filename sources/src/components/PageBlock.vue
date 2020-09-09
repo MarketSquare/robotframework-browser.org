@@ -24,8 +24,8 @@ This code was derived from https://github.com/robotframework/robotframework.gith
     <tab-box v-if="page.tab_box == true" :data="page.data.tabs"/>
     <user-box v-if="page.user_box == true" :data="page.data.users"/>
     <community-block v-if="page.community_block" :data="page.data.items"/>
-
-</section>
+    <contributor-block />    
+  </section>
 </template>
 
 <script>
@@ -34,6 +34,7 @@ import TabBox from "@/components/TabBox.vue";
 import TextBlock from "@/components/TextBlock.vue";
 import UserBox from "@/components/UserBox.vue";
 import CommunityBlock from "@/components/CommunityBlock.vue";
+import ContributorBlock from "@/components/ContributorBlock.vue"
 
 import Examples from "@/components/pages/Examples";
 
@@ -44,6 +45,7 @@ export default {
     TabBox,
     UserBox,
     CommunityBlock,
+    ContributorBlock,
     Examples
   },
   props: ["page"]

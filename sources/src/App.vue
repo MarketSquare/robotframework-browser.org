@@ -23,14 +23,16 @@ This code was derived from https://github.com/robotframework/robotframework.gith
      </div>
 
     <div class="col-md-10" id="scroller"
-    ref="content" style="position:relative;height:100vh;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling: touch;">
+        ref="content" style="position:relative;height:100vh;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling: touch;"
+    >
         <app-header/>
         <page-block v-for="(page, index) in pages.filter(page => page.data)"
           v-bind:page="page"
           v-bind:index="index"
           v-bind:key="index"
-          class="pl-md-5 px-lg-2 p-sm-3 py-2 p-xs-1"/>
-	  <!-- <app-footer class="mt-0 py-5"/> -->
+          class="pl-md-5 px-lg-2 p-sm-3 py-2 p-xs-1"
+        />
+	<app-footer class="mt-0 py-5"/>
       </div>
     </div>
 </template>

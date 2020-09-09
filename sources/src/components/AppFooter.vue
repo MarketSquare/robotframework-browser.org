@@ -23,7 +23,4 @@ This code was derived from https://github.com/robotframework/robotframework.gith
           <a href="/privacypolicy" class="row-header" style="position: absolute; right: 1rem; color: #eee;">Privacy Policy</a>
           <!--<div class="slogan"><a href="http://robotframework.org/" target="_blank">robotframework.org</a></div>-->
     </footer>
-
-
 </template>
-
