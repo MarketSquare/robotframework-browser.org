@@ -1,7 +1,7 @@
 .highlight {
   font-family: "Courier";
   line-height: 1.1rem;
-  font-size: 0.9rem;
+  font-size: .9rem;
   padding: 15px;
 }
 
@@ -12,7 +12,7 @@
 }
 
 .highlight {
-  background: #202020;
+  background: #002b36;
   color: #d0d0d0
 }
 

@@ -193,6 +193,11 @@ small.info::after {
   background-color: var(--main-color);
   color: #fff;
 }
+.feature-box code {
+    font-family: "Courier";
+    color: #ddd;
+    font-weight: normal;
+  }
 
 #nav_collapse .nav-item a {
   font-family: "OCRA";

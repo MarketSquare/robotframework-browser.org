@@ -45,7 +45,7 @@ export default {
             }
           }
         },
-/*
+
         {
           title: "Architecture",
           text_block: false,
@@ -58,23 +58,21 @@ export default {
               {
                 header: "🚀SPEED",
                 text:
-                  '<p> Robot Framework has a modular architecture that can be extended with bundled and self-made <a href="#libraries">libraries</a>. </p> <p> Data is defined in files using the syntax shown in the <a href="#examples">examples</a> below. A file containing tests or tasks creates a suite, and placing these files into directories creates a nested structure of suites. </p>'
+                  "<p> Robot Framework Browser is fast! With its direct API to the browsers, designed for high performance testing, fast feedback is now only limited by the speed of the test object. </p> <p>With its inovative Context concept, a clean browser session is started within a less than 10 milliseconds! </p><p> Learn more about <a href='https://marketsquare.github.io/robotframework-browser/Browser.html#Browser%2C%20Context%20and%20Page' target='_blank'>Browser/Contexts/Pages</a>. </p>Browser library is designed to run headless first and brings a ready-to-test docker image to scale your test environments with your needs.</p>"
               },
               {
                 header: "✅RELIABILITY",
                 text:
-                  "<p> When execution is started, the framework first parses the data. It then utilizes keywords provided by the libraries to interact with the target system. Libraries can communicate with the system either directly or using other tools as drivers. </p> <p> Test or task execution is started from the command line. As a result, you get a report and log in HTML format as well as an XML output. These provide an extensive look into what your system does. </p>"
+                  "<p><code>Wait Until ...</code> and <code>Sleep</code> keywords belong to the past. </p> <p> The browser library automatically waits for the elements of the page and interacts with them when they are ready for interaction. </p> <p>Flickering tests that are sometimes PASS and sometimes FAIL are drastically reduced and confidence in test automation increases!</p> <p>Find real errors instead of fixing your tests...</p> "
               },
               {
                 header: "🔬VISIBILITY",
-                img: require("@/assets/img/architecture.png"),
-                img_big: require("@/assets/img/architecture_big.png"),
-                text: ""
+                text: "<p> Robot Framework Browser utilizes a JavaScript based technology called Playwright. Playwright connects directly to the browsers API and has <b>full control</b> of the browser and its content. The Users has full access to all JavaScript object of the page and with the <code>Execute JavaScript</code> keyword you can directly manipulate them.</p> <p>Browser has also access to the Network Traffic between page and server and gives the user the possibility to interact with the server via HTTP calls from the same browser session.</p> <p>You have never been closer to your test object!</p>"
               }
             ]
           }
         },
-       {
+        {
           title: "Examples",
           text_block: false,
           tab_box: false,
