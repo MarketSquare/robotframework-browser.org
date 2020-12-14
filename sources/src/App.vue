@@ -43,15 +43,15 @@ Robot Framework deserves a browser automation solution that's designed for the 2
 
 Browser library powered by <a href="https://playwright.dev/" target="_blank">Playwright</a> provides.
 
-🚀 Speed, ✅ reliability and 🔬 visibility. 
+🚀 Speed, ✅ reliability and 🔬 visibility.
 
 
-- Conscise assertions. 
-- Precise and fast browser window and tab control. 
-- Chainable selector strategies. 
+- Conscise assertions.
+- Precise and fast browser window and tab control.
+- Chainable selector strategies.
 - Good shadow DOM support.
-- Easy mobile device descriptors. 
-- Sending HTTP requests. 
+- Easy mobile device descriptors.
+- Sending HTTP requests.
 
 
 See <a href="https://marketsquare.github.io/robotframework-browser/Browser.html" target="_blank">keyword documentation</a> and our <a href="https://github.com/MarketSquare/robotframework-browser#robotframework-browser" target="_blank">project on Github</a>.
@@ -66,7 +66,7 @@ Get it now!
  1. Initialize the Browser library:
         > rfbrowser init
 
-Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">robotframework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>. 
+Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">robotframework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>.
 
 Use. Benefit. Contribute. Lets make the best Browser library.`)
 
@@ -128,7 +128,7 @@ export default {
             //Different component, TODO: implement in reproducible component
           }
         },
-	
+
 	/*
         {
           title: "Documentation",
