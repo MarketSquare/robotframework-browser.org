@@ -352,6 +352,32 @@ export default {
           }
         },
         {
+          title: "Training",
+          text_block: true,
+          community_block: true,
+          feature_box: false,
+          data: {
+            text: {
+              header: "Training",
+              text: 'Learn to use the tool in a workshop.'
+            },
+            items: [
+              {
+                title: 'community',
+                items: [
+                  {
+                    img: require("@/assets/img/sponsors/reaktor.jpg"),
+                    title: 'Robot Framework Browser -työpaja 🇫🇮',
+                    href: 'https://forum.robotframework.org/c/libraries/browser',
+                    text: "Puolipäivää kestävän kurssin aikana tutustutaan Robot Framework Browser -kirjaston ominaisuuksiin tiiviinä pakettina."
+                  }
+                ]
+              }
+            ]
+          }
+        },
+
+        {
           title: "Keyword Docs",
           text_block: true,
           tab_box: false,
