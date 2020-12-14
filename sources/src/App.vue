@@ -368,7 +368,7 @@ export default {
                   {
                     img: require("@/assets/img/sponsors/reaktor.jpg"),
                     title: 'Robot Framework Browser -työpaja 🇫🇮',
-                    href: 'https://forum.robotframework.org/c/libraries/browser',
+                    href: 'https://www.reaktor.com/training/robot-framework-browser-tyopaja/',
                     text: "Puolipäivää kestävän kurssin aikana tutustutaan Robot Framework Browser -kirjaston ominaisuuksiin tiiviinä pakettina."
                   }
                 ]
