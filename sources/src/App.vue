@@ -92,6 +92,22 @@ export default {
             }
           }
         },
+        {
+          title: "RoboCon-Talk",
+          text_block: true,
+          tab_box: false,
+          member_box: false,
+          feature_box: false,
+          data: {
+            text: {
+              twitter: false,
+              header: "Intro-Talk",
+              text: `<p>Browser team gave this introduction talk at RoboCon 2021.</p>
+              <iframe  width=640 height=360 src="https://www.youtube-nocookie.com/embed/3BNVS6uiFeo" title="Browser-Intro-Talk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+              `
+            }
+          }
+        },
 
         {
           title: "Architecture",
