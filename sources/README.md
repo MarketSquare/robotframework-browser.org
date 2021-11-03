@@ -1,13 +1,13 @@
 # Robotframework sources
 
-> Robot Framework ecosystem front page sources
+> Robot Framework Browser front page sources
 
 ## Build Setup
 
 ``` bash
 
 # clone repo
-git clone https://github.com/robotframework/robotframework.github.com.git
+git clone https://github.com/robotframework-browser.org/robotframework-browser.org.git
 
 # go to sources folder
 cd sources
