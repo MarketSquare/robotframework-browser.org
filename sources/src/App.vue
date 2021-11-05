@@ -57,18 +57,73 @@ Browser library powered by <a href="https://playwright.dev/" target="_blank">Pla
 See <a href="https://marketsquare.github.io/robotframework-browser/Browser.html" target="_blank">keyword documentation</a> and our <a href="https://github.com/MarketSquare/robotframework-browser#robotframework-browser" target="_blank">project on Github</a>.
 
 
-Get it now!
+Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">robotframework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>.
 
+Use. Benefit. Contribute. Lets make the best Browser library.`)
 
+const installText = marked(`
+<h1>Dependecies</h1>
+
+Library installation requires both Python and NodeJs 
+ 1. Install <a href="https://www.python.org/downloads/" target="_blank">Python™</a>
  1. Install <a href="https://nodejs.org/en/download/" target="_blank">Node.js®</a>
+
+<h1>Installation</h1>
+Library can be installed in two different modes, each library installation will also include browser binaries or browser binaries
+are managed outside of the library. Example for CI installation, where enviroment may contain multiple library installation, it is beneficial 
+to manage browser binaries outside of the library installation. This will option saves disk space in the enviroment, because each enviroment contains
+only one set of browsers binaries. When installation is done for test case development, it is better to install browser binraries with
+the library.<br><br>
+
+Install library with browser binaries.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install robotframework-browser
  1. Initialize the Browser library:
         > rfbrowser init
 
-Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">robotframework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>.
+Install library when browsers binaries are installed separetly to non standart location.
+ 1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
+        > pip install robotframework-browser
+ 1. Initialize the Browser library and skip browsers installation:
+        > rfbrowser init --skip-browsers
+ 1. Install browser binaries separetly according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
+        > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
+ 1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
+        > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
 
-Use. Benefit. Contribute. Lets make the best Browser library.`)
+<h1>Update</h1>
+The update procedure depends on which way the library is installed, with out without the browser binaries.<br><br>
+
+Update library with browser binaries.
+ 1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
+        > pip install --upgrade robotframework-browser
+ 1. Clean old browser binaries and node dependecies:
+        > rfbrowser clean-node
+ 1. Initialize the Browser library with new node dependecies:
+        > rfbrowser init
+
+Update library when browsers binaries are installed separetly to non standart location.
+ 1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
+        > pip install --upgrade robotframework-browser
+ 1. Clean node dependecies:
+        > rfbrowser clean-node
+ 1. Initialize the Browser library with new node dependecies:
+        > rfbrowser init --skip-browsers
+ 1. Install browser binaries separetly according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
+        > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
+ 1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
+        > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
+
+<h1>Uninstall</h1>
+Uninstall procedure is same for both installation way, but if browser binaries are managed separetly, user must delete browser binaries manually.<br><br>
+
+ 1. Clean old browser binaries and node dependecies:
+        > rfbrowser clean-node
+ 1. Uninstall with pip:
+        > pip uninstall robotframework-browser
+ 1. If browser binaries are manages separetly, user must delete binaries manually, example:
+        > rm -rf $HOME/pw-browsers
+`)
 
 export default {
   components: {
@@ -88,6 +143,21 @@ export default {
               twitter: false,
               header: "Introduction",
               text: introText
+
+            }
+          }
+        },
+        {
+          title: "Installation",
+          text_block: true,
+          tab_box: false,
+          member_box: false,
+          feature_box: false,
+          data: {
+            text: {
+              twitter: false,
+              header: "Installation",
+              text: installText
 
             }
           }
