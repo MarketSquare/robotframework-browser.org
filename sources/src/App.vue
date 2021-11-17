@@ -62,7 +62,7 @@ Join us for discussion and support at the <a href="https://forum.robotframework.
 Use. Benefit. Contribute. Lets make the best Browser library.`)
 
 const installText = marked(`
-<h1>Dependecies</h1>
+<h1>Dependencies</h1>
 
 Library installation requires both Python and NodeJs 
  1. Install <a href="https://www.python.org/downloads/" target="_blank">Python™</a>
@@ -97,17 +97,17 @@ The update procedure depends on which way the library is installed, with out wit
 Update library with browser binaries.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install --upgrade robotframework-browser
- 1. Clean old browser binaries and node dependecies:
+ 1. Clean old browser binaries and node dependencies:
         > rfbrowser clean-node
- 1. Initialize the Browser library with new node dependecies:
+ 1. Initialize the Browser library with new node dependencies:
         > rfbrowser init
 
 Update library when browsers binaries are installed separetly to non standart location.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install --upgrade robotframework-browser
- 1. Clean node dependecies:
+ 1. Clean node dependencies:
         > rfbrowser clean-node
- 1. Initialize the Browser library with new node dependecies:
+ 1. Initialize the Browser library with new node dependencies:
         > rfbrowser init --skip-browsers
  1. Install browser binaries separetly according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
@@ -117,7 +117,7 @@ Update library when browsers binaries are installed separetly to non standart lo
 <h1>Uninstall</h1>
 Uninstall procedure is same for both installation way, but if browser binaries are managed separetly, user must delete browser binaries manually.<br><br>
 
- 1. Clean old browser binaries and node dependecies:
+ 1. Clean old browser binaries and node dependencies:
         > rfbrowser clean-node
  1. Uninstall with pip:
         > pip uninstall robotframework-browser
