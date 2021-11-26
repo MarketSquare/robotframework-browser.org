@@ -62,7 +62,7 @@ Join us for discussion and support at the <a href="https://forum.robotframework.
 Use. Benefit. Contribute. Lets make the best Browser library.`)
 
 const installText = marked(`
-<h1 id="dependencies">Dependecies</h1>
+<h1 id="dependencies">Dependencies</h1>
 
 Library installation requires both Python and NodeJs 
  1. Install <a href="https://www.python.org/downloads/" target="_blank">Python™</a>
