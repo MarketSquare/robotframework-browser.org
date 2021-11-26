@@ -62,13 +62,13 @@ Join us for discussion and support at the <a href="https://forum.robotframework.
 Use. Benefit. Contribute. Lets make the best Browser library.`)
 
 const installText = marked(`
-<h1>Dependecies</h1>
+<h1 id="dependencies">Dependecies</h1>
 
 Library installation requires both Python and NodeJs 
  1. Install <a href="https://www.python.org/downloads/" target="_blank">Python™</a>
  1. Install <a href="https://nodejs.org/en/download/" target="_blank">Node.js®</a>
 
-<h1>Installation</h1>
+<h1 id="installation">Installation</h1>
 Library can be installed in two different modes, each library installation will also include browser binaries or browser binaries
 are managed outside of the library. Example for CI installation, where enviroment may contain multiple library installation, it is beneficial 
 to manage browser binaries outside of the library installation. This will option saves disk space in the enviroment, because each enviroment contains
@@ -91,8 +91,8 @@ Install library when browsers binaries are installed separetly to non standart l
  1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
 
-<h1>Update</h1>
-The update procedure depends on which way the library is installed, with out without the browser binaries.<br><br>
+<h1 id="update">Update</h1>
+The update procedure depends on which way the library is installed, with or without the browser binaries.<br><br>
 
 Update library with browser binaries.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
@@ -102,7 +102,7 @@ Update library with browser binaries.
  1. Initialize the Browser library with new node dependecies:
         > rfbrowser init
 
-Update library when browsers binaries are installed separetly to non standart location.
+Update library when browsers binaries are installed separetly to non standard location.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install --upgrade robotframework-browser
  1. Clean node dependecies:
@@ -114,7 +114,7 @@ Update library when browsers binaries are installed separetly to non standart lo
  1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
 
-<h1>Uninstall</h1>
+<h1 id="uninstall">Uninstall</h1>
 Uninstall procedure is same for both installation way, but if browser binaries are managed separetly, user must delete browser binaries manually.<br><br>
 
  1. Clean old browser binaries and node dependecies:
