@@ -57,7 +57,7 @@ Browser library powered by <a href="https://playwright.dev/" target="_blank">Pla
 See <a href="https://marketsquare.github.io/robotframework-browser/Browser.html" target="_blank">keyword documentation</a> and our <a href="https://github.com/MarketSquare/robotframework-browser#robotframework-browser" target="_blank">project on Github</a>.
 
 
-Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">robotframework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>.
+Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">Robot Framework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>.
 
 Use. Benefit. Contribute. Lets make the best Browser library.`)
 
@@ -70,9 +70,9 @@ Library installation requires both Python and NodeJs
 
 <h1 id="installation">Installation</h1>
 Library can be installed in two different modes, each library installation will also include browser binaries or browser binaries
-are managed outside of the library. Example for CI installation, where enviroment may contain multiple library installation, it is beneficial 
-to manage browser binaries outside of the library installation. This will option saves disk space in the enviroment, because each enviroment contains
-only one set of browsers binaries. When installation is done for test case development, it is better to install browser binraries with
+are managed outside of the library. Example for CI installation, where environment may contain multiple library installation, it is beneficial 
+to manage browser binaries outside of the library installation. This will option saves disk space in the environment, because each environment contains
+only one set of browsers binaries. When installation is done for test case development, it is better to install browser binaries with
 the library.<br><br>
 
 Install library with browser binaries.
@@ -81,12 +81,12 @@ Install library with browser binaries.
  1. Initialize the Browser library:
         > rfbrowser init
 
-Install library when browsers binaries are installed separetly to non standart location.
+Install library when browsers binaries are installed separately to non standard location.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install robotframework-browser
  1. Initialize the Browser library and skip browsers installation:
         > rfbrowser init --skip-browsers
- 1. Install browser binaries separetly according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
+ 1. Install browser binaries separately according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
  1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
@@ -97,31 +97,31 @@ The update procedure depends on which way the library is installed, with or with
 Update library with browser binaries.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install --upgrade robotframework-browser
- 1. Clean old browser binaries and node dependecies:
+ 1. Clean old browser binaries and node dependencies:
         > rfbrowser clean-node
- 1. Initialize the Browser library with new node dependecies:
+ 1. Initialize the Browser library with new node dependencies:
         > rfbrowser init
 
-Update library when browsers binaries are installed separetly to non standard location.
+Update library when browsers binaries are installed separately to non standard location.
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install --upgrade robotframework-browser
- 1. Clean node dependecies:
+ 1. Clean node dependencies:
         > rfbrowser clean-node
- 1. Initialize the Browser library with new node dependecies:
+ 1. Initialize the Browser library with new node dependencies:
         > rfbrowser init --skip-browsers
- 1. Install browser binaries separetly according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
+ 1. Install browser binaries separately according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
  1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
 
 <h1 id="uninstall">Uninstall</h1>
-Uninstall procedure is same for both installation way, but if browser binaries are managed separetly, user must delete browser binaries manually.<br><br>
+Uninstall procedure is same for both installation way, but if browser binaries are managed separately, user must delete browser binaries manually.<br><br>
 
- 1. Clean old browser binaries and node dependecies:
+ 1. Clean old browser binaries and node dependencies:
         > rfbrowser clean-node
  1. Uninstall with pip:
         > pip uninstall robotframework-browser
- 1. If browser binaries are manages separetly, user must delete binaries manually, example:
+ 1. If browser binaries are manages separately, user must delete binaries manually, example:
         > rm -rf $HOME/pw-browsers
 `)
 
@@ -214,184 +214,6 @@ export default {
             //Different component, TODO: implement in reproducible component
           }
         },
-
-	/*
-        {
-          title: "Documentation",
-          text_block: true,
-          tab_box: true,
-          feature_box: false,
-          data: {
-            text: {
-              header: "Documentation",
-              text:
-                '<p> Want to get started? Looking for a way to do things? Here are the most important documentation resources needed to work with Robot Framework. Notice that individual <a href="#libraries">libraries</a> and <a href="#tools">tools</a> in the ecosystem have their own documentation that is typically accessed via their project pages. </p> <p> <a href="https://github.com/robotframework/robotframework.github.com" target="_blank">Let us know</a> if useful links are missing from the list. </p>'
-            },
-            tabs: [
-              {
-                title: "Getting started",
-                items: [
-                  {
-                    title: "Installation Instructions",
-                    href:
-                      "https://github.com/robotframework/robotframework/blob/master/INSTALL.rst",
-                    text:
-                      "If you are familiar with Python and pip, just run <code>pip install robotframework</code>. Notice that external libraries and tools need to be installed separately."
-                  },
-                  {
-                    title: "Introduction Slides",
-                    href:
-                      "http://www.slideshare.net/pekkaklarck/robot-framework-introduction",
-                    text: "Generic Robot Framework introduction slides."
-                  },
-                  {
-                    title: "Quick Start Guide",
-                    href:
-                      "https://github.com/robotframework/QuickStartGuide/blob/master/QuickStart.rst",
-                    text:
-                      "Introduces the most important features of Robot Framework and acts as an executable demo."
-                  },
-                  {
-                    title: "User Guide",
-                    href:
-                      "http://robotframework.org/robotframework/#user-guide",
-                    text:
-                      "Reference manual explaining all Robot Framework features in detail."
-                  },
-                  {
-                    title: "How to write good test cases",
-                    href:
-                      "https://github.com/robotframework/HowToWriteGoodTestCases/blob/master/HowToWriteGoodTestCases.rst",
-                    text:
-                      "Guidelines for writing good test cases using Robot Framework."
-                  },
-                  {
-                    title: "Dos And Don'ts",
-                    href:
-                      "http://www.slideshare.net/pekkaklarck/robot-framework-dos-and-donts",
-                    text:
-                      "Slide set loosely based on 'How to write good test cases' guidelines."
-                  },
-                  {
-                    title: "Public API",
-                    href: "http://robot-framework.readthedocs.org/en/latest/",
-                    text:
-                      "Public API for writing your own tools against Robot Framework."
-                  },
-                  {
-                    title: "Robohub",
-                    href: "https://hub.robocorp.com/robotic-process-automation/basics-of-rpa/",
-                    text:
-                      "RPA tutorials and guidelines"
-                  }
-                ]
-              },
-              {
-                title: "Demos",
-                items: [
-                  {
-                    title: "Web Demo",
-                    href: "https://github.com/robotframework/WebDemo",
-                    text:
-                      "Demonstrates how to create tests and higher level keywords. The system under test is a simple web page that is tested using SeleniumLibrary."
-                  },
-                  {
-                    title: "Robot Demo",
-                    href: "https://github.com/robotframework/RobotDemo",
-                    text:
-                      "Demonstrates how to create tests and test libraries. The system under test is a simple calculator that is tested using a custom library."
-                  },
-                  {
-                    title: "Quick Start Guide",
-                    href:
-                      "https://github.com/robotframework/QuickStartGuide/blob/master/QuickStart.rst",
-                    text:
-                      "Introduces the most important features of Robot Framework and acts as an executable demo."
-                  },
-                  {
-                    title: "ATDD with Robot Framework",
-                    href:
-                      "https://code.google.com/p/atdd-with-robot-framework/",
-                    text:
-                      "How to use Robot Framework for Acceptance Test Driven Development (ATDD) a.k.a. Specification by Example."
-                  },
-                  {
-                    title: "Using C with Robot Framework",
-                    href: "https://bitbucket.org/robotframework/cdemo",
-                    text:
-                      "This simple example demonstrates how to use C language from Robot Framework test libraries."
-                  },
-                  {
-                    title: "Remote interface demo",
-                    href: "https://github.com/jg8481/robotframework-scala-remote-library",
-                    text:
-                      "Example demonstrates how to use Robot Framework's <a href='https://github.com/robotframework/RemoteInterface' target='_blank'>Remote interface</a> to call test libraries written in any programming language."
-                  },
-                ]
-              },
-              {
-                title: "Videos",
-                items: [
-                  {
-                    src: "https://www.youtube.com/embed/T0SK5A1rwdk"
-                  },
-                  {
-                    src: "https://www.youtube.com/embed/LhUre0hu8I8"
-                  },
-                  {
-                    src: "https://www.youtube.com/embed/819sBbvT6gM"
-                  },
-                  {
-                    title: "",
-                    src: "//player.vimeo.com/video/93124154",
-                    href: "",
-                    text: ""
-                  },
-                  {
-                    title: "",
-                    src: "//player.vimeo.com/video/94638895",
-                    href: "",
-                    text: ""
-                  },
-                  {
-                    title: "",
-                    src: "//player.vimeo.com/video/96527858",
-                    href: "",
-                    text: ""
-                  },
-                  {
-                    title: "Much more at robocon.io!",
-                    href: "https://robocon.io/#previous-talks",
-                    text: ""
-                  }
-                ]
-              },
-              {
-                title: "Online courses",
-                items: [
-                  {
-                    title: "eTestingAcademy",
-                    href: "http://www.etestingacademy.com/",
-                    text:
-                      "Offers online courses to groom you from manual engineer to professional test automation developer with Selenium, Appium and Robot Framework."
-                  },
-                  {
-                    title: "Introduction to Robot Framework (FREE)",
-                    href: "https://testautomationu.applitools.com/robot-framework-tutorial/",
-                    text:
-                      "Want to learn Robot Framework? Learn the fundamentals in 1 hour with Test Automation University’s FREE course!"
-                  },
-                  {
-                    title: "Robotframeworktutorial.com",
-                    href: "http://www.robotframeworktutorial.com",
-                    text:
-                      "Offers several paid video training courses that have got 3000+ students in over 90 countries up and running very quickly."
-                  }
-                ]
-              }
-            ]
-          }
-        }, */
         {
           title: "Community",
           text_block: true,
@@ -400,7 +222,7 @@ export default {
           data: {
             text: {
               header: "Community",
-              text: "Join the Browser community and help us shape its deveopment."
+              text: "Join the Browser community and help us shape its development."
             },
             items: [
               {
@@ -417,21 +239,7 @@ export default {
                     title: 'Slack',
                     href: 'http://robotframework.slack.com',
 		            text: 'Community team chat. Get an <a href="https://rf-invite.herokuapp.com/" target="_blank">invite to the workspace.</a>. Then join <a href="https://robotframework.slack.com/#browser">our channel #browser</a>.'
-                  },
-		  /*
-                  {
-                    title: "@robotframework",
-                    href: "http://twitter.com/robotframework",
-                    text: "Announcements in Twitter."
-                  },
-                  {
-                    title: "Stack Overflow",
-                    href:
-                      "http://stackoverflow.com/questions/tagged/robotframework",
-                    text:
-                      "Questions in Stack Overflow tagged with Robot Framework."
-                  },
-		  */
+                  }
                 ]
               }
             ]
@@ -491,28 +299,6 @@ export default {
           url: 'https://playwright.dev/',
           feature_box: false
         },
-/* unnecessary sidebar stuff               {
-          title: "Forum",
-          text_block: true,
-          tab_box: false,
-          url: 'http://forum.robotframework.org',
-          feature_box: false
-        },
-        {
-          title: "Shop",
-          text_block: true,
-          tab_box: false,
-          url: 'https://reddyshop.co/robotframework/',
-          feature_box: false
-        },
-        {
-          title: "RPA",
-          text_block: true,
-          tab_box: false,
-          url: 'https://robotframework.org/rpa/',
-          feature_box: false
-        }
-	*/
       ]
     };
   }
