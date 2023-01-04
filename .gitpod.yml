@@ -1,5 +1,5 @@
 tasks:
-  - init: cd sources && npm install && npm run dev
+  - init: npm install --prefix ./sources && npm run dev --prefix ./sources
 vscode:
   extensions:
     - octref.vetur
