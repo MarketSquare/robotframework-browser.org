@@ -46,11 +46,11 @@ Browser library powered by <a href="https://playwright.dev/" target="_blank">Pla
 🚀 Speed, ✅ reliability and 🔬 visibility.
 
 
-- Conscise assertions.
+- Conscientious assertions.
 - Precise and fast browser window and tab control.
 - Chainable selector strategies.
 - Good shadow DOM support.
-- Easy mobile device descriptors.
+- Simple descriptors for mobile devices.
 - Sending HTTP requests.
 
 
