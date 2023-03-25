@@ -46,19 +46,14 @@ Browser library powered by <a href="https://playwright.dev/" target="_blank">Pla
 🚀 Speed, ✅ reliability and 🔬 visibility.
 
 
-- Conscientious [assertions]
-- Fast yet precise browser [window and tab control]
-- [Chainable selector strategies]
-- Good [shadow DOM support]
-- [Simple descriptors] for mobile devices
-- Ability to [send HTTP requests]
-
-[assertions]: https://marketsquare.github.io/robotframework-browser/Browser.html#Assertions
-[window and tab control]: https://marketsquare.github.io/robotframework-browser/Browser.html#Pages
-[Chainable selector strategies]: https://marketsquare.github.io/robotframework-browser/Browser.html#Cascaded%20selector%20syntax
-[shadow DOM support]: https://marketsquare.github.io/robotframework-browser/Browser.html#WebComponents%20and%20Shadow%20DOM
-[Simple descriptors]: https://marketsquare.github.io/robotframework-browser/Browser.html#Get%20Device
-[send HTTP requests]: https://marketsquare.github.io/robotframework-browser/Browser.html#Http
+<ul>
+<li>Conscientious <a href="https://marketsquare.github.io/robotframework-browser/Browser.html#Assertions" target="_blank">assertions</a></li>
+<li>Fast yet precise browser <a href="https://marketsquare.github.io/robotframework-browser/Browser.html#Pages" target="_blank">window and tab control</a></li>
+<li><a href="https://marketsquare.github.io/robotframework-browser/Browser.html#Cascaded%20selector%20syntax" target="_blank">Chainable selector strategies</a></li>
+<li>Good <a href="https://marketsquare.github.io/robotframework-browser/Browser.html#WebComponents%20and%20Shadow%20DOM" target="_blank">shadow DOM support</a></li>
+<li><a href="https://marketsquare.github.io/robotframework-browser/Browser.html#Get%20Device" target="_blank">Simple descriptors</a> for mobile devices</li>
+<li>Ability to <a href="https://marketsquare.github.io/robotframework-browser/Browser.html#Http" target="_blank">send HTTP requests</a></li>
+</ul>
 
 See the <a href="https://marketsquare.github.io/robotframework-browser/Browser.html" target="_blank">keyword documentation</a> and our <a href="https://github.com/MarketSquare/robotframework-browser#robotframework-browser" target="_blank">project on Github</a>.
 
