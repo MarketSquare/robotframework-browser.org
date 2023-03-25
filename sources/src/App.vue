@@ -46,13 +46,19 @@ Browser library powered by <a href="https://playwright.dev/" target="_blank">Pla
 🚀 Speed, ✅ reliability and 🔬 visibility.
 
 
-- Conscientious assertions
-- Fast yet precise browser window and tab control
-- Chainable selector strategies
-- Good shadow DOM support
-- Simple descriptors for mobile devices
-- Ability to send HTTP requests
+- Conscientious [assertions]
+- Fast yet precise browser [window and tab control]
+- [Chainable selector strategies]
+- Good [shadow DOM support]
+- [Simple descriptors] for mobile devices
+- Ability to [send HTTP requests]
 
+[assertions]: https://marketsquare.github.io/robotframework-browser/Browser.html#Assertions
+[window and tab control]: https://marketsquare.github.io/robotframework-browser/Browser.html#Pages
+[Chainable selector strategies]: https://marketsquare.github.io/robotframework-browser/Browser.html#Cascaded%20selector%20syntax
+[shadow DOM support]: https://marketsquare.github.io/robotframework-browser/Browser.html#WebComponents%20and%20Shadow%20DOM
+[Simple descriptors]: https://marketsquare.github.io/robotframework-browser/Browser.html#Get%20Device
+[send HTTP requests]: https://marketsquare.github.io/robotframework-browser/Browser.html#Http
 
 See the <a href="https://marketsquare.github.io/robotframework-browser/Browser.html" target="_blank">keyword documentation</a> and our <a href="https://github.com/MarketSquare/robotframework-browser#robotframework-browser" target="_blank">project on Github</a>.
 
