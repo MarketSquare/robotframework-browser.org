@@ -80,16 +80,20 @@ only one set of browsers binaries. When installation is done for test case devel
 <br/>
 
 ## All together
-To install <em>with</em> browser binaries...
+<details open><summary>To install <em>with</em> browser binaries...</summary>
+
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install robotframework-browser
  1. Initialize the Browser library:
         > rfbrowser init
 
-<!-- TODO: I'd say that explaining the both processes in detail isn't a *front-page* activity. Instead, what if we wrapped up the details so that the people that need them can reach them, but the majority who don't can move on. -->
+</details>
+<br/>
 
 ## Separate
-To install browser binaries <em>separately</em>...
+<details><summary>To install browser binaries <em>separately</em>...
+</summary>
+
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install robotframework-browser
  1. Initialize the Browser library and skip browsers installation:
@@ -99,8 +103,12 @@ To install browser binaries <em>separately</em>...
  1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
 
+</details>
+<br/>
+
 <h1 id="update">Updating</h1>
-The update procedure depends on which way the library is installed, with or without the browser binaries.<br><br>
+<details><summary>The update procedure depends on which way the library is installed, with or without the browser binaries...</summary>
+<br/>
 
 ## All together
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
@@ -120,10 +128,14 @@ The update procedure depends on which way the library is installed, with or with
  1. Install browser binaries separately according <a href="https://playwright.dev/docs/browsers/#installing-browsers" target="_blank">Playwright</a> instructions. Example:
         > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
  1. Run test with PLAYWRIGHT_BROWSERS_PATH set. Example:
-        > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test
+        > PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers robot path/to/test</details>
+</details>
+<br/>
+
 
 <h1 id="uninstall">Uninstalling</h1>
-Uninstall procedure is the same for both installation methods (but if browser binaries are managed separately, user must delete browser binaries manually).<br><br>
+
+<details><summary>The uninstall procedure is the same for both installation methods...</summary> (but if browser binaries are managed separately, user must delete browser binaries manually).<br><br>
 
  1. Clean old browser binaries and node dependencies:
         > rfbrowser clean-node
