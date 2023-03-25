@@ -61,11 +61,11 @@ export default {
       items: [
         {
           text:
-            '<p> New up-to-date keyword design make Browser library intuitive to use and fast to design. </p>'
+            '<p> New up-to-date keyword design makes Browser library intuitive to use and fast to design with. </p>'
         },
         {
           text:
-            '<p> The Browser class can also be used directly from Python. You can design you own Robot Framework Libraries by using Browser internally or create your own Python based Test with a framework like PyTest. </p> <p> It is designed to support the user as much as possible within a Python IDE with typehints, enum types and code completion. </p>'
+            '<p> The Browser class can also be used directly from Python. You can design your own Robot Framework Libraries by using Browser internally or create your own Python based Test with a framework like PyTest. </p> <p> It is designed to support the user as much as possible within a Python IDE with typehints, enum types and code completion. </p>'
         }
       ]
     };

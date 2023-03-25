@@ -59,7 +59,7 @@ See the <a href="https://marketsquare.github.io/robotframework-browser/Browser.h
 
 Join us for discussion and support at the <a href="https://forum.robotframework.org/c/libraries/browser" target="_blank">Robot Framework forum</a> and <a href="https://github.com/MarketSquare/robotframework-browser/issues" target="_blank">our GitHub issues</a>.
 
-Use. Benefit. Contribute. Lets make the best Browser library.`)
+Use. Benefit. Contribute. Let's make the best Browser library.`)
 
 const installText = marked(`
 <h1 id="dependencies">Dependencies</h1>
@@ -69,17 +69,21 @@ Library installation requires both Python and Node.js®
  1. Install <a href="https://nodejs.org/en/download/" target="_blank">Node.js®</a>
 
 <h1 id="installation">Installing</h1>
-The Browser library can be installed in two different modes. Either the library installation will <em>include</em> browser binaries or they can be managed <em>outside</em> of the library. <br/>
 
+The Browser library can be installed in two different modes. 
 
-<details><summary>When would I want them separate?</summary>
+While **developing**, having the browser binaries **bundled** with the library makes sense.
+
+In **production**, it might make more sense to have them **separate**. 
+
+<details><summary>Why might separate be better in production?</summary>
 For example, in a <abbr title="Continuous Integration">CI</abbr> installation, where the environment may contain multiple library installations, it is beneficial 
 to manage browser binaries outside of the library installation. This allows you to save disk space in the environment, because each environment contains
-only one set of browsers binaries. When installation is done for test case development, it is better to install browser binaries with the library.<br><br>
+only one set of browser binaries. When installation is done for test case development, it is better to install browser binaries with the library.<br><br>
 </details>
 <br/>
 
-## All together
+## Bundled
 <details open><summary>To install <em>with</em> browser binaries...</summary>
 
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
@@ -110,7 +114,7 @@ only one set of browsers binaries. When installation is done for test case devel
 <details><summary>The update procedure depends on which way the library is installed, with or without the browser binaries...</summary>
 <br/>
 
-## All together
+## Bundled
  1. Install Browser library from <a href="https://pypi.org/search/?q=robotframework-browser" target="_blank">PyPi</a> with pip:
         > pip install --upgrade robotframework-browser
  1. Clean old browser binaries and node dependencies:
@@ -135,13 +139,13 @@ only one set of browsers binaries. When installation is done for test case devel
 
 <h1 id="uninstall">Uninstalling</h1>
 
-<details><summary>The uninstall procedure is the same for both installation methods...</summary> (but if browser binaries are managed separately, user must delete browser binaries manually).<br><br>
+<details><summary>The uninstall procedure is the same for both installation methods...</summary> (but if browser binaries are managed separately, the user must delete browser binaries manually).<br><br>
 
  1. Clean old browser binaries and node dependencies:
         > rfbrowser clean-node
  1. Uninstall with pip:
         > pip uninstall robotframework-browser
- 1. If browser binaries are manages separately, user must delete binaries manually, example:
+ 1. If browser binaries are managed separately, the user must delete binaries manually. Example:
         > rm -rf $HOME/pw-browsers
 `)
 
@@ -192,7 +196,7 @@ export default {
             text: {
               twitter: false,
               header: "Intro-Talk",
-              text: `<p>Browser team gave this introduction talk at RoboCon 2021.</p>
+              text: `<p>The Browser team gave this introduction talk at RoboCon 2021.</p>
               <iframe  width=640 height=360 src="https://www.youtube-nocookie.com/embed/3BNVS6uiFeo" title="Browser-Intro-Talk" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
               `
             }
@@ -211,16 +215,16 @@ export default {
               {
                 header: "🚀SPEED",
                 text:
-                  "<p>Robot Framework's Browser library is fast! With its direct API to your browser, designed for high performance testing, fast feedback is now only limited by the speed of the test object.</p> <p>With its innovative Context concept, a clean browser session is started within less than 10 milliseconds! </p><p>Learn more about <a href='https://marketsquare.github.io/robotframework-browser/Browser.html#Browser%2C%20Context%20and%20Page' target='_blank'>Browser/Contexts/Pages</a>. </p>Browser library is designed to run headless first and brings a ready-to-test docker image to scale your test environments with your needs.</p>"
+                  "<p>Robot Framework's Browser library is fast! With its direct API to your browser, designed for high performance testing, fast feedback is now only limited by the speed of the test object.</p> <p>With its innovative Context concept, a clean browser session starts within less than 10 milliseconds! </p><p>Learn more about <a href='https://marketsquare.github.io/robotframework-browser/Browser.html#Browser%2C%20Context%20and%20Page' target='_blank'>Browser/Contexts/Pages</a>. </p>Browser library is designed to run headless first and brings a ready-to-test docker image to scale your test environments with your needs.</p>"
               },
               {
                 header: "✅RELIABILITY",
                 text:
-                  "<p>The <code>Wait Until</code> and <code>Sleep</code> keywords belong to the past.</p> <p>The Browser library automatically waits for the elements of the page and interacts with them when they are ready for interaction.</p> <p>Flaky tests, that sometimes PASS and sometimes FAIL, are drastically reduced and confidence in test automation increases!</p> <p>Find real errors instead of fixing your tests...</p> "
+                  "<p>The <code>Wait Until</code> and <code>Sleep</code> keywords belong to the past.</p> <p>The Browser library automatically waits for the elements of the page and interacts with them when they are ready for interaction.</p> <p>Flaky tests, that sometimes PASS and sometimes FAIL, are drastically reduced and confidence in test automation increases!</p> <p>Find real errors instead of fixing your tests.</p> "
               },
               {
                 header: "🔬VISIBILITY",
-                text: "<p>Robot Framework's Browser library utilizes a JavaScript-based technology called Playwright. Playwright connects directly to the browser's API and has <b>full control</b> of the browser and its content. The user has full access to all JavaScript objects on the page and with the <code>Execute JavaScript</code> keyword you can directly manipulate them.</p> <p>Browser also has access to the Network Traffic between page and server and gives the user the possibility to interact with the server via HTTP calls from the same browser session.</p> <p>You have never been closer to your test object!</p>"
+                text: "<p>Robot Framework's Browser library utilizes a JavaScript-based technology called Playwright. Playwright connects directly to the browser's API and has <b>full control</b> of the browser and its content. With the <code>Execute JavaScript</code> keyword you can directly manipulate and access all JavaScript objects on the page.</p> <p>Browser also has access to the Network Traffic between page and server and gives the user the possibility to interact with the server via HTTP calls from the same browser session.</p> <p>You have never been closer to your test object!</p>"
               }
             ]
           }
