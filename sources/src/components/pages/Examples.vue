@@ -88,14 +88,13 @@ This code was derived from https://github.com/robotframework/robotframework.gith
 
 
 <span class="gh">*** Test Cases ***</span>
-<span class="gu">Test Eight Components</span>
-<span class="p">    </span><span class="nf">New Browser</span><span class="p">    </span><span class="s">chromium</span><span class="p">    </span><span class="s">headless=No</span>
-<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://www.selenium.dev/selenium/web/web-form.html</span>
-<span class="p">    </span><span class="nf">Set Browser Timeout</span><span class="p">    </span><span class="s">0.5 sec</span>
-<span class="p">    </span><span class="nf">Get Title</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Web form</span>
-<span class="p">    </span><span class="nf">Type Text</span><span class="p">    </span><span class="s">[name=&quot;my-text&quot;]</span><span class="p">    </span><span class="s">Selenium</span>
-<span class="p">    </span><span class="nf">Click</span><span class="p">    </span><span class="s">button</span>
-<span class="p">    </span><span class="nf">Get Text</span><span class="p">    </span><span class="s">id=message</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Received!</span>
+<span class="gu">My First Test</span>
+<span class="p">    [</span><span class="kn">Documentation</span><span class="p">]    </span><span class="s">Gets, types and asserts</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://example.cypress.io</span>
+<span class="p">    </span><span class="nf">Click</span><span class="p">    </span><span class="s">&quot;type&quot;</span>
+<span class="p">    </span><span class="nf">Get Url</span><span class="p">    </span><span class="s">*=</span><span class="p">    </span><span class="s">/commands/actions</span>
+<span class="p">    </span><span class="nf">Type Text</span><span class="p">    </span><span class="s">.action-email</span><span class="p">    </span><span class="s">fake@email.com</span>
+<span class="p">    </span><span class="nf">Get Text</span><span class="p">     </span><span class="s">.action-email</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">fake@email.com</span>
 </pre></div>
           </b-tab>
           <b-tab title="Example 2 with Cypress">
