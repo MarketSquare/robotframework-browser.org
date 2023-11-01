@@ -148,21 +148,6 @@ export default {
           }
         },
         {
-          title: "Installation",
-          text_block: true,
-          tab_box: false,
-          member_box: false,
-          feature_box: false,
-          data: {
-            text: {
-              twitter: false,
-              header: "Installation",
-              text: installText
-
-            }
-          }
-        },
-        {
           title: "RoboCon-Talk",
           text_block: true,
           tab_box: false,
@@ -246,30 +231,45 @@ export default {
           }
         },
         {
-          title: "Training",
+          title: "Installation",
           text_block: true,
-          community_block: true,
+          tab_box: false,
+          member_box: false,
           feature_box: false,
           data: {
             text: {
-              header: "Training",
-              text: 'Learn to use the tool in a workshop.'
-            },
-            items: [
-              {
-                title: 'community',
-                items: [
-                  {
-                    img: require("@/assets/img/sponsors/reaktor.jpg"),
-                    title: 'Robot Framework Browser -työpaja 🇫🇮',
-                    href: 'https://www.reaktor.com/training/robot-framework-browser-tyopaja/',
-                    text: "Puolipäivää kestävän kurssin aikana tutustutaan Robot Framework Browser -kirjaston ominaisuuksiin tiiviinä pakettina."
-                  }
-                ]
-              }
-            ]
+              twitter: false,
+              header: "Installation",
+              text: installText
+
+            }
           }
         },
+        // {
+        //   title: "Training",
+        //   text_block: true,
+        //   community_block: true,
+        //   feature_box: false,
+        //   data: {
+        //     text: {
+        //       header: "Training",
+        //       text: 'Learn to use the tool in a workshop.'
+        //     },
+        //     items: [
+        //       {
+        //         title: 'community',
+        //         items: [
+        //           {
+        //             img: require("@/assets/img/sponsors/imbus.png"),
+        //             title: 'Robot Framework Browser -työpaja 🇫🇮',
+        //             href: 'https://www.reaktor.com/training/robot-framework-browser-tyopaja/',
+        //             text: "Puolipäivää kestävän kurssin aikana tutustutaan Robot Framework Browser -kirjaston ominaisuuksiin tiiviinä pakettina."
+        //           }
+        //         ]
+        //       }
+        //     ]
+        //   }
+        // },
 
         {
           title: "Keyword Docs",

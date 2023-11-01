@@ -23,20 +23,194 @@ This code was derived from https://github.com/robotframework/robotframework.gith
     <div class="row">
     
       <div class="col-md-12 order-md-2 order-lg-1">
+        <b-tabs cards pills class="nav-fill card " v-model="tabIndex" @input="changeTabText(tabIndex)">
+          <b-tab title="Example 1 with Robot Framework">
+            <div class="highlight"><pre><span></span><span class="gh">*** Settings ***</span>
+<span class="kn">Library</span><span class="p">    </span><span class="nn">Browser</span>
+
+
+<span class="gh">*** Test Cases ***</span>
+<span class="gu">Has Title</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://playwright.dev/</span>
+<span class="p">    </span><span class="nf">Get Title</span><span class="p">    </span><span class="s">contains</span><span class="p">    </span><span class="s">Playwright</span>
+
+<span class="gu">Get Started Link</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://playwright.dev/</span>
+<span class="p">    ${</span><span class="nv">element</span><span class="p">}=    </span><span class="nf">Get Element By Role</span><span class="p">    </span><span class="s">LINK</span><span class="p">    </span><span class="s">name=Get started</span>
+<span class="p">    </span><span class="nf">Click</span><span class="p">    ${</span><span class="nv">element</span><span class="p">}</span>
+<span class="p">    ${</span><span class="nv">heading</span><span class="p">}=    </span><span class="nf">Get Element By Role</span><span class="p">    </span><span class="s">HEADING</span><span class="p">    </span><span class="s">name=Installation</span>
+<span class="p">    </span><span class="nf">Get Element States</span><span class="p">    ${</span><span class="nv">heading</span><span class="p">}    </span><span class="s">contains</span><span class="p">    </span><span class="s">visible</span>
+
+<span class="gu">Get Started Link [Alternative]</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://playwright.dev/</span>
+<span class="p">    </span><span class="nf">Click</span><span class="p">    </span><span class="s">a &gt;&gt; &quot;Get started&quot;</span>
+<span class="p">    </span><span class="nf">Get Element States</span><span class="p">    </span><span class="s">h1 &gt;&gt; &quot;Installation&quot;</span><span class="p">    </span><span class="s">contains</span><span class="p">    </span><span class="s">visible</span>
+
+<span class="gu">Playwright Test</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://playwright.dev/</span>
+<span class="p">    </span><span class="nf">Get Title</span><span class="p">    </span><span class="s">matches</span><span class="p">   </span><span class="s">Playwright</span>
+<span class="p">    </span><span class="nf">Get Attribute</span><span class="p">    </span><span class="s">&quot;Get started&quot;</span><span class="p">    </span><span class="s">href</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">/docs/intro</span>
+<span class="p">    </span><span class="nf">Click</span><span class="p">    </span><span class="s">&quot;Get started&quot;</span>
+<span class="p">    </span><span class="nf">Get Url</span><span class="p">    </span><span class="s">matches</span><span class="p">    </span><span class="s">.*intro</span>
+</pre></div>
+          </b-tab>
+          <b-tab title="Example 1 with Playwright">
+            <div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">test</span><span class="p">,</span><span class="w"> </span><span class="nx">expect</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;@playwright/test&#39;</span><span class="p">;</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">&#39;has title&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">&#39;https://playwright.dev/&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">).</span><span class="nx">toHaveTitle</span><span class="p">(</span><span class="sr">/Playwright/</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">&#39;get started link&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">&#39;https://playwright.dev/&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">&#39;link&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Get started&#39;</span><span class="w"> </span><span class="p">}).</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">getByRole</span><span class="p">(</span><span class="s1">&#39;heading&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;Installation&#39;</span><span class="w"> </span><span class="p">})).</span><span class="nx">toBeVisible</span><span class="p">();</span>
+<span class="p">});</span>
+
+<span class="nx">test</span><span class="p">(</span><span class="s1">&#39;Playwright Test&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="p">({</span><span class="w"> </span><span class="nx">page</span><span class="w"> </span><span class="p">})</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="kr">goto</span><span class="p">(</span><span class="s1">&#39;https://playwright.dev/&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">).</span><span class="nx">toHaveTitle</span><span class="p">(</span><span class="sr">/Playwright/</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">getStarted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">page</span><span class="p">.</span><span class="nx">getByText</span><span class="p">(</span><span class="s1">&#39;Get started&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">getStarted</span><span class="p">).</span><span class="nx">toHaveAttribute</span><span class="p">(</span><span class="s1">&#39;href&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;/docs/intro&#39;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">getStarted</span><span class="p">.</span><span class="nx">click</span><span class="p">();</span>
+<span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">expect</span><span class="p">(</span><span class="nx">page</span><span class="p">).</span><span class="nx">toHaveURL</span><span class="p">(</span><span class="sr">/.*intro/</span><span class="p">);</span>
+<span class="p">});</span>
+</pre></div>
+          </b-tab>
+        </b-tabs>
+        </div>
+        <div class="col-md-12 order-md-2 order-lg-1">
           <b-tabs cards pills class="nav-fill card " v-model="tabIndex" @input="changeTabText(tabIndex)">
+          <b-tab title="Example 2 with Robot Framework">
+            <div class="highlight"><pre><span></span><span class="gh">*** Settings ***</span>
+<span class="kn">Library</span><span class="p">     </span><span class="nn">Browser</span>
 
 
-          <b-tab title="Testing with Robot Framework">
-            <pre class="highlight">
-                <div style="color: #bbbbbb;background-color: #002b36;font-family: Menlo, Monaco, 'Courier New', monospace;font-weight: normal;line-height: 18px;white-space: pre;"><div><span style="color: #cb4b16;">*** Settings ***</span></div><div><span style="color: #93a1a1;font-weight: bold;">Library</span><span style="color: #bbbbbb;">   </span><span style="color: #6c71c4;">Browser</span></div><br><div><span style="color: #cb4b16;">*** Test Cases ***</span></div><div><span style="color: #268bd2;">Example Test</span></div><div><span style="color: #bbbbbb;">    New Page</span><span style="color: #2aa198;">    https://playwright.dev</span></div><div><span style="color: #bbbbbb;">    Get Text</span><span style="color: #2aa198;">    h1    ==    🎭 Playwright</span></div></div>
-            </pre>
+<span class="gh">*** Test Cases ***</span>
+<span class="gu">Test Eight Components</span>
+<span class="p">    </span><span class="nf">New Browser</span><span class="p">    </span><span class="s">chromium</span><span class="p">    </span><span class="s">headless=No</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://www.selenium.dev/selenium/web/web-form.html</span>
+<span class="p">    </span><span class="nf">Set Browser Timeout</span><span class="p">    </span><span class="s">0.5 sec</span>
+<span class="p">    </span><span class="nf">Get Title</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Web form</span>
+<span class="p">    </span><span class="nf">Type Text</span><span class="p">    </span><span class="s">[name=&quot;my-text&quot;]</span><span class="p">    </span><span class="s">Selenium</span>
+<span class="p">    </span><span class="nf">Click</span><span class="p">    </span><span class="s">button</span>
+<span class="p">    </span><span class="nf">Get Text</span><span class="p">    </span><span class="s">id=message</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Received!</span>
+</pre></div>
           </b-tab>
-          <b-tab title="Testing with Python">
-            <pre class="highlight">
-               <div style="color: #bbbbbb;background-color: #002b36;font-family: Menlo, Monaco, 'Courier New', monospace;font-weight: normal;line-height: 18px;white-space: pre;"><div><span style="color: #859900;">from</span><span style="color: #bbbbbb;"> Browser </span><span style="color: #859900;">import</span><span style="color: #bbbbbb;"> Browser</span></div><div><span style="color: #859900;">from</span><span style="color: #bbbbbb;"> Browser.utils.data_types </span><span style="color: #859900;">import</span><span style="color: #bbbbbb;"> SupportedBrowsers</span></div><br><div><span style="color: #bbbbbb;">b </span><span style="color: #859900;">=</span><span style="color: #bbbbbb;"> Browser(timeout</span><span style="color: #859900;">=</span><span style="color: #2aa198;">"20 s"</span><span style="color: #bbbbbb;">, retry_assertions_for</span><span style="color: #859900;">=</span><span style="color: #2aa198;">"500 ms"</span><span style="color: #bbbbbb;">)</span></div><div><span style="color: #bbbbbb;">b.new_browser(browser</span><span style="color: #859900;">=</span><span style="color: #bbbbbb;">SupportedBrowsers.chromium)</span></div><div><span style="color: #bbbbbb;">b.new_context(</span></div><div><span style="color: #bbbbbb;">    acceptDownloads</span><span style="color: #859900;">=</span><span style="color: #b58900;">True</span><span style="color: #bbbbbb;">,</span></div><div><span style="color: #bbbbbb;">    viewport</span><span style="color: #859900;">=</span><span style="color: #bbbbbb;">{</span><span style="color: #2aa198;">"width"</span><span style="color: #bbbbbb;">: </span><span style="color: #d33682;">1920</span><span style="color: #bbbbbb;">, </span><span style="color: #2aa198;">"height"</span><span style="color: #bbbbbb;">: </span><span style="color: #d33682;">1080</span><span style="color: #bbbbbb;">},</span></div><div><span style="color: #bbbbbb;">    httpCredentials</span><span style="color: #859900;">=</span><span style="color: #bbbbbb;">{</span><span style="color: #2aa198;">"username"</span><span style="color: #bbbbbb;">: </span><span style="color: #2aa198;">"admin"</span><span style="color: #bbbbbb;">, </span><span style="color: #2aa198;">"password"</span><span style="color: #bbbbbb;">: </span><span style="color: #2aa198;">"123456"</span><span style="color: #bbbbbb;">},</span></div><div><span style="color: #bbbbbb;">)</span></div><div><span style="color: #bbbbbb;">b.new_page(</span><span style="color: #2aa198;">"https://playwright.dev"</span><span style="color: #bbbbbb;">)</span></div><div><span style="color: #859900;">assert</span><span style="color: #bbbbbb;"> b.get_text(</span><span style="color: #2aa198;">"h1"</span><span style="color: #bbbbbb;">) </span><span style="color: #859900;">==</span><span style="color: #bbbbbb;"> </span><span style="color: #2aa198;">"🎭 Playwright"</span></div><div><span style="color: #bbbbbb;">b.close_browser()</span></div><br></div>
-            </pre>
+          <b-tab title="Example 2 with Cypress">
+            <div class="highlight"><pre><span></span><span class="nx">describe</span><span class="p">(</span><span class="s1">&#39;My First Test&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">it</span><span class="p">(</span><span class="s1">&#39;Gets, types and asserts&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">cy</span><span class="p">.</span><span class="nx">visit</span><span class="p">(</span><span class="s1">&#39;https://example.cypress.io&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="nx">cy</span><span class="p">.</span><span class="nx">contains</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">).</span><span class="nx">click</span><span class="p">()</span>
+<span class="w">      </span><span class="nx">cy</span><span class="p">.</span><span class="nx">url</span><span class="p">().</span><span class="nx">should</span><span class="p">(</span><span class="s1">&#39;include&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;/commands/actions&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="nx">cy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;.action-email&#39;</span><span class="p">).</span><span class="nx">type</span><span class="p">(</span><span class="s1">&#39;fake@email.com&#39;</span><span class="p">)</span>
+<span class="w">      </span><span class="nx">cy</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;.action-email&#39;</span><span class="p">).</span><span class="nx">should</span><span class="p">(</span><span class="s1">&#39;have.value&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;fake@email.com&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">  </span><span class="p">})</span>
+</pre></div>
           </b-tab>
+        </b-tabs>
+        </div>
+        <div class="col-md-12 order-md-2 order-lg-1">
+          <b-tabs cards pills class="nav-fill card " v-model="tabIndex" @input="changeTabText(tabIndex)">
+          <b-tab title="Example 3 with Robot Framework">
+            <div class="highlight"><pre><span></span><span class="gh">*** Settings ***</span>
+<span class="kn">Library</span><span class="p">     </span><span class="nn">Browser</span>
 
+
+<span class="gh">*** Test Cases ***</span>
+<span class="gu">Test Eight Components</span>
+<span class="p">    </span><span class="nf">New Browser</span><span class="p">    </span><span class="s">chromium</span><span class="p">    </span><span class="s">headless=No</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://www.selenium.dev/selenium/web/web-form.html</span>
+<span class="p">    </span><span class="nf">Set Browser Timeout</span><span class="p">    </span><span class="s">0.5 sec</span>
+<span class="p">    </span><span class="nf">Get Title</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Web form</span>
+<span class="p">    </span><span class="nf">Type Text</span><span class="p">    </span><span class="s">[name=&quot;my-text&quot;]</span><span class="p">    </span><span class="s">Selenium</span>
+<span class="p">    </span><span class="nf">Click</span><span class="p">    </span><span class="s">button</span>
+<span class="p">    </span><span class="nf">Get Text</span><span class="p">    </span><span class="s">id=message</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Received!</span>
+</pre></div>
+          </b-tab>
+          <b-tab title="Example 3 with Selenium (Python)">
+            <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
+
+
+<span class="k">def</span> <span class="nf">test_eight_components</span><span class="p">():</span>
+    <span class="n">driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">()</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;https://www.selenium.dev/selenium/web/web-form.html&quot;</span><span class="p">)</span>
+
+    <span class="n">title</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">title</span>
+    <span class="k">assert</span> <span class="n">title</span> <span class="o">==</span> <span class="s2">&quot;Web form&quot;</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+    <span class="n">text_box</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">By</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;my-text&quot;</span><span class="p">)</span>
+    <span class="n">submit_button</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">By</span><span class="o">.</span><span class="n">CSS_SELECTOR</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;button&quot;</span><span class="p">)</span>
+
+    <span class="n">text_box</span><span class="o">.</span><span class="n">send_keys</span><span class="p">(</span><span class="s2">&quot;Selenium&quot;</span><span class="p">)</span>
+    <span class="n">submit_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
+
+    <span class="n">message</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">find_element</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">By</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;message&quot;</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">text</span>
+    <span class="k">assert</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;Received!&quot;</span>
+
+    <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+</pre></div>
+          </b-tab>
+        </b-tabs>
+        </div>
+        <div class="col-md-12 order-md-2 order-lg-1">
+          <b-tabs cards pills class="nav-fill card " v-model="tabIndex" @input="changeTabText(tabIndex)">
+          <b-tab title="Example 4 with Python">
+            
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">Browser</span> <span class="kn">import</span> <span class="n">Browser</span>
+<span class="kn">from</span> <span class="nn">Browser</span> <span class="kn">import</span> <span class="n">SupportedBrowsers</span>
+<span class="kn">from</span> <span class="nn">Browser</span> <span class="kn">import</span> <span class="n">AssertionOperator</span> <span class="k">as</span> <span class="n">AO</span>
+
+<span class="n">browser</span> <span class="o">=</span> <span class="n">Browser</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">test_keyword_filtering</span><span class="p">():</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">new_browser</span><span class="p">(</span><span class="n">SupportedBrowsers</span><span class="o">.</span><span class="n">chromium</span><span class="p">,</span> <span class="n">headless</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">new_page</span><span class="p">(</span><span class="s2">&quot;https://robotframework-browser.org/&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">browser</span><span class="o">.</span><span class="n">get_title</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Browser Library&quot;</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">click</span><span class="p">(</span><span class="s1">&#39;a &gt;&gt; &quot;keyword documentation&quot;&#39;</span><span class="p">)</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">switch_page</span><span class="p">(</span><span class="s2">&quot;NEW&quot;</span><span class="p">)</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">get_title</span><span class="p">(</span><span class="n">AO</span><span class="o">.</span><span class="n">equals</span><span class="p">,</span> <span class="s2">&quot;Browser&quot;</span><span class="p">)</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">get_url</span><span class="p">(</span><span class="n">AO</span><span class="o">.</span><span class="n">ends</span><span class="p">,</span> <span class="s2">&quot;robotframework-browser/Browser.html&quot;</span><span class="p">)</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">type_text</span><span class="p">(</span><span class="s1">&#39;input[placeholder=&quot;Search&quot;]&#39;</span><span class="p">,</span> <span class="s2">&quot;Style&quot;</span><span class="p">)</span>
+    <span class="n">style_elements</span> <span class="o">=</span> <span class="n">browser</span><span class="o">.</span><span class="n">get_elements</span><span class="p">(</span>
+        <span class="s1">&#39;id=keyword-shortcuts-container &gt;&gt; a &gt; span:has-text(&quot;Style&quot;)&#39;</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">style_elements</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">browser</span><span class="o">.</span><span class="n">get_style</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="s2">&quot;background-color&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;rgb(255, 255, 0)&quot;</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">style_elements</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">browser</span><span class="o">.</span><span class="n">close_browser</span><span class="p">(</span><span class="s2">&quot;ALL&quot;</span><span class="p">)</span>
+</pre></div>
+          </b-tab>
+          <b-tab title="Example 4 with Robot Framework">
+            <div class="highlight"><pre><span></span><span class="gh">*** Settings ***</span>
+<span class="kn">Library</span><span class="p">     </span><span class="nn">Browser</span>
+
+
+<span class="gh">*** Test Cases ***</span>
+<span class="gu">Test Keyword Filtering</span>
+<span class="p">    </span><span class="nf">New Browser</span><span class="p">    </span><span class="s">Chromium</span><span class="p">    </span><span class="s">headless=False</span>
+<span class="p">    </span><span class="nf">New Page</span><span class="p">    </span><span class="s">https://robotframework-browser.org/</span>
+<span class="p">    </span><span class="nf">Get Title</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Browser Library</span>
+<span class="p">    </span><span class="nf">Click</span><span class="p">    </span><span class="s">a &gt;&gt; &quot;keyword documentation&quot;</span>
+<span class="p">    </span><span class="nf">Switch Page</span><span class="p">    </span><span class="s">NEW</span>
+<span class="p">    </span><span class="nf">Get Title</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">Browser</span>
+<span class="p">    </span><span class="nf">Get URL</span><span class="p">    </span><span class="s">ends</span><span class="p">    </span><span class="s">robotframework-browser/Browser.html</span>
+<span class="p">    </span><span class="nf">Type Text</span><span class="p">    </span><span class="s">input[placeholder=&quot;Search&quot;]</span><span class="p">    </span><span class="s">Style</span>
+<span class="p">    ${</span><span class="nv">style_elements</span><span class="p">}=    </span><span class="nf">Get Elements</span><span class="p">    </span><span class="s">id=keyword-shortcuts-container &gt;&gt; a &gt; span:has-text(&quot;Style&quot;)</span>
+<span class="p">    </span><span class="nf">FOR</span><span class="p">    ${</span><span class="nv">element</span><span class="p">}    </span><span class="s">IN</span><span class="p">    @{</span><span class="nv">style_elements</span><span class="p">}</span>
+<span class="p">        </span><span class="nf">Get Style</span><span class="p">    ${</span><span class="nv">element</span><span class="p">}    </span><span class="s">background-color</span><span class="p">    </span><span class="s">==</span><span class="p">    </span><span class="s">rgb(255, 255, 0)</span>
+<span class="p">    </span><span class="nf">END</span>
+<span class="p">    </span><span class="nf">Length Should Be</span><span class="p">    ${</span><span class="nv">style_elements</span><span class="p">}    </span><span class="s">2</span>
+</pre></div>
+          </b-tab>
         </b-tabs>
         </div>
   </div>
@@ -60,12 +234,12 @@ export default {
       tabIndex: 0,
       items: [
         {
-          text:
-            '<p> New up-to-date keyword design make Browser library intuitive to use and fast to design. </p>'
-        },
-        {
-          text:
-            '<p> The Browser class can also be used directly from Python. You can design you own Robot Framework Libraries by using Browser internally or create your own Python based Test with a framework like PyTest. </p> <p> It is designed to support the user as much as possible within a Python IDE with typehints, enum types and code completion. </p>'
+          text: `In this section, we've re-implemented examples from various web automation tools using Robot Framework and the Browser library.
+          These original examples were taken from the tools pages. 
+          This isn't to claim superiority but to demonstrate our approach using familiar examples.
+          We deeply respect the projects we've referenced.
+          A big thanks to the Playwright team, as our library is built on their work. We also appreciate Selenium for their longstanding contributions to web automation.
+          Explore the examples to see Robot Framework's capabilities in action.`
         }
       ]
     };
