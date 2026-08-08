@@ -29,6 +29,7 @@
     "@vue/test-utils": "^2.4.11",
     "better-sqlite3": "^13.0.3",
     "happy-dom": "^20.11.2",
+    "nuxt-studio": "^1.7.0",
     "playwright-core": "^1.62.1",
     "sanitize-html": "^2.17.6",
     "vitest": "^4.1.10"

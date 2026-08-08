@@ -1,6 +1,11 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-08',
-  modules: ['@nuxt/content'],
+  /*
+   * nuxt-studio gives a visual editor over the Markdown and JSON in content/,
+   * mounted by the dev server. Dev only on purpose: it is an authoring tool,
+   * and the deployed site is a static build with no editing surface.
+   */
+  modules: ['@nuxt/content', ...(process.env.NODE_ENV === 'production' ? [] : ['nuxt-studio'])],
 
   devtools: { enabled: false },
 

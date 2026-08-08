@@ -59,8 +59,7 @@ const kind = computed<Kind>(() => {
 
 <style scoped>
 .glyph {
-  width: 13px;
-  height: 13px;
+  /* Sized by the tab it sits in, so every glyph matches. */
   flex: none;
   stroke: currentcolor;
   fill: none;

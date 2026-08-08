@@ -1,8 +1,8 @@
 ---
 title: Getting started
 description: Install Browser, write a first test, and run it.
-section: start
 order: 1
+section: start
 ---
 
 Install the library and its browser binaries, write one test, run it. Five minutes.
@@ -19,7 +19,9 @@ sessions:
           - Successfully installed robotframework-browser-20.2.0
       - command: rfbrowser init
         status:
-          - { ok: true, text: chromium, firefox and webkit downloaded }
+          - ok: true
+            text: chromium
+            firefox and webkit downloaded: null
   - shell: powershell
     steps:
       - command: py -m pip install robotframework-browser

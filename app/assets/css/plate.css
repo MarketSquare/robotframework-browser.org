@@ -163,6 +163,20 @@
   font-size: 0.76rem;
 }
 
+/*
+ * Glyphs are sized in `em`, so they track the tab's own text and every glyph
+ * matches its neighbours. 1.75em is the tab's line height, which fills the
+ * content box.
+ *
+ * Deliberately NOT `align-self: stretch` with `aspect-ratio`: the tab's height
+ * comes from its content, so an icon sized from the tab height feeds back into
+ * it, and the circular constraint resolves at roughly 100px.
+ */
+.plate-tab :is(.glyph, .rf-mark) {
+  width: 1.75em;
+  height: 1.75em;
+}
+
 .plate-tab--shell {
   font-family: var(--font-display);
   font-size: var(--step--2);

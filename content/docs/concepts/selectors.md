@@ -1,8 +1,8 @@
 ---
 title: Finding elements
 description: Which selector strategy to reach for, why the order matters, and how to chain across iframes and shadow DOM.
-section: concepts
 order: 2
+section: concepts
 ---
 
 Every keyword that touches the page takes a `selector`. Which strategy you choose
@@ -19,14 +19,31 @@ keeps working when the page is redesigned but the feature is unchanged.**
 
 ::doc-table
 ---
-head: [Rank, Strategy, Reach for it when]
+head:
+  - Rank
+  - Strategy
+  - Reach for it when
 rows:
-  - ['1', 'role=', 'The element has a proper accessible role and name. This is the default choice.']
-  - ['2', 'data-test-id=', 'Stability matters more than testing the interface as a user meets it.']
-  - ['3', 'text=', 'The visible text is the thing you actually mean, and the app is single-language.']
-  - ['4', 'css=', 'None of the above identify the element.']
-  - ['5', 'id=', 'You know the id is contractual, not incidental.']
-  - ['6', 'xpath=', 'Genuinely nothing else can select it.']
+  - - "1"
+    - role=
+    - The element has a proper accessible role and name. This is the default
+      choice.
+  - - "2"
+    - data-test-id=
+    - Stability matters more than testing the interface as a user meets it.
+  - - "3"
+    - text=
+    - The visible text is the thing you actually mean, and the app is
+      single-language.
+  - - "4"
+    - css=
+    - None of the above identify the element.
+  - - "5"
+    - id=
+    - You know the id is contractual, not incidental.
+  - - "6"
+    - xpath=
+    - Genuinely nothing else can select it.
 ---
 ::
 
@@ -76,18 +93,6 @@ so a suite built on test ids is **using the interface to test the functionality
 behind it**, not testing the interface. That is often exactly the right trade —
 just make it deliberately rather than by default.
 
-::doc-note
----
-kind: aside
----
-This is where this page differs from
-[Simon Meggle's article on web selectors](https://www.robotmk.org/en/blog/web-selectors),
-which ranks automation ids first and role second. Both orders are defensible. If
-your priority is a suite that never breaks, put `data-test-id=` first. If your
-priority is testing what the user actually meets — and getting accessibility
-feedback for free — put `role=` first, which is what this page does.
-::
-
 ### 3. `text=` — what is written on it
 
 ```robot-repl
@@ -136,10 +141,7 @@ them changing in a refactor that nobody thought was user-visible. The stability
 is a **false sense of safety** unless you have agreed with the developers that
 these particular ids are contractual.
 
-::doc-note
----
-kind: warning
----
+::doc-note{kind="warning"}
 `#` starts a comment in Robot Framework syntax, so a CSS id selector must be
 escaped as `\#submit-button`, or written as `id=submit-button`.
 ::
@@ -180,11 +182,16 @@ Without a prefix, the strategy is inferred:
 
 ::doc-table
 ---
-head: [Selector looks like, Treated as]
+head:
+  - Selector looks like
+  - Treated as
 rows:
-  - ['Starts with `//` or `..`', 'XPath']
-  - ['Starts and ends with a quote', 'Text']
-  - ['Anything else', 'CSS']
+  - - Starts with `//` or `..`
+    - XPath
+  - - Starts and ends with a quote
+    - Text
+  - - Anything else
+    - CSS
 ---
 ::
 
