@@ -1,20 +1,16 @@
 /**
  * Build-time syntax highlighting. Spec §5.4.
  *
- * Shiki runs during `nuxt generate` and emits static HTML, so the browser
- * downloads no highlighter and no grammars.
+ * SERVER ONLY. This module statically imports ~250 KB of TextMate grammars,
+ * so it must never be reachable from the client graph. Editor.vue imports it
+ * behind `import.meta.server`, which Nuxt strips from the client build; the
+ * client-safe half lives in ./lang.ts.
  *
  * Robot Framework grammars are vendored from robotcode (Apache-2.0, pinned in
- * syntaxes/.pinned-commit) rather than written from scratch. Two are
- * registered because Robot Framework snippets come in two shapes:
- *
- *   robot       full suites, with *** Settings *** / *** Test Cases ***
- *   robot-repl  bare keyword sequences with no section headers — what the
- *               keyword reference's extracted examples look like
- *
- * Both grammars were verified to be self-contained (no external `include`
- * of another scope), so registering them together is sufficient and neither
- * can silently degrade to plain text through a missing dependency.
+ * syntaxes/.pinned-commit) rather than written from scratch. Both were
+ * verified self-contained — neither `include`s an external scope — so
+ * registering them together is sufficient and neither can silently degrade to
+ * plain text through a missing dependency.
  */
 import type { BundledLanguage, Highlighter, LanguageRegistration, ThemeRegistration } from 'shiki'
 import { createHighlighter } from 'shiki'
@@ -22,17 +18,12 @@ import { createHighlighter } from 'shiki'
 import rfGrammar from '../../syntaxes/robotframework.tmLanguage.json'
 import rfReplGrammar from '../../syntaxes/robotframework-repl.tmLanguage.json'
 import plateTheme from '../../themes/rfb-plate.json'
+import { type Lang, ROBOT, ROBOT_REPL, THEME } from './lang'
 
-export const THEME = 'rfb-plate'
-
-/** Our own aliases. `robot` is what a Markdown fence will say. */
-export const ROBOT = 'robot'
-export const ROBOT_REPL = 'robot-repl'
+export { LANG_LABEL, ROBOT, ROBOT_REPL, THEME, type Lang } from './lang'
 
 /** Languages the comparison and guides need, beyond Robot Framework. */
 const BUNDLED: BundledLanguage[] = ['python', 'typescript', 'javascript', 'bash', 'json', 'yaml']
-
-export type Lang = typeof ROBOT | typeof ROBOT_REPL | BundledLanguage
 
 const robot = {
   ...(rfGrammar as unknown as LanguageRegistration),
@@ -63,9 +54,9 @@ export interface HighlightOptions {
 }
 
 /**
- * Returns the `<pre>`-free inner HTML: one `<span class="line">` per line.
- * The Editor and Terminal components supply their own chrome, so wrapping
- * markup from Shiki would only have to be stripped again.
+ * Returns the inner HTML only: one `<span class="line">` per line. The Editor
+ * supplies its own chrome, so Shiki's <pre><code> shell would only have to be
+ * stripped again downstream.
  */
 export async function highlight(
   code: string,
@@ -81,27 +72,12 @@ export async function highlight(
     transformers: [
       {
         line(node, line) {
-          if (marked.has(line)) {
-            this.addClassToHast(node, 'is-marked')
-          }
+          if (marked.has(line)) this.addClassToHast(node, 'is-marked')
         },
       },
     ],
   })
 
-  // Strip Shiki's <pre><code> shell; keep the lines.
   const match = html.match(/<code[^>]*>([\s\S]*)<\/code>/)
   return match?.[1] ?? html
-}
-
-/** Language label for the Editor status strip. */
-export const LANG_LABEL: Record<string, string> = {
-  [ROBOT]: 'Robot Framework',
-  [ROBOT_REPL]: 'Robot Framework',
-  python: 'Python',
-  typescript: 'TypeScript',
-  javascript: 'JavaScript',
-  bash: 'Bash',
-  json: 'JSON',
-  yaml: 'YAML',
 }

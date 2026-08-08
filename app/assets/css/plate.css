@@ -1,0 +1,362 @@
+/*
+ * The dark plate — shared chrome for <Terminal> and <Editor>. Spec §5.4.
+ *
+ * Global rather than scoped for two reasons: the chrome is passed through
+ * slots, and Shiki's generated line markup (.line) has to be styleable.
+ *
+ * Every colour is a --term-* or --tok-* token, and those are frozen across
+ * light and dark, so a plate looks identical in both themes.
+ */
+
+.plate {
+  background: var(--term-bg);
+  border: 1px solid var(--term-line);
+  box-shadow: var(--shadow);
+  color: var(--term-ink);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.75;
+}
+
+/* ---------- top bar ---------- */
+
+.plate-bar {
+  display: flex;
+  align-items: stretch;
+  min-height: 2.1rem;
+  background: var(--term-chrome);
+  border-bottom: 1px solid var(--term-line);
+}
+
+.plate-dots {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 0 var(--sp-3);
+  flex: none;
+}
+
+.plate-dots i {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--term-line);
+  display: block;
+}
+
+.plate-title {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: var(--step--2);
+  letter-spacing: 0.16em;
+  color: var(--term-faint);
+}
+
+.plate-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding-right: var(--sp-1);
+}
+
+/* ---------- copy ---------- */
+
+.plate-copy {
+  font-family: var(--font-display);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  background: transparent;
+  border: 1px solid var(--term-line);
+  color: var(--term-dim);
+  padding: 0.24rem var(--sp-2);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.plate:hover .plate-copy,
+.plate-copy:focus-visible {
+  opacity: 1;
+}
+
+.plate-copy:hover {
+  color: var(--term-ink);
+  border-color: var(--term-faint);
+}
+
+.plate-copy[data-copied='true'] {
+  color: var(--term-teal);
+  border-color: var(--term-teal);
+  opacity: 1;
+}
+
+/* ---------- tabs (both OS tabs and file tabs) ---------- */
+
+.plate-tabs {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.plate-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.plate-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem var(--sp-3);
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--term-faint);
+  background: var(--term-tab);
+  border-right: 1px solid var(--term-line);
+  border-top: 2px solid transparent;
+}
+
+.plate-tab:hover {
+  color: var(--term-dim);
+}
+
+/* File tabs carry the filename in the code face; OS tabs are a display label. */
+.plate-tab--file {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+
+.plate-tab--shell {
+  font-family: var(--font-display);
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  border-top-width: 0;
+  border-bottom: 2px solid transparent;
+}
+
+/* The radio that drives a tab. Off-screen, not display:none, so it stays
+   focusable and keyboard arrow-keys move between tabs natively. */
+.plate-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Terminal: radio and label are adjacent, so this is enough. */
+.plate-radio:checked + .plate-tab {
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-top-color: var(--red);
+}
+
+.plate-radio:checked + .plate-tab--shell {
+  border-top-color: transparent;
+  border-bottom-color: var(--term-red);
+}
+
+.plate-radio:focus-visible + .plate-tab {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+/*
+ * Editor: the radios sit as direct children of .plate so `~` can reach the
+ * panes, which puts them out of reach of the adjacent-sibling rule above.
+ * MAX_TABS in Editor.vue caps this at 6 and throws past it, so a seventh tab
+ * fails loudly at build time rather than rendering a blank pane.
+ */
+.editor .pane {
+  display: none;
+}
+
+.editor > .plate-radio:nth-of-type(1):checked ~ .pane[data-index='0'] {
+  display: block;
+}
+
+.editor:has(> .plate-radio:nth-of-type(1):checked) .plate-tab[data-index='0'] {
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-top-color: var(--red);
+}
+
+.editor > .plate-radio:nth-of-type(1):focus-visible ~ .plate-bar .plate-tab[data-index='0'] {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+.editor > .plate-radio:nth-of-type(2):checked ~ .pane[data-index='1'] {
+  display: block;
+}
+
+.editor:has(> .plate-radio:nth-of-type(2):checked) .plate-tab[data-index='1'] {
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-top-color: var(--red);
+}
+
+.editor > .plate-radio:nth-of-type(2):focus-visible ~ .plate-bar .plate-tab[data-index='1'] {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+.editor > .plate-radio:nth-of-type(3):checked ~ .pane[data-index='2'] {
+  display: block;
+}
+
+.editor:has(> .plate-radio:nth-of-type(3):checked) .plate-tab[data-index='2'] {
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-top-color: var(--red);
+}
+
+.editor > .plate-radio:nth-of-type(3):focus-visible ~ .plate-bar .plate-tab[data-index='2'] {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+.editor > .plate-radio:nth-of-type(4):checked ~ .pane[data-index='3'] {
+  display: block;
+}
+
+.editor:has(> .plate-radio:nth-of-type(4):checked) .plate-tab[data-index='3'] {
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-top-color: var(--red);
+}
+
+.editor > .plate-radio:nth-of-type(4):focus-visible ~ .plate-bar .plate-tab[data-index='3'] {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+.editor > .plate-radio:nth-of-type(5):checked ~ .pane[data-index='4'] {
+  display: block;
+}
+
+.editor:has(> .plate-radio:nth-of-type(5):checked) .plate-tab[data-index='4'] {
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-top-color: var(--red);
+}
+
+.editor > .plate-radio:nth-of-type(5):focus-visible ~ .plate-bar .plate-tab[data-index='4'] {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+.editor > .plate-radio:nth-of-type(6):checked ~ .pane[data-index='5'] {
+  display: block;
+}
+
+.editor:has(> .plate-radio:nth-of-type(6):checked) .plate-tab[data-index='5'] {
+  color: var(--term-ink);
+  background: var(--term-bg);
+  border-top-color: var(--red);
+}
+
+.editor > .plate-radio:nth-of-type(6):focus-visible ~ .plate-bar .plate-tab[data-index='5'] {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
+}
+
+/* ---------- code body ---------- */
+
+.plate-code {
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.plate-gutter {
+  padding: var(--sp-3) 0.75rem var(--sp-3) var(--sp-4);
+  text-align: right;
+  color: var(--term-faint);
+  border-right: 1px solid var(--term-line);
+  font-variant-numeric: tabular-nums;
+  white-space: pre;
+  /* Excluded from selection so copying code never drags line numbers along. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.plate-body {
+  padding: var(--sp-3) 0;
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.plate-body pre {
+  margin: 0;
+  font: inherit;
+  white-space: pre;
+  padding: 0 var(--sp-4);
+}
+
+/* Shiki emits one .line per source line. */
+.plate-body .line {
+  display: block;
+  min-height: 1.75em;
+}
+
+.plate-body .line.is-marked {
+  background: color-mix(in srgb, var(--term-red) 9%, transparent);
+  box-shadow: inset 2px 0 0 var(--term-red);
+}
+
+/* ---------- status strip ---------- */
+
+.plate-status {
+  display: flex;
+  gap: var(--sp-6);
+  align-items: center;
+  border-top: 1px solid var(--term-line);
+  background: var(--term-chrome);
+  padding: 0.3rem var(--sp-3);
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--term-faint);
+}
+
+.plate-status .push {
+  margin-left: auto;
+}
+
+/* ---------- terminal ---------- */
+
+.term-line {
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/*
+ * The prompt is chrome, not content. Excluding it from selection means a
+ * drag-copy or the copy button yields runnable commands, never a paste
+ * full of "$".
+ */
+.term-prompt {
+  color: var(--term-dim);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.term-command {
+  color: var(--term-ink);
+}
+
+.term-output {
+  color: var(--term-dim);
+}
+
+.term-ok {
+  color: var(--term-teal);
+}
+
+.term-fail {
+  color: var(--term-red);
+}

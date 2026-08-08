@@ -10,7 +10,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "verify": "pnpm test && pnpm generate && pnpm check:bundle"
   },
   "dependencies": {
     "@nuxt/content": "^3.15.2",

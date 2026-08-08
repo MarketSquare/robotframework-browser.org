@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     prerender: { crawlLinks: true, routes: ['/'], failOnError: true },
   },
 
-  css: ['~/assets/css/tokens.css', '~/assets/css/base.css'],
+  css: ['~/assets/css/tokens.css', '~/assets/css/base.css', '~/assets/css/plate.css'],
 
   app: {
     head: {
