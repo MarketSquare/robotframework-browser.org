@@ -144,8 +144,8 @@ and how the library got this far.
 
 ### And 206 people who made it better
 
-Bug reports, ideas, documentation, testing a release candidate before anyone
-else did. Most of them never wrote a line of code for Browser.
+Bug reports, ideas, documentation, running main against a real suite before it
+was ever released. Most of them never wrote a line of code for Browser.
 [See who did what](/community#hall).
 
 ::contributor-wall{compact}

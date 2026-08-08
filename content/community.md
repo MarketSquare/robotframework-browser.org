@@ -84,19 +84,42 @@ Docs changes need no development environment. The site's pages are Markdown in
 the repository, and typo-sized fixes are perfectly welcome pull requests. So are
 issues that just say "this paragraph made no sense to me".
 
-### 4. Test a release before it is one
+### 4. Test main before it becomes a release
 
-Every release is preceded by a release candidate, announced in Slack and on the
-forum. Installing it against your own suite for ten minutes is worth more than
-any amount of testing we can do ourselves, because your suite does things ours
-never thought of.
+We do not ship release candidates, so there is nothing to wait for. Instead,
+**every commit to main that passes CI builds an installable wheel**, and you can
+have it within a minute of a fix landing.
+
+Running it against your own suite for ten minutes is worth more than any amount
+of testing we can do ourselves, because your suite does things ours never
+thought of. It is also the only way a regression gets caught *before* it is in a
+release rather than after.
+
+Take the wheel from the latest green **Continuous integration** run on main —
+Actions → the run → Artifacts → `rfbrowser-wheel` — then, in a throwaway
+virtual environment rather than the one you work in:
 
 ```bash
-pip install --pre --upgrade robotframework-browser
+pip install --force-reinstall robotframework_browser-*-py3-none-any.whl
+rfbrowser clean-node
+rfbrowser init
 ```
 
-Tell us either way. "Ran our 400 tests, nothing broke" is genuinely useful
-information, and it is the report we get least often.
+::doc-note{kind="warning"}
+`clean-node` and `init` are not optional. The wheel carries a new Node side, and
+skipping them leaves the previous one in place — so you end up testing a Python
+half and a Node half that were never built together, and any failure tells you
+nothing.
+::
+
+Tell us either way. "Ran our 400 tests against main, nothing broke" is genuinely
+useful information, and it is the report we get least often.
+
+::doc-note
+Build artifacts need a GitHub account to download and are cleaned up after a
+while, so take one from a recent run. This way of testing is new — if the steps
+above do not work for you, that is worth an issue in itself.
+::
 
 ### 5. Build a plugin, and publish it
 
