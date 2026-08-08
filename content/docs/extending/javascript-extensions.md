@@ -170,3 +170,16 @@ rows:
   - ['Both Python and page-side logic in one keyword', 'Python plugin calling a JS module']
 ---
 ::
+
+## Before you write one
+
+Somebody may have already written it.
+[robotframework-browser-extensions](https://github.com/MarketSquare/robotframework-browser-extensions)
+collects working community extensions — accessibility checks with axe-core,
+visual comparison, network throttling, request mocking, element highlighting,
+and native Playwright page methods.
+
+Reading one is also the fastest way to see the shape of a finished extension
+rather than a snippet. And when yours works, it belongs there too: it is a
+monorepo that takes pull requests, so publishing is one PR rather than a
+release process.

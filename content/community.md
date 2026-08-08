@@ -127,12 +127,19 @@ Not everything belongs in the library. Browser has a plugin API and a JavaScript
 extension mechanism precisely so that your idea does not have to wait for our
 review — you can build it, publish it, and own it.
 
-If it turns out lots of people need it, that is the strongest possible argument
-for bringing it into the library. Several features arrived that way.
+And then tell people it exists, which is the step everyone skips.
+[robotframework-browser-extensions](https://github.com/MarketSquare/robotframework-browser-extensions)
+collects the ones that work — accessibility checks with axe-core, visual
+comparison, network throttling, request mocking, element highlighting. It is a
+monorepo, not a registry: **if yours works, open a pull request and it goes in.**
+
+That is also the strongest possible argument for bringing a feature into the
+library itself. Something people are already installing has proven demand behind
+it, and several features arrived exactly that way.
 
 :::btn-row
 :btn{to="/docs/extending/python-plugins" primary}[Extending Browser]
-:btn{to="https://github.com/MarketSquare"}[MarketSquare on GitHub]
+:btn{to="https://github.com/MarketSquare/robotframework-browser-extensions"}[Browse the extensions]
 :::
 
 ### 6. Send a pull request
