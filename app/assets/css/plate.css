@@ -368,17 +368,28 @@
 /*
  * One block per line, no newlines in the markup. Terminal.vue renders a flat
  * list of typed lines precisely so the break comes from one source only.
+ *
+ * Never wraps, exactly like the Editor: a wrapped shell line is a different
+ * command from the one you would type, and a wrapped run of output stops
+ * lining up in columns. Long lines scroll horizontally inside .plate-body
+ * instead.
+ *
+ * `width: max-content` is what makes that scroll work — the flex column has
+ * to grow to its widest line, or the lines are clipped at the container width
+ * instead of extending its scrollable area. `min-width: 100%` keeps short
+ * blocks full width so the padding still reaches the right edge.
  */
 .term-lines {
   display: flex;
   flex-direction: column;
   padding: 0 var(--sp-4);
+  width: max-content;
+  min-width: 100%;
 }
 
 .term-line {
   display: block;
-  white-space: pre-wrap;
-  word-break: break-word;
+  white-space: pre;
 }
 
 .term-mark {

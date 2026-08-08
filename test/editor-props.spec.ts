@@ -85,3 +85,23 @@ describe('Terminal steps', () => {
     expect(src).toContain(".filter((c): c is string => Boolean(c))")
   })
 })
+
+describe('Terminal wrapping', () => {
+  it('never wraps a shell line', async () => {
+    const { readFileSync } = await import('node:fs')
+    const css = readFileSync(process.cwd() + '/app/assets/css/plate.css', 'utf8')
+    const block = css.slice(css.indexOf('.term-line {'), css.indexOf('.term-prompt'))
+    // A wrapped shell line is a different command from the one you would type.
+    expect(block).toContain('white-space: pre;')
+    expect(block).not.toContain('pre-wrap')
+    expect(block).not.toContain('word-break')
+  })
+
+  it('lets the line list grow so the overflow can scroll', async () => {
+    const { readFileSync } = await import('node:fs')
+    const css = readFileSync(process.cwd() + '/app/assets/css/plate.css', 'utf8')
+    const block = css.slice(css.indexOf('.term-lines {'), css.indexOf('.term-line {'))
+    expect(block).toContain('width: max-content')
+    expect(block).toContain('min-width: 100%')
+  })
+})

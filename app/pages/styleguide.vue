@@ -48,7 +48,7 @@ const testRun: TerminalSession[] = [
     shell: 'bash',
     steps: [
       {
-        command: 'robot login.robot',
+        command: 'robot --variable BROWSER:chromium --outputdir results/ci --loglevel DEBUG --include smokeANDweb login.robot',
         output: ['=========================================================', 'Login'],
         status: [
           { ok: true, text: 'Sign In' },
@@ -211,7 +211,7 @@ const syntax = ['--tok-sand', '--tok-amber', '--tok-violet']
         from then on. Prompts are excluded from selection, so a drag-copy yields runnable commands.
       </p>
       <Terminal :sessions="install" />
-      <p class="label sg-gap">Pass and fail states</p>
+      <p class="label sg-gap">Pass and fail states, and a command too long to fit</p>
       <Terminal :sessions="testRun" />
     </section>
 
