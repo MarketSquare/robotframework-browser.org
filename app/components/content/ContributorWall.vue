@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
  * ::contributor-wall — everyone the all-contributors bot knows about.
+ * ::contributor-wall{compact} — the same people, faces only.
  *
  * A wrapper with nothing in it, on purpose.
  *
@@ -12,8 +13,9 @@
  * The body lives in `components/` instead, where the `.server` suffix does what
  * it says: it renders as an island, and the client receives markup only.
  */
+withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
 </script>
 
 <template>
-  <ContributorWallBody />
+  <ContributorWallBody :compact="compact" />
 </template>

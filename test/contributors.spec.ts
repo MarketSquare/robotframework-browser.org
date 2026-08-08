@@ -88,7 +88,8 @@ describe('the wall stays off the client', () => {
     ['CoreTeam', 'CoreTeamBody'],
   ])('%s is a wrapper around the %s island', (wrapper, body) => {
     const src = read(`app/components/content/${wrapper}.vue`)
-    expect(src).toContain(`<${body} />`)
+    // The tag, not the whole element — a wrapper may forward props.
+    expect(src).toContain(`<${body}`)
     expect(src, 'the wrapper must not import the data itself').not.toContain('contributors.json')
   })
 

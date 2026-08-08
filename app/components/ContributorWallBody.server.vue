@@ -11,9 +11,16 @@
  * grid, and each tile carrying a class per way it contributed. Same technique
  * as the keyword reference, and it keeps working with JavaScript disabled.
  *
+ * Two shapes. The full one carries the filter and every name, for /community.
+ * The compact one is faces only, for the foot of a page that is about something
+ * else — there it is a picture of how many people there are, not a directory.
+ *
  * ::contributor-wall
+ * ::contributor-wall{compact}
  */
 import data from '~/../content/contributors.json'
+
+const props = withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
 
 interface Person {
   login: string
@@ -49,7 +56,19 @@ const inputId = (way: string) => `way-${way}`
 </script>
 
 <template>
-  <div class="wall-block">
+  <!--
+    Faces only. Each link needs its accessible name from the alt text here,
+    because unlike the full wall there is no visible name to read.
+  -->
+  <ul v-if="props.compact" class="wall is-compact">
+    <li v-for="p in people" :key="p.login">
+      <a class="person" :href="p.profile" :title="p.name">
+        <img class="face" :src="p.avatar" :alt="p.name" width="40" height="40" loading="lazy" decoding="async">
+      </a>
+    </li>
+  </ul>
+
+  <div v-else class="wall-block">
     <!--
       Inputs first and flat, because the filtering below is a sibling selector.
       Visually hidden rather than display:none — a display:none radio is not
@@ -191,6 +210,41 @@ const inputId = (way: string) => `way-${way}`
 #way-testing:checked ~ .wall li:not(.w-testing),
 #way-code:checked ~ .wall li:not(.w-code) {
   display: none;
+}
+
+/*
+ * Compact: faces packed tight, so the block reads as a crowd at a glance
+ * rather than as a list you are meant to scan.
+ */
+.wall.is-compact {
+  grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
+  gap: var(--sp-1);
+}
+
+.wall.is-compact .person {
+  padding: 0;
+}
+
+.wall.is-compact .face {
+  transition: transform 0.1s;
+}
+
+.wall.is-compact .person:hover {
+  background: none;
+}
+
+.wall.is-compact .person:hover .face {
+  transform: scale(1.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wall.is-compact .face {
+    transition: none;
+  }
+
+  .wall.is-compact .person:hover .face {
+    transform: none;
+  }
 }
 
 .person {
