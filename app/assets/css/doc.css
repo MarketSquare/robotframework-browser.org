@@ -27,6 +27,20 @@
   border-bottom: 1px solid color-mix(in srgb, var(--teal) 35%, transparent);
 }
 
+/*
+ * Heading self-links, again — base.css exempts them, but `.doc a` outscores
+ * that exemption, so the rule has to be repeated at this specificity or every
+ * Markdown heading renders as a teal link.
+ */
+.doc :is(h1, h2, h3, h4, h5, h6) > a {
+  color: inherit;
+  border-bottom-color: transparent;
+}
+
+.doc :is(h1, h2, h3, h4, h5, h6) > a:hover {
+  border-bottom-color: color-mix(in srgb, currentcolor 30%, transparent);
+}
+
 .doc code {
   font-family: var(--font-mono);
   font-size: 0.9em;

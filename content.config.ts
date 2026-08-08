@@ -2,6 +2,27 @@ import { defineCollection, defineContentConfig, z } from '@nuxt/content'
 
 export default defineContentConfig({
   collections: {
+    /** The landing page, authored like every other page on the site. */
+    landing: defineCollection({
+      type: 'page',
+      source: 'index.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+      }),
+    }),
+
+    /** Component demos for the styleguide. Not routed; queried by /styleguide. */
+    gallery: defineCollection({
+      type: 'page',
+      source: 'gallery/**/*.md',
+      schema: z.object({
+        title: z.string(),
+        description: z.string(),
+        order: z.number().default(99),
+      }),
+    }),
+
     compare: defineCollection({
       type: 'data',
       source: 'compare/**.json',

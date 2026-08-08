@@ -50,6 +50,20 @@ a:hover {
   border-bottom-color: var(--teal);
 }
 
+/*
+ * Nuxt Content wraps every Markdown heading's text in a self-link, so without
+ * this a heading renders teal and underlined like body prose. The anchor still
+ * works — it is just invisible until the heading is hovered.
+ */
+:is(h1, h2, h3, h4, h5, h6) > a {
+  color: inherit;
+  border-bottom-color: transparent;
+}
+
+:is(h1, h2, h3, h4, h5, h6) > a:hover {
+  border-bottom-color: color-mix(in srgb, currentcolor 30%, transparent);
+}
+
 /* ---------- display type: OCR-A, never running text ---------- */
 
 h1,

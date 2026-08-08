@@ -4,6 +4,38 @@ import type { TerminalSession } from '~/components/Terminal.vue'
 
 useHead({ title: 'Styleguide — Robot Framework Browser' })
 
+/*
+ * Gallery. Each entry renders a Markdown file and shows that same file's
+ * source, so the documented usage cannot drift from the demonstrated output.
+ */
+const RAW = import.meta.glob('~/../content/gallery/*.md', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
+const sources = Object.fromEntries(
+  Object.entries(RAW).map(([file, text]) => [
+    file.split('/').pop()!.replace(/\.md$/, ''),
+    // Frontmatter is metadata for the gallery, not part of the usage.
+    text.replace(/^---\n[\s\S]*?\n---\n+/, '').trimEnd(),
+  ]),
+)
+
+const { data: demos } = await useAsyncData('gallery', async () => {
+  // Server, plus the client in dev — see app/utils/content-guard.md
+  if (import.meta.server || import.meta.dev) {
+    return await queryCollection('gallery').select('path', 'title', 'description', 'order').all()
+  }
+  return []
+})
+
+const gallery = computed(() =>
+  [...(demos.value ?? [])]
+    .sort((a, b) => a.order - b.order)
+    .map(d => ({ ...d, slug: d.path.split('/').pop()!, source: sources[d.path.split('/').pop()!] ?? '' })),
+)
+
 const install: TerminalSession[] = [
   {
     shell: 'bash',
@@ -227,6 +259,30 @@ const syntax = ['--tok-sand', '--tok-amber', '--tok-violet']
       <Editor :files="[snippet]" :line-numbers="false" />
     </section>
 
+    <!-- ---------- component gallery ---------- -->
+    <section id="components">
+      <h2>Components</h2>
+      <p class="sg-note">
+        Every content component, rendered from a Markdown file and shown beside that same
+        file's source. The two cannot disagree — they are the same text.
+      </p>
+
+      <nav class="sg-toc">
+        <a v-for="d in gallery" :key="d.slug" :href="`#${d.slug}`">{{ d.title }}</a>
+      </nav>
+
+      <div class="sg-gallery">
+        <GalleryItem
+          v-for="d in gallery"
+          :key="d.slug"
+          :title="d.title"
+          :description="d.description"
+          :path="d.path"
+          :source="d.source"
+        />
+      </div>
+    </section>
+
     <!-- ---------- comparison ---------- -->
     <section>
       <h2>ComparisonSplit</h2>
@@ -337,5 +393,21 @@ section {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
+}
+
+.sg-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-block: 1px solid var(--line);
+  font-size: 0.85rem;
+}
+
+.sg-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-16);
+  margin-top: var(--sp-6);
 }
 </style>

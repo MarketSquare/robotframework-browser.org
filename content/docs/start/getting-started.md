@@ -33,23 +33,17 @@ sessions:
 
 The assertion is part of the keyword — `Get Text` both reads and checks.
 
-::editor
----
-files:
-  - name: first.robot
-    lang: robot
-    code: |
-      *** Settings ***
-      Library    Browser
+```robot [first.robot]
+*** Settings ***
+Library    Browser
 
-      *** Test Cases ***
-      Sign In
-          New Page     https://example.com/login
-          Fill Text    id=user    admin
-          Click        text=Sign in
-          Get Text     h1    ==    Welcome
----
-::
+*** Test Cases ***
+Sign In
+    New Page     https://example.com/login
+    Fill Text    id=user    admin
+    Click        text=Sign in
+    Get Text     h1    ==    Welcome
+```
 
 No `Sleep`, and no `Wait Until Element Is Visible` in front of anything: every
 keyword waits for the element to be actionable before it acts.

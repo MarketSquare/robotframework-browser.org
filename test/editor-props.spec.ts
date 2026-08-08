@@ -132,7 +132,7 @@ describe('bevelled accents', () => {
      * shape instead.
      */
     for (const [file, sel] of [
-      ['app/pages/index.vue', '.pillar {'],
+      ['app/components/content/Card.vue', '.card.accent-green {'],
       ['app/components/content/DocNote.vue', '.callout {'],
     ] as const) {
       const src = readFileSync(process.cwd() + '/' + file, 'utf8')
