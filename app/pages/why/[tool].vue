@@ -51,7 +51,7 @@ useHead(() => ({
     <SiteHeader />
     <main class="main">
       <nav class="crumb">
-        <NuxtLink to="/compare">Comparison</NuxtLink><span>/</span><span>{{ doc.tool }}</span>
+        <NuxtLink to="/why">Why Browser</NuxtLink><span>/</span><NuxtLink to="/why#compare">Comparison</NuxtLink><span>/</span><span>{{ doc.tool }}</span>
       </nav>
 
       <h1>Browser vs {{ doc.tool }}</h1>

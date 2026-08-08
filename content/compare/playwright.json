@@ -1,13 +1,21 @@
 {
   "tool": "Playwright",
-  "slug": "playwright",
+  "slug": "vs-playwright",
   "tagline": "The engine underneath Browser, used directly from TypeScript.",
   "comparedAgainst": "@playwright/test",
   "scenario": "Open a page, check the title, follow a link and assert the destination.",
-  "left": { "file": "comparison/playwright/test.robot", "name": "test.robot", "lang": "robot" },
-  "right": { "file": "comparison/playwright/test.spec.ts", "name": "test.spec.ts", "lang": "typescript" },
+  "left": {
+    "file": "comparison/playwright/test.robot",
+    "name": "test.robot",
+    "lang": "robot"
+  },
+  "right": {
+    "file": "comparison/playwright/test.spec.ts",
+    "name": "test.spec.ts",
+    "lang": "typescript"
+  },
   "notes": [
-    "Same engine, same auto-waiting, same selector power — Browser is Playwright underneath.",
+    "Same engine, same auto-waiting, same selector power \u2014 Browser is Playwright underneath.",
     "The difference is the surface: keywords a non-programmer can read, versus async TypeScript.",
     "Browser test data, tagging, parallelisation and reporting come from Robot Framework.",
     "Playwright's own API moves faster; Browser exposes it a release or two behind."

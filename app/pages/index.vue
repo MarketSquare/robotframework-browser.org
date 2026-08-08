@@ -3,13 +3,17 @@ import type { EditorFile } from '~/components/Editor.vue'
 import type { TerminalSession } from '~/components/Terminal.vue'
 
 /**
- * The landing page. Spec §6.1, D16.
+ * The landing page. High level only.
  *
- * Written for Robot Framework users who do not use Browser yet — it assumes
- * keywords and suites are familiar, and assumes the reader is on
- * SeleniumLibrary. It does not explain what a keyword is.
+ * The voice is the one the project already had: "Robot Framework deserves a
+ * browser automation solution that's designed for the 2020s", the three
+ * pillars of speed, reliability and visibility, and "Use. Benefit.
+ * Contribute." It sells the library on its own merits.
  *
- * Every benefit shows the code. A claim that cannot be shown as code was cut.
+ * Nothing here argues against another tool. The reasoning lives on /why and
+ * the evidence in the comparisons beneath it — a landing page that opens by
+ * positioning against SeleniumLibrary is picking a fight with a sibling
+ * project on its own front page.
  */
 const { index, version } = useKeywordIndex()
 
@@ -83,74 +87,39 @@ const run: TerminalSession[] = [
   },
 ]
 
-/** Each benefit is a claim plus the code that demonstrates it. */
-const benefits: { title: string; body: string; file: EditorFile }[] = [
+/** The three pillars the project has always led with. */
+const pillars = [
   {
-    title: 'Waiting is built in',
-    body: 'Every keyword waits for the element to be actionable — attached, visible, stable, enabled and unobscured — before it acts. There is no sleep to tune and no wait keyword to remember.',
-    file: {
-      name: 'waiting.robot',
-      lang: 'robot-repl',
-      code: `# No Sleep. No Wait Until Element Is Visible.
-Click       text=Sign in
-Fill Text   id=search    robot`,
-    },
+    name: 'Speed',
+    body: 'One Node process drives Chromium, Firefox and WebKit. No driver binary per browser, no version to keep in step with an update.',
   },
   {
-    title: 'The assertion is part of the keyword',
-    body: 'Getters take an operator and an expected value, so reading a value and checking it is one line instead of three. The failure message names the selector and both values.',
-    file: {
-      name: 'assertions.robot',
-      lang: 'robot-repl',
-      code: `Get Text       h1               ==       Welcome
-Get Title      contains         Robot
-Get Element Count   .row        >        3
-Get Attribute  a#next    href   matches  /page/\\d+`,
-    },
+    name: 'Reliability',
+    body: 'Every action waits for the element to be actionable before it acts. No sleeps to tune, and no flake to chase down.',
   },
   {
-    title: 'One process drives three engines',
-    body: 'Chromium, Firefox and WebKit are driven from a single Node process — no driver binary per browser, no version to keep in step with an update.',
-    file: {
-      name: 'engines.robot',
-      lang: 'robot-repl',
-      code: `New Browser    chromium    headless=True
-New Browser    firefox
-New Browser    webkit`,
-    },
-  },
-  {
-    title: 'Selectors that go where CSS cannot',
-    body: 'Chain strategies with >>, cross into iframes and pierce shadow DOM without switching context first. Selectors read left to right, in one string.',
-    file: {
-      name: 'selectors.robot',
-      lang: 'robot-repl',
-      code: `Click     text=Sign in
-Click     "Sign in" >> xpath=../input
-Get Text  iframe#preview >>> h1
-Get Text  css=my-widget >> css=button`,
-    },
-  },
-  {
-    title: 'Evidence when it fails',
-    body: 'Video, a Playwright trace and a screenshot on failure, attached to the Robot Framework log. A failure in CI comes with a recording of what the browser actually did.',
-    file: {
-      name: 'evidence.robot',
-      lang: 'robot-repl',
-      code: `New Context   tracing=True    videosPath=videos
-New Browser   chromium
-# On failure, the trace and video land in the log.`,
-    },
+    name: 'Visibility',
+    body: 'Video, a Playwright trace and a screenshot on failure, attached to the Robot Framework log.',
   },
 ]
 
+/** The feature list, in the project's own words. */
+const features = [
+  'Conscientious assertions',
+  'Precise and fast browser window and tab control',
+  'Chainable selector strategies',
+  'Good shadow DOM support',
+  'Simple descriptors for mobile devices',
+  'Sending HTTP requests',
+]
+
 useHead({
-  title: 'Robot Framework Browser — browser automation that does not flake',
+  title: 'Robot Framework Browser — modern web automation, powered by Playwright',
   meta: [
     {
       name: 'description',
       content:
-        'A modern web automation library for Robot Framework, powered by Playwright. Auto-waiting on every action, assertions inside the keywords, and one process for Chromium, Firefox and WebKit.',
+        'A browser automation library for Robot Framework, powered by Playwright. Speed, reliability and visibility, with assertions built into the keywords.',
     },
   ],
 })
@@ -166,13 +135,14 @@ useHead({
       <div class="hero-text">
         <h1>Browser automation<br>that doesn't flake.</h1>
         <p class="lede">
-          A web automation library for Robot Framework, built on Playwright. Every action waits for
-          the element to be ready, every getter can assert, and one process drives all three
-          engines.
+          Robot Framework deserves a browser automation solution designed for the 2020s. Browser
+          library, powered by
+          <a href="https://playwright.dev/" rel="noopener noreferrer" target="_blank">Playwright</a>,
+          provides speed, reliability and visibility.
         </p>
         <div class="cta">
           <NuxtLink class="btn primary" to="#start">Get started</NuxtLink>
-          <NuxtLink class="btn" to="/keywords">{{ index.length }} keywords</NuxtLink>
+          <NuxtLink class="btn" to="/why">Why Browser</NuxtLink>
         </div>
         <ul class="stats">
           <li><b>{{ index.length }}</b> keywords</li>
@@ -183,22 +153,25 @@ useHead({
       </div>
     </section>
 
-    <!-- ---------- why ---------- -->
-    <section class="why">
-      <p class="label">Coming from SeleniumLibrary</p>
-      <h2>What changes.</h2>
-      <p class="section-lede">
-        Your suites, variables, tags, reporting and CI all stay. What changes is how much
-        scaffolding a test needs to be reliable.
-      </p>
+    <!-- ---------- three pillars ---------- -->
+    <section class="pillars-section">
+      <p class="label">What you get</p>
+      <h2>Speed, reliability and visibility.</h2>
 
-      <div v-for="(b, i) in benefits" :key="b.title" class="benefit" :class="{ flip: i % 2 === 1 }">
-        <div class="benefit-text">
-          <h3>{{ b.title }}</h3>
-          <p>{{ b.body }}</p>
-        </div>
-        <Editor :files="[b.file]" :line-numbers="false" />
+      <div class="pillars">
+        <article v-for="p in pillars" :key="p.name" class="pillar">
+          <h3>{{ p.name }}</h3>
+          <p>{{ p.body }}</p>
+        </article>
       </div>
+
+      <ul class="features">
+        <li v-for="f in features" :key="f">{{ f }}</li>
+      </ul>
+
+      <p class="more">
+        <NuxtLink to="/why">How it works, and how it compares</NuxtLink>
+      </p>
     </section>
 
     <!-- ---------- getting started ---------- -->
@@ -214,8 +187,8 @@ useHead({
         <li>
           <div class="step-head"><span class="n">01</span><h3>Install the library and the browsers</h3></div>
           <p>
-            <code>rfbrowser init</code> downloads the browser binaries Playwright drives. It picks
-            your shell automatically below.
+            <code>rfbrowser init</code> downloads the browser binaries Playwright drives. The tabs
+            below pick your shell automatically.
           </p>
           <Terminal :sessions="install" />
         </li>
@@ -237,20 +210,25 @@ useHead({
       </ol>
 
       <p class="next">
-        Next: <NuxtLink to="/guides/getting-started">the full getting-started guide</NuxtLink>, or
-        the <NuxtLink to="/keywords">keyword reference</NuxtLink>.
+        Next: the <NuxtLink to="/guides/getting-started">getting-started guide</NuxtLink>, or the
+        <NuxtLink to="/keywords">keyword reference</NuxtLink>.
       </p>
     </section>
 
-    <!-- ---------- compare ---------- -->
-    <section class="compare">
-      <p class="label">Comparison</p>
-      <h2>See it beside the alternatives.</h2>
+    <!-- ---------- community ---------- -->
+    <section class="community">
+      <p class="label">Community</p>
+      <h2>Use. Benefit. Contribute.</h2>
       <p class="section-lede">
-        The same scenario written with Browser and with Cypress, Playwright and Selenium — the real
-        files, side by side. Facts underneath, no scores.
+        Browser library is built in the open by the Robot Framework community. Questions, ideas and
+        bug reports are how most contributors started, and how the library got this far.
       </p>
-      <NuxtLink class="btn" to="/compare">Compare the code</NuxtLink>
+      <div class="links">
+        <a class="btn" href="https://forum.robotframework.org/c/libraries/browser" rel="noopener noreferrer" target="_blank">Forum</a>
+        <a class="btn" href="https://github.com/MarketSquare/robotframework-browser" rel="noopener noreferrer" target="_blank">GitHub</a>
+        <a class="btn" href="https://github.com/MarketSquare/robotframework-browser/issues" rel="noopener noreferrer" target="_blank">Issues</a>
+      </div>
+      <p class="closing">Let's make the best Browser library.</p>
     </section>
   </div>
 </template>
@@ -305,7 +283,7 @@ h1 {
 .lede {
   font-size: var(--step-1);
   color: var(--dim);
-  max-width: 46ch;
+  max-width: 48ch;
 }
 
 .cta {
@@ -363,27 +341,62 @@ h1 {
   font-weight: 400;
 }
 
-/* ---------- benefits ---------- */
-.benefit {
+/* ---------- pillars ---------- */
+.pillars {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: clamp(1.5rem, 4vw, 3.5rem);
-  align-items: center;
-  padding-top: var(--sp-12);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-8);
 }
 
-.benefit.flip .benefit-text {
-  order: 2;
-}
-
-.benefit-text {
+.pillar {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--green);
+  border-radius: var(--radius);
+  padding: var(--sp-6);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: var(--sp-2);
 }
 
-.benefit-text p {
+.pillar h3 {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+}
+
+.pillar p {
   color: var(--dim);
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-8) 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  gap: 0 var(--sp-8);
+  max-width: 62rem;
+}
+
+.features li {
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: var(--sp-3);
+  align-items: baseline;
+}
+
+.features li::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: none;
+  background: var(--red);
+}
+
+.more {
+  margin-top: var(--sp-8);
 }
 
 /* ---------- quick start ---------- */
@@ -424,15 +437,30 @@ h1 {
   color: var(--dim);
 }
 
-/* ---------- compare ---------- */
-.compare {
+/* ---------- community ---------- */
+.community {
   border-bottom: 0;
 }
 
-.compare .btn {
-  align-self: flex-start;
-  display: inline-block;
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
   margin-top: var(--sp-6);
+}
+
+.closing {
+  margin-top: var(--sp-8);
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  color: var(--ink);
+}
+
+@supports (corner-shape: bevel) {
+  .btn,
+  .pillar {
+    corner-shape: bevel;
+  }
 }
 
 @media (max-width: 900px) {
@@ -442,12 +470,6 @@ h1 {
 
   .mark {
     max-width: 15rem;
-  }
-
-  .benefit,
-  .benefit.flip .benefit-text {
-    grid-template-columns: 1fr;
-    order: 0;
   }
 }
 </style>

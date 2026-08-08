@@ -1,14 +1,22 @@
 {
   "tool": "Cypress",
-  "slug": "cypress",
+  "slug": "vs-cypress",
   "tagline": "A JavaScript end-to-end runner with its own browser-embedded UI.",
   "comparedAgainst": "Cypress 13",
   "scenario": "Open a page, click a link, type into a field and assert what it contains.",
-  "left": { "file": "comparison/cypress/test.robot", "name": "test.robot", "lang": "robot" },
-  "right": { "file": "comparison/cypress/test.cy.js", "name": "test.cy.js", "lang": "javascript" },
+  "left": {
+    "file": "comparison/cypress/test.robot",
+    "name": "test.robot",
+    "lang": "robot"
+  },
+  "right": {
+    "file": "comparison/cypress/test.cy.js",
+    "name": "test.cy.js",
+    "lang": "javascript"
+  },
   "notes": [
     "Both wait automatically; neither needs an explicit sleep.",
-    "Browser puts the assertion inside the keyword — Get Text reads and checks in one line.",
+    "Browser puts the assertion inside the keyword \u2014 Get Text reads and checks in one line.",
     "Cypress runs inside the browser; Browser drives it from outside via Playwright.",
     "Cypress supports Chromium-family browsers and Firefox; Browser also drives WebKit."
   ]
