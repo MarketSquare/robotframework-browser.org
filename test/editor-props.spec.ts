@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { defineComponent, h } from 'vue'
@@ -39,7 +41,7 @@ describe('Editor source', () => {
     const { readFileSync } = await import('node:fs')
     const src = readFileSync(process.cwd() + '/app/components/Editor.vue', 'utf8')
     expect(src).toContain('withDefaults(')
-    expect(src).toContain('{ lineNumbers: true }')
+    expect(src).toMatch(/withDefaults\([\s\S]*lineNumbers: true/)
     // The comment above the fix names the old pattern, so strip comments first.
     const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
     expect(code).not.toContain('props.lineNumbers !== false')
@@ -138,5 +140,42 @@ describe('bevelled accents', () => {
       expect(block, `${file} still borders its accent`).not.toMatch(/border-(top|left): 2px solid var\(--(green|teal|red)\)/)
       expect(block, `${file} should paint the accent`).toContain('linear-gradient(')
     }
+  })
+})
+
+describe('code blocks look alike', () => {
+  const read = (p: string) => readFileSync(process.cwd() + '/' + p, 'utf8')
+
+  it('draws dark scrollbars on every dark plate', async () => {
+    const plate = read('app/assets/css/plate.css')
+    const doc = read('app/assets/css/doc.css')
+    /*
+     * :root sets color-scheme: light, so without this the browser renders the
+     * light scrollbar inside a near-black block — a pale bar and track that
+     * reads as a rendering fault. The Libdoc blocks scroll on themselves, so
+     * they need it too.
+     */
+    expect(plate).toMatch(/\.plate \{[^}]*color-scheme: dark/)
+    expect(doc).toMatch(/pre\.doc-code \{[^}]*color-scheme: dark/)
+  })
+
+  it('gives a nameless block no chrome, but the same plate', () => {
+    const editor = read('app/components/Editor.vue')
+    const pre = read('app/components/content/ProsePre.vue')
+    expect(editor).toContain('chrome?: boolean')
+    expect(editor).toMatch(/withDefaults\([\s\S]*chrome: true/)
+    // The bar and status strip go; the plate itself must not.
+    expect(editor).toContain(`<div v-if="props.chrome" class="plate-bar">`)
+    expect(editor).toContain(`<div v-if="props.chrome" class="plate-status">`)
+    expect(editor).toContain(`'is-bare': !props.chrome`)
+    // A fence with a filename keeps its tab.
+    expect(pre).toContain('const hasChrome = computed(() => Boolean(props.filename))')
+  })
+
+  it('keeps the copy button reachable without a bar to hold it', () => {
+    const editor = read('app/components/Editor.vue')
+    const plate = read('app/assets/css/plate.css')
+    expect(editor).toContain('<CopyButton v-else')
+    expect(plate).toMatch(/\.plate\.is-bare \.plate-copy \{[^}]*position: absolute/)
   })
 })

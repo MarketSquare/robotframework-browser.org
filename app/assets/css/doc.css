@@ -130,6 +130,13 @@
   padding: var(--sp-3) var(--sp-4);
   overflow-x: auto;
   white-space: pre;
+  /*
+   * Matches a bare <Editor>: same plate, same padding, same scrollbar. These
+   * blocks come from Libdoc's HTML and cannot be components, so the styling
+   * has to agree by hand — see .plate in plate.css.
+   */
+  color-scheme: dark;
+  box-shadow: var(--shadow);
 }
 
 @supports (corner-shape: bevel) {

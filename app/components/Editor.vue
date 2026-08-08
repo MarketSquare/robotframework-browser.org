@@ -42,8 +42,15 @@ const props = withDefaults(
     files: EditorFile[]
     /** On by default; pass false for short snippets where counting is noise. */
     lineNumbers?: boolean
+    /**
+     * Tab bar and status strip. Off for a block with nothing to put in them —
+     * a snippet with no filename gets a tab reading "Robot Framework", which
+     * is chrome carrying no information. The plate, padding and palette stay
+     * identical either way, so bare and full blocks still read as one family.
+     */
+    chrome?: boolean
   }>(),
-  { lineNumbers: true },
+  { lineNumbers: true, chrome: true },
 )
 
 /** Keep in step with the generated rules in plate.css. */
@@ -121,7 +128,7 @@ function gutter(n: number) {
 </script>
 
 <template>
-  <div class="plate editor" :data-tabs="prepared.length">
+  <div class="plate editor" :class="{ 'is-bare': !props.chrome }" :data-tabs="prepared.length">
     <!--
       Direct children of .plate on purpose: `~ .pane` needs them to be
       siblings of the panes. Visually hidden but focusable, so the tab bar
@@ -137,7 +144,7 @@ function gutter(n: number) {
       :checked="i === 0"
     >
 
-    <div class="plate-bar">
+    <div v-if="props.chrome" class="plate-bar">
       <div class="plate-tabs">
         <label
           v-for="(f, i) in prepared"
@@ -158,6 +165,9 @@ function gutter(n: number) {
       </span>
     </div>
 
+    <!-- With no bar to live in, copy floats over the code. -->
+    <CopyButton v-else :text="prepared[0]!.code" />
+
     <div v-for="(f, i) in prepared" :key="`p-${f.name}`" class="pane" :data-index="i">
       <div class="plate-code">
         <div v-if="showLines" class="plate-gutter" aria-hidden="true">{{ gutter(f.lines) }}</div>
@@ -166,7 +176,7 @@ function gutter(n: number) {
           <pre v-html="rendered?.[i] ?? fallback(f.code)" />
         </div>
       </div>
-      <div class="plate-status">
+      <div v-if="props.chrome" class="plate-status">
         <span>{{ LANG_LABEL[f.lang] ?? f.lang }}</span>
         <span>{{ f.lines }} {{ f.lines === 1 ? 'line' : 'lines' }}</span>
         <span class="push">UTF-8</span>

@@ -54,6 +54,13 @@ const lang = computed(() => {
   return (ALIAS[raw] ?? raw) as Lang
 })
 
+/*
+ * A fence with no filename gets no chrome. Writing ```robot in Markdown is a
+ * statement about the language, not a request for a tab reading "Robot
+ * Framework" — the highlighting already says that.
+ */
+const hasChrome = computed(() => Boolean(props.filename))
+
 const name = computed(() => props.filename || LABEL[props.language ?? ''] || (props.language ?? 'text'))
 
 const file = computed(() => ({
@@ -65,5 +72,5 @@ const file = computed(() => ({
 </script>
 
 <template>
-  <Editor :files="[file]" :line-numbers="false" />
+  <Editor :files="[file]" :line-numbers="false" :chrome="hasChrome" />
 </template>

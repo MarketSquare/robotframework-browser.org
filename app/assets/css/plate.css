@@ -8,6 +8,13 @@
  * light and dark, so a plate looks identical in both themes.
  */
 
+/*
+ * `color-scheme: dark` is not decoration. The page sets `color-scheme: light`
+ * on :root, so a scrollbar inside a dark plate is rendered by the browser in
+ * its light form — a pale bar and track sitting on near-black, which reads as
+ * a rendering fault rather than a scrollbar. This makes the browser draw the
+ * dark one instead.
+ */
 .plate {
   background: var(--term-bg);
   border: 1px solid var(--term-line);
@@ -19,6 +26,7 @@
   border-radius: var(--radius);
   /* Clips the bar and status strip to the beveled outline. */
   overflow: hidden;
+  color-scheme: dark;
 }
 
 @supports (corner-shape: bevel) {
@@ -197,10 +205,6 @@
  * fails loudly at build time rather than rendering a blank pane.
  */
 
-.editor {
-    color-scheme: dark;
-}
-
 
 .editor .pane {
   display: none;
@@ -341,6 +345,24 @@
 .plate-body .line.is-marked {
   background: color-mix(in srgb, var(--term-red) 9%, transparent);
   box-shadow: inset 2px 0 0 var(--term-red);
+}
+
+/* ---------- bare mode ---------- */
+
+/*
+ * A code block with no filename to show. Same plate, same padding, same
+ * palette — just without chrome that would carry no information.
+ */
+.plate.is-bare {
+  position: relative;
+}
+
+.plate.is-bare .plate-copy {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  z-index: 1;
+  background: var(--term-chrome);
 }
 
 /* ---------- status strip ---------- */
