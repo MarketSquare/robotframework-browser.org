@@ -5,6 +5,7 @@ const NAV = [
   { to: '/', label: 'Intro' },
   { to: '/guides/getting-started', label: 'Guides' },
   { to: '/keywords', label: 'Keywords' },
+  { to: '/compare', label: 'Compare' },
   { to: '/styleguide', label: 'Styleguide' },
 ]
 </script>

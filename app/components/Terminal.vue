@@ -17,8 +17,12 @@
 import { type Shell, SHELL_LABEL, SHELL_PROMPT, detectShell } from '~/utils/os'
 
 export interface TerminalStep {
-  /** Typed at the prompt. This, and only this, is what the copy button yields. */
-  command: string
+  /**
+   * Typed at the prompt. This, and only this, is what the copy button yields.
+   * Omit it for a block that is pure output, such as a run summary — an empty
+   * string would otherwise render a bare prompt with nothing after it.
+   */
+  command?: string
   /** Program output, dimmed. */
   output?: string[]
   /** Result lines: a tick in teal, a cross in red. */
@@ -60,14 +64,19 @@ const active = computed(
 
 const lines = computed<Line[]>(() =>
   active.value.steps.flatMap(step => [
-    { kind: 'command' as const, text: step.command },
+    ...(step.command ? [{ kind: 'command' as const, text: step.command }] : []),
     ...(step.output ?? []).map(text => ({ kind: 'output' as const, text })),
     ...(step.status ?? []).map(s => ({ kind: 'status' as const, text: s.text, ok: s.ok })),
   ]),
 )
 
 /** Commands only — prompts and output are chrome. */
-const copyText = computed(() => active.value.steps.map(s => s.command).join('\n'))
+const copyText = computed(() =>
+  active.value.steps
+    .map(s => s.command)
+    .filter((c): c is string => Boolean(c))
+    .join('\n'),
+)
 
 function pick(shell: Shell) {
   chosenByUser.value = true

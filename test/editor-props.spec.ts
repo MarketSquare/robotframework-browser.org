@@ -45,3 +45,43 @@ describe('Editor source', () => {
     expect(code).not.toContain('props.lineNumbers !== false')
   })
 })
+
+describe('payload key stability', () => {
+  it('derives the highlight payload key from content, not render order', async () => {
+    const { readFileSync } = await import('node:fs')
+    const src = readFileSync(process.cwd() + '/app/components/Editor.vue', 'utf8')
+    const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+
+    // useId() numbers by render order, so it differs between a direct page
+    // load and a client-side navigation. Keying the payload on it made the
+    // prerendered highlight miss on navigation, and every block fell back to
+    // plain text until reload.
+    expect(code).not.toMatch(/useAsyncData\(\s*`editor-\$\{uid\}`/)
+    expect(code).toContain('useAsyncData(payloadKey')
+    expect(code).toMatch(/const payloadKey = `editor-\$\{fnv1a\(/)
+  })
+
+  it('never joins fallback lines with a newline', async () => {
+    const { readFileSync } = await import('node:fs')
+    const src = readFileSync(process.cwd() + '/app/components/Editor.vue', 'utf8')
+
+    // Only the fallback: the gutter joins line numbers with '\n' on purpose,
+    // because it is white-space: pre and the newline IS its line break.
+    const fallback = src.slice(src.indexOf('function fallback'), src.indexOf('function gutter'))
+    expect(fallback).toContain('.line')
+    // `.line` is display:block, so a newline separator breaks every line twice.
+    expect(fallback).not.toMatch(/\.join\('\\n'\)/)
+    expect(fallback).toMatch(/\.join\(''\)/)
+  })
+})
+
+describe('Terminal steps', () => {
+  it('allows an output-only step without rendering a bare prompt', async () => {
+    const { readFileSync } = await import('node:fs')
+    const src = readFileSync(process.cwd() + '/app/components/Terminal.vue', 'utf8')
+    // A run summary is pure output; `command: ''` used to render "$" alone.
+    expect(src).toContain('command?: string')
+    expect(src).toContain('step.command ? [{ kind:')
+    expect(src).toContain(".filter((c): c is string => Boolean(c))")
+  })
+})

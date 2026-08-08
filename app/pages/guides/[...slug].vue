@@ -1,9 +1,31 @@
 <script setup lang="ts">
 const route = useRoute()
-const path = computed(() => `/guides/${(route.params.slug as string[]).join('/')}`)
 
-const { data: doc } = await useAsyncData(`guide-${path.value}`, () =>
-  queryCollection('guides').path(path.value).first(),
+/**
+ * `.filter(Boolean)` is load-bearing, not tidiness.
+ *
+ * A catch-all route splits a trailing slash into an empty final segment, so
+ * hard-loading `/guides/getting-started/` — which is exactly what a static
+ * host serves, and what every direct link and search result uses — produced
+ * the path `/guides/getting-started/`. That missed both the prerendered
+ * payload and the content query, leaving `doc` null and the entire page
+ * rendering blank after hydration. Client-side navigation hid it, because
+ * NuxtLink hrefs carry no trailing slash.
+ */
+const path = computed(
+  () => `/guides/${(route.params.slug as string[]).filter(Boolean).join('/')}`,
+)
+
+/*
+ * Server-only on purpose. Every route here is prerendered and Nuxt's payload
+ * extraction carries the result to the client, so the browser never needs to
+ * run a content query — and Nuxt Content only ships its client-side SQLite
+ * WASM engine (~540 KB: sqlite3-worker1, an OPFS proxy and support code) when
+ * a query can execute in the browser. Guarding the call keeps that out of the
+ * bundle; scripts/check-bundle.mjs fails the build if it comes back.
+ */
+const { data: doc } = await useAsyncData(`guide-${path.value}`, async () =>
+  import.meta.server ? await queryCollection('guides').path(path.value).first() : null,
 )
 
 if (!doc.value) {

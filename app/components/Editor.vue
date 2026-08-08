@@ -53,6 +53,33 @@ if (props.files.length > MAX_TABS) {
 const uid = useId()
 const showLines = computed(() => props.lineNumbers)
 
+/**
+ * The payload key must be derived from the CONTENT, not from useId().
+ *
+ * useId() numbers components by render order, which differs between a direct
+ * load of a page and a client-side navigation to it. That made the key miss
+ * the prerendered payload on navigation, so useAsyncData re-ran its handler in
+ * the browser — where the `import.meta.server` branch is stripped, so it
+ * returned [] and every block silently fell back to unhighlighted plain text
+ * until the reader hit reload.
+ *
+ * Hashing the files makes the key identical in both cases, so the payload is
+ * always found. Two identical Editors sharing a key is correct: same input,
+ * same output.
+ */
+function fnv1a(input: string): string {
+  let h = 0x811c9dc5
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i)
+    h = Math.imul(h, 0x01000193) >>> 0
+  }
+  return h.toString(36)
+}
+
+const payloadKey = `editor-${fnv1a(
+  props.files.map(f => `${f.name}|${f.lang}|${f.highlightLines?.join(',') ?? ''}|${f.code}`).join('\u0000'),
+)}`
+
 const prepared = computed(() =>
   props.files.map(f => {
     const code = f.code.replace(/\n+$/, '')
@@ -60,7 +87,7 @@ const prepared = computed(() =>
   }),
 )
 
-const { data: rendered } = await useAsyncData(`editor-${uid}`, async () => {
+const { data: rendered } = await useAsyncData(payloadKey, async () => {
   if (import.meta.server) {
     const { highlight } = await import('~/utils/highlight')
     return Promise.all(
@@ -77,7 +104,8 @@ function fallback(code: string) {
   return code
     .split('\n')
     .map(l => `<span class="line">${l.replace(/[&<>]/g, c => ESC[c]!)}</span>`)
-    .join('\n')
+    // No separator: `.line` is display:block, so a newline would break twice.
+    .join('')
 }
 
 function gutter(n: number) {
