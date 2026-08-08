@@ -6,19 +6,32 @@
  * Body content, any Markdown.
  * ::
  */
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title?: string
     /** Painted stripe along the top edge. */
     accent?: 'none' | 'green' | 'red' | 'teal'
+    /** Makes the whole card a link. */
     to?: string
   }>(),
   { accent: 'none' },
 )
+
+/*
+ * `resolveComponent`, not the string 'NuxtLink'.
+ *
+ * `<component :is="'NuxtLink'">` looks like it works and does not: a string
+ * `is` is treated as a native element name, so Vue emitted a literal
+ * <NuxtLink> tag that the browser rendered as an unknown inline element. The
+ * card looked right and simply was not clickable — and because 'article' *is*
+ * a real tag, the non-link case gave no hint anything was wrong.
+ */
+const NuxtLink = resolveComponent('NuxtLink')
+const tag = computed(() => (props.to ? NuxtLink : 'article'))
 </script>
 
 <template>
-  <component :is="to ? 'NuxtLink' : 'article'" :to="to" class="card" :class="`accent-${accent}`">
+  <component :is="tag" :to="to" class="card" :class="`accent-${accent}`">
     <h3 v-if="title">{{ title }}</h3>
     <div class="card-body"><slot /></div>
   </component>
@@ -60,8 +73,39 @@ withDefaults(
     var(--panel);
 }
 
+/*
+ * A card that is a link has to look like one before it is hovered — a whole
+ * clickable panel with no affordance is a panel people do not click. The
+ * arrow is the cheapest signal that does not turn the title teal and fight
+ * the accent stripe.
+ */
+a.card h3::after {
+  content: ' →';
+  color: var(--teal);
+  white-space: nowrap;
+}
+
+a.card {
+  transition: border-color 0.12s, transform 0.12s;
+}
+
 a.card:hover {
   border-color: var(--line-strong);
+  transform: translateY(-2px);
+}
+
+a.card:hover h3::after {
+  color: var(--red);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.card {
+    transition: none;
+  }
+
+  a.card:hover {
+    transform: none;
+  }
 }
 
 h3 {

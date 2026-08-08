@@ -24,12 +24,13 @@ Three places, and they are good at different things. None of them requires you
 to have a bug, or to know what you are doing yet.
 
 :::card-grid
-::card{title="Slack — #browser" accent="red" to="https://slack.robotframework.org/"}
+::card{title="Slack — #browser" accent="red" to="https://robotframework.org/#community"}
 The fast one. Half-formed questions welcome, and the people who wrote the
-library read it. Join the Robot Framework workspace, then find `#browser`.
+library read it. Join the Robot Framework workspace from the community section,
+then find `#browser`.
 ::
 
-::card{title="Forum" accent="teal" to="https://forum.robotframework.org/c/libraries/browser"}
+::card{title="Forum" accent="teal" to="https://forum.robotframework.org/"}
 The one that lasts. A forum thread is still findable in two years, which makes
 it the better place for anything the next person will also wonder about.
 ::
