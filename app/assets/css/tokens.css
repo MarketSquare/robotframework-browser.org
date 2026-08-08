@@ -72,14 +72,22 @@
    * Terminal / editor plate.
    * Deliberately identical in both themes: code is dark everywhere, so the
    * syntax palette is defined once and the two themes cannot drift apart.
+   *
+   * The chrome/tab/content steps are wide on purpose. At the original values
+   * (#1c1a16 bar over #14120f content) the bar barely separated from the code
+   * it sat on, and --term-faint at #6f675c left line numbers and status labels
+   * close to unreadable.
+   *
+   * --term-bg and --term-ink must stay in step with themes/rfb-plate.json;
+   * test/highlight.spec.ts enforces it.
    */
-  --term-bg: #14120f;
-  --term-chrome: #1c1a16;
-  --term-tab: #211e19;
-  --term-line: #2e2a24;
+  --term-bg: #14120f; /* code surface — darkest */
+  --term-chrome: #2c2822; /* bar, status strip */
+  --term-tab: #383229; /* inactive tab — lighter still */
+  --term-line: #453f35;
   --term-ink: #ede9e1;
-  --term-dim: #a39c90;
-  --term-faint: #6f675c;
+  --term-dim: #b3aa9c;
+  --term-faint: #9a907f; /* line numbers, status labels — 5.0:1 on the bar */
   --term-red: #ff6b5e;
   --term-teal: #3fc9bc;
 
@@ -117,6 +125,9 @@
   --sp-16: 4rem;
   --sp-24: 6rem;
 
+  --radius: 7px;
+  --radius-sm: 4px;
+
   --measure: 66ch;
   --gutter: clamp(1.25rem, 5vw, 4rem);
 
@@ -127,15 +138,25 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --paper: #14120f;
-    --chrome: #1c1a16;
-    --panel: #201d19;
-    --line: #2e2a24;
-    --line-strong: #454038;
+    /*
+     * These were #14120f — the exact value of --term-bg — so every code
+     * block and terminal was the same colour as the page behind it and
+     * disappeared entirely.
+     *
+     * The ground now sits ABOVE the plate. #14120f is so close to black that
+     * nothing can be placed below it with a perceptible step, so rather than
+     * a near-black page the dark theme uses a warm charcoal and the plate
+     * stays the darkest surface in BOTH themes — one rule, not two.
+     */
+    --paper: #322d26;
+    --chrome: #2a2620;
+    --panel: #3b352d;
+    --line: #4a4339;
+    --line-strong: #625a4d;
 
     --ink: #ede9e1;
-    --dim: #a39c90;
-    --faint: #7a7266;
+    --dim: #b5ac9e;
+    --faint: #9e9484;
 
     --red: #ff6b5e;
     --red-text: #ff6b5e;
@@ -153,15 +174,15 @@
 /* ---------- dark: explicit choice, wins over a light OS ---------- */
 
 :root[data-theme='dark'] {
-  --paper: #14120f;
-  --chrome: #1c1a16;
-  --panel: #201d19;
-  --line: #2e2a24;
-  --line-strong: #454038;
+  --paper: #322d26;
+  --chrome: #2a2620;
+  --panel: #3b352d;
+  --line: #4a4339;
+  --line-strong: #625a4d;
 
   --ink: #ede9e1;
-  --dim: #a39c90;
-  --faint: #7a7266;
+  --dim: #b5ac9e;
+  --faint: #9e9484;
 
   --red: #ff6b5e;
   --red-text: #ff6b5e;

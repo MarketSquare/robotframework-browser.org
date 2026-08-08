@@ -92,6 +92,7 @@ const uid = useId()
 }
 
 .cmp-exp {
+  border-radius: var(--radius-sm);
   font-family: var(--font-display);
   font-size: var(--step--2);
   letter-spacing: 0.1em;

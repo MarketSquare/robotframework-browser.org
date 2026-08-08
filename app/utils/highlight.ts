@@ -79,5 +79,13 @@ export async function highlight(
   })
 
   const match = html.match(/<code[^>]*>([\s\S]*)<\/code>/)
-  return match?.[1] ?? html
+  const inner = match?.[1] ?? html
+
+  /*
+   * Shiki separates its line spans with a newline. Our `.line` rule is
+   * display:block so it can paint a marked range full width, which means the
+   * newline becomes a *second* break and every block renders double-spaced.
+   * Drop the separators; keep newlines that live inside a line's own content.
+   */
+  return inner.replace(/<\/span>\n(?=<span class="line)/g, '</span>')
 }

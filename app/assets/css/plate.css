@@ -16,6 +16,15 @@
   font-family: var(--font-mono);
   font-size: var(--step--1);
   line-height: 1.75;
+  border-radius: var(--radius);
+  /* Clips the bar and status strip to the beveled outline. */
+  overflow: hidden;
+}
+
+@supports (corner-shape: bevel) {
+  .plate {
+    corner-shape: bevel;
+  }
 }
 
 /* ---------- top bar ---------- */
@@ -64,6 +73,7 @@
 /* ---------- copy ---------- */
 
 .plate-copy {
+  border-radius: var(--radius-sm);
   font-family: var(--font-display);
   font-size: var(--step--2);
   letter-spacing: 0.14em;
@@ -84,6 +94,12 @@
 .plate-copy:hover {
   color: var(--term-ink);
   border-color: var(--term-faint);
+}
+
+@supports (corner-shape: bevel) {
+  .plate-copy {
+    corner-shape: bevel;
+  }
 }
 
 .plate-copy[data-copied='true'] {
@@ -120,6 +136,17 @@
 
 .plate-tab:hover {
   color: var(--term-dim);
+}
+
+/* Top corners only: the active tab must still fuse with the code below it. */
+.plate-tab {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+@supports (corner-shape: bevel) {
+  .plate-tab {
+    corner-shape: bevel;
+  }
 }
 
 /* File tabs carry the filename in the code face; OS tabs are a display label. */
@@ -295,7 +322,11 @@
   padding: 0 var(--sp-4);
 }
 
-/* Shiki emits one .line per source line. */
+/*
+ * Shiki emits one .line per source line. `display: block` is what breaks the
+ * lines — the newlines Shiki puts *between* the spans are stripped in
+ * utils/highlight.ts, because keeping both renders everything double-spaced.
+ */
 .plate-body .line {
   display: block;
   min-height: 1.75em;
@@ -328,10 +359,29 @@
 
 /* ---------- terminal ---------- */
 
+/*
+ * One block per line, no newlines in the markup. Terminal.vue renders a flat
+ * list of typed lines precisely so the break comes from one source only.
+ */
+.term-lines {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--sp-4);
+}
+
 .term-line {
   display: block;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.term-mark {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.term-statustext {
+  color: var(--term-dim);
 }
 
 /*

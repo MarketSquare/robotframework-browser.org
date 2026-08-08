@@ -115,6 +115,32 @@ table {
   max-width: 100%;
 }
 
+/*
+ * Corners.
+ *
+ * The house shape is a bevel — a cut corner rather than a curve, which suits
+ * OCR-A's flat geometry better than a radius does. `corner-shape` needs a
+ * `border-radius` to have something to shape, so the radius is the natural
+ * fallback: browsers without `corner-shape` simply render rounded corners.
+ *
+ * Unlike clip-path, this shapes the border and box-shadow too, so a beveled
+ * plate keeps its outline.
+ */
+.bevel {
+  border-radius: var(--radius);
+}
+
+.bevel-sm {
+  border-radius: var(--radius-sm);
+}
+
+@supports (corner-shape: bevel) {
+  .bevel,
+  .bevel-sm {
+    corner-shape: bevel;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -123,5 +149,17 @@ table {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * Bevel the small controls and cards that carry a radius. Kept here rather
+ * than repeated in every component so the shape is defined in one place.
+ */
+@supports (corner-shape: bevel) {
+  .toggle,
+  .cmp-exp,
+  .sg-swatch {
+    corner-shape: bevel;
   }
 }

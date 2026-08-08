@@ -9,6 +9,10 @@
  * When more than one shell is supplied, the tabs auto-select the reader's
  * own OS on mount. SSR always renders the first session so the prerendered
  * HTML is deterministic.
+ *
+ * Steps are flattened to a list of typed lines rather than interpolated into
+ * a <pre> with literal newlines. Line breaks come from `display: block`
+ * alone; a newline in the markup *as well* renders every line double-spaced.
  */
 import { type Shell, SHELL_LABEL, SHELL_PROMPT, detectShell } from '~/utils/os'
 
@@ -25,6 +29,11 @@ export interface TerminalSession {
   shell: Shell
   steps: TerminalStep[]
 }
+
+type Line =
+  | { kind: 'command'; text: string }
+  | { kind: 'output'; text: string }
+  | { kind: 'status'; text: string; ok: boolean }
 
 const props = defineProps<{
   sessions: TerminalSession[]
@@ -49,6 +58,14 @@ const active = computed(
   () => props.sessions.find(s => s.shell === selected.value) ?? props.sessions[0]!,
 )
 
+const lines = computed<Line[]>(() =>
+  active.value.steps.flatMap(step => [
+    { kind: 'command' as const, text: step.command },
+    ...(step.output ?? []).map(text => ({ kind: 'output' as const, text })),
+    ...(step.status ?? []).map(s => ({ kind: 'status' as const, text: s.text, ok: s.ok })),
+  ]),
+)
+
 /** Commands only — prompts and output are chrome. */
 const copyText = computed(() => active.value.steps.map(s => s.command).join('\n'))
 
@@ -63,23 +80,21 @@ function pick(shell: Shell) {
     <div class="plate-bar">
       <span class="plate-dots" aria-hidden="true"><i /><i /><i /></span>
 
-      <template v-if="multi">
-        <div class="plate-tabs" role="tablist" :aria-label="'Shell'">
-          <template v-for="s in props.sessions" :key="s.shell">
-            <input
-              :id="`${uid}-${s.shell}`"
-              class="plate-radio"
-              type="radio"
-              :name="`${uid}-shell`"
-              :checked="selected === s.shell"
-              @change="pick(s.shell)"
-            >
-            <label class="plate-tab plate-tab--shell" :for="`${uid}-${s.shell}`">
-              {{ SHELL_LABEL[s.shell] }}
-            </label>
-          </template>
-        </div>
-      </template>
+      <div v-if="multi" class="plate-tabs">
+        <template v-for="s in props.sessions" :key="s.shell">
+          <input
+            :id="`${uid}-${s.shell}`"
+            class="plate-radio"
+            type="radio"
+            :name="`${uid}-shell`"
+            :checked="selected === s.shell"
+            @change="pick(s.shell)"
+          >
+          <label class="plate-tab plate-tab--shell" :for="`${uid}-${s.shell}`">
+            {{ SHELL_LABEL[s.shell] }}
+          </label>
+        </template>
+      </div>
       <span v-else class="plate-title">{{ props.title ?? SHELL_LABEL[active.shell] }}</span>
 
       <span class="plate-actions">
@@ -88,10 +103,22 @@ function pick(shell: Shell) {
     </div>
 
     <div class="plate-body">
-      <pre><template v-for="(step, i) in active.steps" :key="i"><span class="term-line"><span class="term-prompt">{{ SHELL_PROMPT[active.shell] }}</span><span class="term-command">{{ step.command }}</span></span>
-<template v-for="(line, j) in step.output ?? []" :key="`o${j}`"><span class="term-line term-output">{{ line }}</span>
-</template><template v-for="(s, k) in step.status ?? []" :key="`s${k}`"><span class="term-line"><span :class="s.ok ? 'term-ok' : 'term-fail'">{{ s.ok ? '✓' : '✗' }}</span> <span class="term-output">{{ s.text }}</span></span>
-</template></template></pre>
+      <div class="term-lines">
+        <span
+          v-for="(line, i) in lines"
+          :key="i"
+          class="term-line"
+          :class="{
+            'term-output': line.kind === 'output',
+            'term-ok': line.kind === 'status' && line.ok,
+            'term-fail': line.kind === 'status' && !line.ok,
+          }"
+        >
+          <span v-if="line.kind === 'command'" class="term-prompt">{{ SHELL_PROMPT[active.shell] }}</span>
+          <span v-if="line.kind === 'status'" class="term-mark">{{ line.ok ? '✓' : '✗' }} </span>
+          <span :class="{ 'term-command': line.kind === 'command', 'term-statustext': line.kind === 'status' }">{{ line.text }}</span>
+        </span>
+      </div>
     </div>
   </div>
 </template>

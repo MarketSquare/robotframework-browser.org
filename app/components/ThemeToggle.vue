@@ -53,6 +53,7 @@ const LABEL: Record<Theme, string> = { system: 'AUTO', light: 'LIGHT', dark: 'DA
 
 <style scoped>
 .toggle {
+  border-radius: var(--radius-sm);
   font-family: var(--font-display);
   font-size: var(--step--2);
   letter-spacing: 0.14em;

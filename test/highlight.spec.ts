@@ -145,3 +145,18 @@ describe('language labels', () => {
     expect(LANG_LABEL[ROBOT_REPL]).toBe('Robot Framework')
   })
 })
+
+describe('line separators', () => {
+  it('emits no newline between line spans', async () => {
+    // `.line` is display:block so a marked range can paint full width. A
+    // newline between the spans would then be a second break, rendering
+    // every code block double-spaced.
+    const html = await highlight(SUITE, ROBOT)
+    expect(html).not.toMatch(/<\/span>\n<span class="line/)
+  })
+
+  it('still emits one line element per source line', async () => {
+    const html = await highlight(SUITE, ROBOT)
+    expect((html.match(/class="line/g) ?? []).length).toBe(SUITE.trimEnd().split('\n').length)
+  })
+})

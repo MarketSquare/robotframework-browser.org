@@ -315,6 +315,7 @@ section {
 }
 
 .sg-swatch {
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   gap: var(--sp-2);
@@ -325,6 +326,7 @@ section {
 }
 
 .sg-chip {
+  border-radius: 2px;
   width: 1rem;
   height: 1rem;
   display: block;
