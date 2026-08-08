@@ -1,0 +1,4 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]: browser-light.svg ON PAPER
+  - generic [ref=e5]: browser-dark.svg ON PLATE
+  - generic [ref=e8]: browser-mark.svg INLINE currentColor

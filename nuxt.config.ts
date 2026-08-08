@@ -19,7 +19,7 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
-      link: [{ rel: 'icon', href: '/logo/browser-light.svg', type: 'image/svg+xml' }],
+      link: [{ rel: 'icon', href: '/logo/browser.svg', type: 'image/svg+xml' }],
       script: [
         {
           // Applies a stored theme choice before first paint. Without this the
