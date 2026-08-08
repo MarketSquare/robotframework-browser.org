@@ -8,7 +8,7 @@ description: Browser is built by the people who use it. Where to find us, six wa
 Built by the people who use it.
 
 #default
-Browser library is built in the open by **206 people so far**, and paid for by
+Browser library is built in the open by **206 people so far**, and supported by
 companies who decided it was worth funding. Most of those people started the
 same way: they found something, said something, and made it better. That is a
 lower bar than it sounds, and you are already close enough to clear it.
