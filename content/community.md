@@ -8,10 +8,10 @@ description: Browser is built by the people who use it. Where to find us, six wa
 Built by the people who use it.
 
 #default
-Browser library has no company behind it and no support contract. It has a
-community — **206 people so far** — who found something, said something, and
-made it better. That is a lower bar than it sounds, and you are already close
-enough to clear it.
+Browser library is built in the open by **206 people so far**, and paid for by
+companies who decided it was worth funding. Most of those people started the
+same way: they found something, said something, and made it better. That is a
+lower bar than it sounds, and you are already close enough to clear it.
 
 :::btn-row
 :btn{to="#ways" primary}[Ways to help]
@@ -20,8 +20,8 @@ enough to clear it.
 ::::
 
 ::::page-section{label="Where we are" title="Come and say hello."}
-Two places, and they answer different questions. Neither of them requires you to
-have a bug, or to know what you are doing yet.
+Three places, and they are good at different things. None of them requires you
+to have a bug, or to know what you are doing yet.
 
 :::card-grid
 ::card{title="Slack — #browser" accent="red" to="https://slack.robotframework.org/"}
@@ -145,10 +145,25 @@ line of code for Browser, which is rather the point.
 ::contributor-wall
 ::
 
-**Supported by** [Robocorp](https://robocorp.com/) through the
-[Robot Framework Foundation](https://robotframework.org/foundation/), whose
-funding is why this library got built at all.
-
 Missing from this list, or listed wrongly? Say so in an issue — being forgotten
 is a bug too.
+
+### Who pays for it
+
+Open source is not the same as free to produce. Some of the work above was paid
+for, and it is worth being specific about by whom:
+
+- **[Robocorp](https://robocorp.com/)** funded the initial development. Browser
+  exists in the first place because they backed it.
+- The **[Robot Framework Foundation](https://robotframework.org/foundation/)**
+  has funded development several times since, out of its members' fees.
+- **[imbus](https://www.imbus.de/)** sponsors development time for one of the
+  maintainers, so that maintenance is somebody's job rather than only their
+  evenings.
+
+None of that makes Browser a product with a vendor behind it — the roadmap is
+still decided in the open, by the people doing the work. But if your company
+depends on this library, [joining the Foundation](https://robotframework.org/foundation/)
+is a way to contribute that costs nobody their spare time, and it is what keeps
+the funded work funded.
 ::::
