@@ -3,6 +3,7 @@ const { version } = useKeywordIndex()
 
 const NAV = [
   { to: '/', label: 'Intro' },
+  { to: '/guides/getting-started', label: 'Guides' },
   { to: '/keywords', label: 'Keywords' },
   { to: '/styleguide', label: 'Styleguide' },
 ]

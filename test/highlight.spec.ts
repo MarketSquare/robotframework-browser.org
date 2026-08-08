@@ -2,7 +2,8 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import { LANG_LABEL, ROBOT, ROBOT_REPL, highlight } from '../app/utils/highlight'
+import { highlight } from '../app/utils/highlight'
+import { LANG_LABEL, ROBOT, ROBOT_REPL } from '../app/utils/lang'
 
 const ROOT = process.cwd()
 

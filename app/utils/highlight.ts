@@ -20,7 +20,12 @@ import rfReplGrammar from '../../syntaxes/robotframework-repl.tmLanguage.json'
 import plateTheme from '../../themes/rfb-plate.json'
 import { type Lang, ROBOT, ROBOT_REPL, THEME } from './lang'
 
-export { LANG_LABEL, ROBOT, ROBOT_REPL, THEME, type Lang } from './lang'
+/*
+ * Deliberately NOT re-exporting lang.ts's names. Nuxt auto-imports everything
+ * under app/utils, so re-exporting them from here registers each name twice
+ * and Nuxt warns about the duplicate. Import them from './lang' directly —
+ * which is also the module components are allowed to touch.
+ */
 
 /** Languages the comparison and guides need, beyond Robot Framework. */
 const BUNDLED: BundledLanguage[] = ['python', 'typescript', 'javascript', 'bash', 'json', 'yaml']

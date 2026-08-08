@@ -122,6 +122,12 @@ The SVG also carries Inkscape metadata and references `OCRAStd` as a live font f
 
 ### 5.2 Colour tokens
 
+> **Open design note (2026-08-08).** The current warm neutral reads as too
+> brown. Next revision: take the dark theme's neutrals from robotframework.org's
+> own dark palette, and use the logo's red *and* green as heading accents rather
+> than red alone. Not yet applied — every colour is a token, so this is a change
+> to `tokens.css` and nothing else.
+
 Light is the default. Dark is a designed second theme, not an inversion. Every colour is a custom property; no component is ever painted from inside a media query.
 
 ```css
