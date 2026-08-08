@@ -8,3 +8,5 @@ dist
 .env
 coverage
 .playwright-mcp
+app/generated
+public/libdoc

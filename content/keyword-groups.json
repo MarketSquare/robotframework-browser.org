@@ -1,0 +1,25 @@
+{
+  "_comment": "Libdoc JSON carries no group field. Groups are derived from each keyword's defining module (its `source` path), which maps exactly onto the library's own layout. An unmapped module falls back to a title-cased filename and logs a build warning, so a new module never silently disappears from the rail.",
+  "groups": [
+    { "module": "interaction.py",          "name": "Interaction" },
+    { "module": "getters.py",              "name": "Getters & Assertions" },
+    { "module": "playwright_state.py",     "name": "Browser, Context & Page" },
+    { "module": "browser_control.py",      "name": "Browser Control" },
+    { "module": "waiter.py",               "name": "Waiting" },
+    { "module": "webapp_state.py",         "name": "Web App State" },
+    { "module": "cookie.py",               "name": "Cookies" },
+    { "module": "network.py",              "name": "Network" },
+    { "module": "evaluation.py",           "name": "JavaScript Evaluation" },
+    { "module": "promises.py",             "name": "Promises" },
+    { "module": "credential.py",           "name": "Credentials" },
+    { "module": "clock.py",                "name": "Clock" },
+    { "module": "locator_handler.py",      "name": "Locator Handlers" },
+    { "module": "coverage.py",             "name": "Coverage" },
+    { "module": "pdf.py",                  "name": "PDF" },
+    { "module": "device_descriptors.py",   "name": "Devices" },
+    { "module": "crawling.py",             "name": "Crawling" },
+    { "module": "strict_mode.py",          "name": "Strict Mode" },
+    { "module": "assertion_formatter.py",  "name": "Assertion Formatter" },
+    { "module": "runonfailure.py",         "name": "Run On Failure" }
+  ]
+}
