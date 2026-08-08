@@ -35,8 +35,15 @@ export const LIBRARY_NAME = libdoc.libraryName
 export interface TypeEntry {
   name: string
   slug: string
+  anchor: string
   kind: 'Enum' | 'TypedDict' | 'Standard' | 'Custom'
   usedByCount: number
+}
+
+export interface IntroSection {
+  title: string
+  slug: string
+  level: number
 }
 
 export function useKeywordIndex() {
@@ -44,6 +51,7 @@ export function useKeywordIndex() {
     index: libdoc.index as IndexEntry[],
     groups: libdoc.groups as GroupEntry[],
     types: libdoc.types as TypeEntry[],
+    introSections: libdoc.introSections as IntroSection[],
     version: LATEST_VERSION,
   }
 }

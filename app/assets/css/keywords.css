@@ -1,0 +1,289 @@
+/*
+ * The keyword reference. Structure follows the Libdoc redesign; colour, type
+ * and shape follow this site's tokens.
+ *
+ * Global rather than scoped because the panels are rendered inside a server
+ * component (an island), which scoped styles from the page do not reach.
+ */
+
+.panels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+/* ---------- headings between groups ---------- */
+
+.group-heading {
+  font-size: var(--step-2);
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin: var(--sp-12) 0 var(--sp-2);
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--red);
+  scroll-margin-top: 5rem;
+}
+
+.group-heading i {
+  font-style: normal;
+  font-size: var(--step--2);
+  font-family: var(--font-display);
+  color: var(--faint);
+}
+
+.intro-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  scroll-margin-top: 5rem;
+}
+
+.intro-section h2 {
+  font-size: var(--step-2);
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--red);
+}
+
+/* ---------- the keyword panel ---------- */
+
+/*
+ * The panel is the muted creme; the page behind it is white. That inversion
+ * is what makes 151 stacked panels readable — each one is an object on a
+ * surface rather than a run of text with rules through it.
+ */
+.kw {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  /* Clear of the sticky header when jumped to by anchor. */
+  scroll-margin-top: 5rem;
+  min-width: 0;
+}
+
+@supports (corner-shape: bevel) {
+  .kw {
+    corner-shape: bevel;
+  }
+}
+
+/* The panel you arrived at. Matches the redesign's targeted-keyword accent. */
+.kw:target {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 1px var(--teal);
+}
+
+.kw-name {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 400;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.kw-anchor {
+  color: var(--ink);
+  border-bottom: 0;
+}
+
+.kw-anchor:hover {
+  color: var(--red-text);
+}
+
+.kw-short {
+  margin: 0;
+  color: var(--dim);
+  max-width: var(--measure);
+}
+
+.kw-short code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--chrome);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.05em 0.3em;
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.block.inline-block {
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--sp-3);
+}
+
+.block h4 {
+  font-family: var(--font-display);
+  font-size: var(--step--2);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 400;
+  margin: 0;
+}
+
+.block.none {
+  color: var(--faint);
+  font-size: 0.9rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+}
+
+/* ---------- arguments ---------- */
+
+table.args {
+  width: 100%;
+  min-width: 28rem;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+table.args th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom: 1px solid var(--line-strong);
+  padding: 0 var(--sp-4) var(--sp-2) 0;
+}
+
+table.args td {
+  padding: var(--sp-2) var(--sp-4) var(--sp-2) 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: baseline;
+}
+
+table.args tr:last-child td {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.a-name {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: baseline;
+}
+
+.ident {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
+
+.req,
+.named {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.req {
+  color: var(--red-text);
+}
+
+/* `= left`, as the redesign writes it — the equals sign carries the meaning. */
+.a-default .eq {
+  color: var(--faint);
+  margin-right: 0.35em;
+}
+
+.a-default code {
+  font-family: var(--font-mono);
+  color: var(--dim);
+}
+
+.a-type,
+.a-type a {
+  font-family: var(--font-mono);
+  color: var(--teal);
+}
+
+/* ---------- tags and values ---------- */
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.pill {
+  font-family: var(--font-display);
+  font-size: var(--step--2);
+  letter-spacing: 0.1em;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.pill.link {
+  color: var(--teal);
+  border-color: color-mix(in srgb, var(--teal) 40%, transparent);
+}
+
+.pill.link:hover {
+  border-color: var(--teal);
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--chrome);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 0.15em 0.5em;
+  color: var(--ink);
+}
+
+.kind {
+  font-family: var(--font-display);
+  font-size: var(--step--2);
+  letter-spacing: 0.12em;
+  color: var(--teal);
+  border: 1px solid color-mix(in srgb, var(--teal) 45%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.45rem;
+}
+
+.kw-source {
+  margin: 0;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--line);
+  font-size: 0.8rem;
+  color: var(--faint);
+}
+
+/* ---------- filtering ---------- */
+
+/*
+ * Applied by the page's filter. `display: none` rather than removing nodes:
+ * the panels are server-rendered and there is no client-side copy of the data
+ * to re-render from.
+ */
+.kw[hidden],
+.group-heading[hidden] {
+  display: none;
+}

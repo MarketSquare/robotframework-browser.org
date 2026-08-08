@@ -51,19 +51,19 @@ describe('rewriteHref', () => {
   const ctx = { keywordNames: new Set(['Add Cookie', 'Click']), typeNames: new Set(['Proxy']) }
 
   it('routes a keyword anchor to its page', () => {
-    expect(rewriteHref('#Add%20Cookie', ctx)).toBe('/keywords/add-cookie')
+    expect(rewriteHref('#Add%20Cookie', ctx)).toBe('#add-cookie')
   })
 
   it('routes a type anchor to its type page', () => {
-    expect(rewriteHref('#type-Proxy', ctx)).toBe('/keywords/types/proxy')
+    expect(rewriteHref('#type-Proxy', ctx)).toBe('#type--proxy')
   })
 
   it('keeps absolute links', () => {
     expect(rewriteHref('https://playwright.dev/', ctx)).toBe('https://playwright.dev/')
   })
 
-  it('sends an unknown fragment to the introduction, not a dead keyword route', () => {
-    expect(rewriteHref('#Implicit waiting', ctx)).toBe('/keywords#implicit-waiting')
+  it('sends an unknown fragment to the introduction section, not a dead anchor', () => {
+    expect(rewriteHref('#Implicit waiting', ctx)).toBe('#implicit-waiting')
   })
 
   it('unlinks a type anchor with no typedoc', () => {
@@ -136,7 +136,7 @@ describe('transform over the real spec', () => {
     const click = result.keywords.find(k => k.name === 'Click')!
     const button = click.args.find(a => a.name === 'button')!
     expect(button.typeName).toBe('MouseButton')
-    expect(button.typeHref).toBe('/keywords/types/mousebutton')
+    expect(button.typeHref).toBe('#type--mousebutton')
     expect(button.defaultValue).toBe('left')
     expect(button.required).toBe(false)
   })
@@ -227,5 +227,56 @@ describe('renderInline', () => {
     for (const k of result.index) {
       expect(k.shortdocHtml, k.name).not.toContain('``')
     }
+  })
+})
+
+describe('single-page anchors', () => {
+  it('keeps type anchors clear of keywords that begin with "Type"', async () => {
+    const { typeAnchor } = await import('../lib/libdoc')
+    // `Type Secret` slugs to `type-secret`. With a single-hyphen prefix the
+    // type `Secret` produced the same id: a duplicate anchor, an unreachable
+    // panel, and a filter that could not tell the two apart.
+    expect(typeAnchor('Secret')).toBe('type--secret')
+    expect(slug('Type Secret')).toBe('type-secret')
+    expect(typeAnchor('Secret')).not.toBe(slug('Type Secret'))
+    expect(typeAnchor('Text')).not.toBe(slug('Type Text'))
+  })
+
+  it('cannot collide by construction, because slug never emits a double hyphen', async () => {
+    const { typeAnchor } = await import('../lib/libdoc')
+    for (const name of ['Type  Secret', 'Type - Secret', 'Type--Secret', 'type   secret']) {
+      expect(slug(name)).toBe('type-secret')
+      expect(slug(name)).not.toBe(typeAnchor('Secret'))
+    }
+  })
+
+  it('gives every anchor on the page a unique id', async () => {
+    const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
+    const anchors = [
+      ...result.keywords.map(k => k.slug),
+      ...result.types.map(t => t.anchor),
+      ...result.introSections.map(s => s.slug),
+    ]
+    expect(new Set(anchors).size).toBe(anchors.length)
+  })
+
+  it('gives the introduction headings ids, so doc links into them resolve', async () => {
+    const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
+    // 618 links in the keyword docs point into the introduction. Libdoc's own
+    // HTML gives these headings no id at all.
+    // "Finding elements" is an <h2>: libdoc uses h2 for the introduction's
+    // major sections, and those were being stripped by the sanitizer entirely.
+    expect(result.intro).toMatch(/<h2 id="finding-elements"/)
+    for (const s of result.introSections) {
+      expect(result.intro, s.slug).toContain(` id="${s.slug}"`)
+    }
+  })
+
+  it('de-duplicates repeated heading titles', async () => {
+    const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
+    // The introduction has two "Examples" sections.
+    const examples = result.introSections.filter(s => s.title === 'Examples')
+    expect(examples.length).toBeGreaterThan(1)
+    expect(examples.map(s => s.slug)).toEqual(['examples', 'examples-2'])
   })
 })

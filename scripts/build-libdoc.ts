@@ -74,13 +74,49 @@ for (const file of specFiles) {
     )
   }
 
+  /*
+   * The reference is one page, so every anchor shares one namespace: keywords,
+   * types and introduction sections together. A duplicate means an unreachable
+   * panel. This caught `Type Secret` colliding with the type `Secret`.
+   */
+  const anchors = [
+    ...result.keywords.map(k => k.slug),
+    ...result.types.map(t => t.anchor),
+    ...result.introSections.map(s => s.slug),
+  ]
+  const seen = new Set<string>()
+  const clashes = anchors.filter(a => (seen.has(a) ? true : (seen.add(a), false)))
+  if (clashes.length) {
+    throw new Error(`duplicate anchors on the reference page: ${[...new Set(clashes)].join(', ')}`)
+  }
+
   for (const w of result.warnings) console.warn(`  warn: ${w}`)
   console.log(
     `${file} -> ${result.version}: ${result.keywords.length} keywords, ` +
       `${result.types.length} types, ${result.groups.length} groups`,
   )
 
-  if (result.version === latest) latestResult = result
+  if (result.version === latest) {
+    latestResult = result
+
+    /*
+     * Everything the single reference page needs, in one file.
+     *
+     * This is large — all 151 rendered documentation bodies — and is read on
+     * the server only. It must never be imported from an ordinary component,
+     * or it lands in the client bundle AND again in the Nuxt payload. See
+     * app/components/KeywordPanels.server.vue.
+     */
+    write(join(GEN, 'libdoc-full.json'), {
+      version: result.version,
+      libraryName: result.libraryName,
+      intro: result.intro,
+      introSections: result.introSections,
+      keywords: result.keywords,
+      types: result.types,
+      groups: result.groups,
+    })
+  }
 }
 
 if (!latestResult) {
@@ -102,11 +138,13 @@ write(join(GEN, 'libdoc.json'), {
   libraryName: latestResult.libraryName,
   index: latestResult.index,
   groups: latestResult.groups,
+  introSections: latestResult.introSections,
   // Name/kind/usage-count only. Enough for the type index and for route
   // generation; the bodies stay in their own payloads.
   types: latestResult.types.map(t => ({
     name: t.name,
     slug: t.slug,
+    anchor: t.anchor,
     kind: t.kind,
     usedByCount: t.usedBy.length,
   })),

@@ -11,7 +11,14 @@ export default defineNuxtConfig({
     prerender: { crawlLinks: true, routes: ['/'], failOnError: true },
   },
 
-  css: ['~/assets/css/tokens.css', '~/assets/css/base.css', '~/assets/css/plate.css', '~/assets/css/doc.css'],
+  /*
+   * Server components. The keyword reference is one page carrying all 151
+   * rendered documentation bodies; rendering it in an island keeps that
+   * markup out of both the client bundle and the Nuxt payload.
+   */
+  experimental: { componentIslands: true },
+
+  css: ['~/assets/css/tokens.css', '~/assets/css/base.css', '~/assets/css/plate.css', '~/assets/css/doc.css', '~/assets/css/keywords.css'],
 
   app: {
     head: {

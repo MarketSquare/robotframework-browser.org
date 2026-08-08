@@ -44,12 +44,12 @@ describe.skipIf(!ready)('generated payloads', () => {
       const kw = JSON.parse(readFileSync(join(dir, 'keywords', `${entry.slug}.json`), 'utf8'))
       for (const arg of kw.args) {
         if (!arg.typeHref) continue
-        const slug = arg.typeHref.split('/').pop()
-        expect(types.has(`${slug}.json`), `${kw.name} -> ${arg.typeHref}`).toBe(true)
+        const s = arg.typeHref.replace(/^#type--/, '')
+        expect(types.has(`${s}.json`), `${kw.name} -> ${arg.typeHref}`).toBe(true)
       }
       if (kw.returnTypeHref) {
-        const slug = kw.returnTypeHref.split('/').pop()
-        expect(types.has(`${slug}.json`), `${kw.name} returns ${kw.returnTypeHref}`).toBe(true)
+        const s = kw.returnTypeHref.replace(/^#type--/, '')
+        expect(types.has(`${s}.json`), `${kw.name} returns ${kw.returnTypeHref}`).toBe(true)
       }
     }
   })

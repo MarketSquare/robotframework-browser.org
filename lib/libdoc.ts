@@ -95,6 +95,8 @@ export interface ResolvedKeyword {
 export interface ResolvedType {
   name: string
   slug: string
+  /** Collision-proof in-page anchor. See typeAnchor. */
+  anchor: string
   kind: LibdocTypedoc['type']
   doc: string
   accepts: string[]
@@ -125,6 +127,9 @@ export interface GroupEntry {
 export interface TransformResult {
   version: string
   libraryName: string
+  /** The library-level documentation: selectors, assertions, waiting. */
+  intro: string
+  introSections: { title: string; slug: string; level: number }[]
   keywords: ResolvedKeyword[]
   types: ResolvedType[]
   index: IndexEntry[]
@@ -139,6 +144,20 @@ export function slug(name: string): string {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
+}
+
+/**
+ * Anchor for a data type.
+ *
+ * The separator is a DOUBLE hyphen, and that is load-bearing. With a single
+ * one, the type `Secret` and the keyword `Type Secret` both produce
+ * `type-secret`: a duplicate id, an unreachable anchor, and a filter that
+ * cannot tell a keyword from a type. `slug()` collapses every run of
+ * non-alphanumerics to a single hyphen, so it can never emit `--`, which
+ * makes this prefix collision-proof by construction rather than by luck.
+ */
+export function typeAnchor(name: string): string {
+  return `type--${slug(name)}`
 }
 
 /**
@@ -187,7 +206,7 @@ export function renderInline(text: string): string {
 const ALLOWED_TAGS = [
   'p', 'a', 'code', 'pre', 'span', 'b', 'i', 'strong', 'em',
   'ul', 'ol', 'li', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
-  'h3', 'h4', 'h5', 'br', 'hr',
+  'h2', 'h3', 'h4', 'h5', 'br', 'hr',
 ]
 
 export interface RewriteContext {
@@ -203,6 +222,10 @@ export interface RewriteContext {
  *   `#Assertions`    -> a section of the library introduction
  * Everything else is either absolute or, in four upstream cases, a broken
  * relative href (`create`, `install`, `Secret`).
+ *
+ * The reference is one scrolling page, so these stay fragments — which also
+ * means an upstream link and ours resolve to the same shape. Anchors keep
+ * deep links working: /keywords#click is as pasteable as a route was.
  */
 export function rewriteHref(href: string, ctx: RewriteContext): string | null {
   if (/^(https?:|mailto:)/.test(href)) return href
@@ -212,12 +235,12 @@ export function rewriteHref(href: string, ctx: RewriteContext): string | null {
 
     if (target.startsWith('type-')) {
       const typeName = target.slice(5)
-      return ctx.typeNames.has(typeName) ? `/keywords/types/${slug(typeName)}` : null
+      return ctx.typeNames.has(typeName) ? `#${typeAnchor(typeName)}` : null
     }
-    if (ctx.keywordNames.has(target)) return `/keywords/${slug(target)}`
+    if (ctx.keywordNames.has(target)) return `#${slug(target)}`
 
     // A section of the library introduction.
-    return `/keywords#${slug(target)}`
+    return `#${slug(target)}`
   }
 
   // Relative and scheme-odd hrefs (chrome://version, and upstream's broken
@@ -308,7 +331,7 @@ export async function transform(
         name: arg.name,
         repr: arg.repr,
         typeName,
-        typeHref: hasPage ? `/keywords/types/${slug(typedoc)}` : null,
+        typeHref: hasPage ? `#${typeAnchor(typedoc)}` : null,
         defaultValue: arg.defaultValue,
         required: arg.required,
         variadic:
@@ -331,7 +354,7 @@ export async function transform(
       groupSlug: slug(group),
       args,
       returnTypeName: kw.returnType?.name ?? null,
-      returnTypeHref: returnHasPage ? `/keywords/types/${slug(returnTypedoc)}` : null,
+      returnTypeHref: returnHasPage ? `#${typeAnchor(returnTypedoc)}` : null,
       sourceUrl:
         options.sourceBase && kw.source
           ? `${options.sourceBase}/Browser/keywords/${basename(kw.source)}#L${kw.lineno}`
@@ -345,6 +368,7 @@ export async function transform(
     spec.typedocs.map(async t => ({
       name: t.name,
       slug: slug(t.name),
+      anchor: typeAnchor(t.name),
       kind: t.type,
       doc: await renderDoc(t.doc ?? '', ctx, options.highlight),
       accepts: t.accepts ?? [],
@@ -378,9 +402,34 @@ export async function transform(
     (a, b) => (groupOrder.get(a.module) ?? 999) - (groupOrder.get(b.module) ?? 999),
   )
 
+  /*
+   * The library introduction explains selectors, assertions and waiting, and
+   * 618 links in the keyword docs point into it. Libdoc's HTML gives its <h3>
+   * headings no ids, so those links resolved nowhere — the ids are added here.
+   *
+   * Titles repeat (the introduction has two "Examples" sections), so slugs are
+   * de-duplicated with a numeric suffix, which is what every Markdown renderer
+   * does and what the incoming links already assume: the first wins.
+   */
+  const renderedIntro = await renderDoc(spec.doc ?? '', ctx, options.highlight)
+  const introSections: { title: string; slug: string; level: number }[] = []
+  const usedSlugs = new Map<string, number>()
+
+  const intro = renderedIntro.replace(/<(h2|h3)([^>]*)>([\s\S]*?)<\/\1>/g, (_all, tag, attrs, inner) => {
+    const title = String(inner).replace(/<[^>]+>/g, '').trim()
+    const base = slug(title)
+    const n = (usedSlugs.get(base) ?? 0) + 1
+    usedSlugs.set(base, n)
+    const id = n === 1 ? base : `${base}-${n}`
+    introSections.push({ title, slug: id, level: tag === 'h2' ? 2 : 3 })
+    return `<${tag} id="${id}"${attrs}>${inner}</${tag}>`
+  })
+
   return {
     version: spec.version,
     libraryName: spec.name,
+    intro,
+    introSections,
     keywords,
     types,
     index,
