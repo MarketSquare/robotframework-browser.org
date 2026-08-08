@@ -52,6 +52,7 @@ const nav = computed<NavItem[]>(() => [
     ],
   },
   { to: '/keywords', label: 'Keywords' },
+  { to: '/community', label: 'Community' },
   { to: '/styleguide', label: 'Styleguide' },
 ])
 

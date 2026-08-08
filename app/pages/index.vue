@@ -10,7 +10,7 @@
 const { data: doc } = await useAsyncData('landing', async () => {
   // Server, plus the client in dev — see app/utils/content-guard.md
   if (import.meta.server || import.meta.dev) {
-    return await queryCollection('landing').path('/').first()
+    return await queryCollection('pages').path('/').first()
   }
   return null
 })

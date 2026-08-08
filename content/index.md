@@ -129,14 +129,14 @@ Next: the [getting-started guide](/docs/start/getting-started), or the
 ::::
 
 ::::page-section{label="Community" title="Use. Benefit. Contribute." last}
-Browser library is built in the open by the Robot Framework community.
-Questions, ideas and bug reports are how most contributors started, and how the
-library got this far.
+Browser library is built in the open by the Robot Framework community — 206
+people so far. Questions, ideas and bug reports are how most of them started,
+and how the library got this far.
 
 :::btn-row
+:btn{to="/community" primary}[Community and contributing]
 :btn{to="https://forum.robotframework.org/c/libraries/browser"}[Forum]
 :btn{to="https://github.com/MarketSquare/robotframework-browser"}[GitHub]
-:btn{to="https://github.com/MarketSquare/robotframework-browser/issues"}[Issues]
 :::
 
 **Let's make the best Browser library.**

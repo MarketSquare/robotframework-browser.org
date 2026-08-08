@@ -2,10 +2,14 @@ import { defineCollection, defineContentConfig, z } from '@nuxt/content'
 
 export default defineContentConfig({
   collections: {
-    /** The landing page, authored like every other page on the site. */
-    landing: defineCollection({
+    /**
+     * Top-level pages — the landing page and /community — authored like every
+     * other page on the site. `*.md` is deliberately not `**`: the docs have
+     * their own collection with its own required frontmatter.
+     */
+    pages: defineCollection({
       type: 'page',
-      source: 'index.md',
+      source: '*.md',
       schema: z.object({
         title: z.string(),
         description: z.string(),
