@@ -12,6 +12,7 @@
  */
 const { index, groups, types, version, introSections } = useKeywordIndex()
 
+const railId = useId()
 const query = ref('')
 const tag = ref('')
 
@@ -67,6 +68,18 @@ function applyFilter() {
 
 watch([query, tag], () => nextTick(applyFilter))
 
+/*
+ * Short kind labels for the rail. Slicing the name gave "Stan" for Standard
+ * and — worse — "Type" for TypedDict, which reads as a type rather than a
+ * kind of type.
+ */
+const KIND_SHORT: Record<string, string> = {
+  Enum: 'Enum',
+  TypedDict: 'Dict',
+  Standard: 'Std',
+  Custom: 'Custom',
+}
+
 /** First letter emphasised, so the alphabetical list can be scanned. */
 function split(name: string) {
   return { head: name.slice(0, 1), rest: name.slice(1) }
@@ -109,32 +122,56 @@ useHead({
           </p>
         </div>
 
-        <p class="rail-heading">Introduction</p>
-        <a
-          v-for="s in introSections"
-          :key="s.slug"
-          class="rail-kw rail-intro"
-          :class="{ sub: s.level === 3 }"
-          :href="`#${s.slug}`"
-        ><span class="nm">{{ s.title }}</span></a>
+        <!--
+          Three sections, exactly one open. Radios rather than checkboxes or
+          <details>: a radio group cannot have nothing selected, so a section
+          is always expanded and closing one is the same action as opening the
+          next. It is also CSS-only, so it works without JavaScript.
+        -->
+        <div class="accordion">
+          <input :id="`${railId}-docs`" class="acc-radio" type="radio" :name="`${railId}-rail`">
+          <label class="acc-head" :for="`${railId}-docs`">
+            Documentation <i>{{ introSections.length }}</i>
+          </label>
+          <div class="acc-body">
+            <a
+              v-for="s in introSections"
+              :key="s.slug"
+              class="rail-kw rail-intro"
+              :class="{ sub: s.level === 3 }"
+              :href="`#${s.slug}`"
+            ><span class="nm">{{ s.title }}</span></a>
+          </div>
 
-        <p class="rail-heading">Keywords <i>{{ matches.length }}</i></p>
-        <a
-          v-for="kw in matches"
-          :key="kw.slug"
-          class="rail-kw"
-          :href="`#${kw.slug}`"
-          :title="kw.shortdoc"
-        ><span class="nm"><b>{{ split(kw.name).head }}</b>{{ split(kw.name).rest }}</span><i>{{ kw.argCount }}</i></a>
-        <p v-if="!matches.length" class="rail-none">No keyword matches.</p>
+          <input :id="`${railId}-kw`" class="acc-radio" type="radio" :name="`${railId}-rail`" checked>
+          <label class="acc-head" :for="`${railId}-kw`">
+            Keywords <i>{{ matches.length }}</i>
+          </label>
+          <div class="acc-body">
+            <a
+              v-for="kw in matches"
+              :key="kw.slug"
+              class="rail-kw"
+              :href="`#${kw.slug}`"
+              :title="kw.shortdoc"
+            ><span class="nm"><b>{{ split(kw.name).head }}</b>{{ split(kw.name).rest }}</span><i>{{ kw.argCount }}</i></a>
+            <p v-if="!matches.length" class="rail-none">No keyword matches.</p>
+          </div>
 
-        <p class="rail-heading">Data types <i>{{ matchingTypes.length }}</i></p>
-        <a
-          v-for="t in matchingTypes"
-          :key="t.slug"
-          class="rail-kw"
-          :href="`#${t.anchor}`"
-        ><span class="nm"><b>{{ split(t.name).head }}</b>{{ split(t.name).rest }}</span><i>{{ t.kind.slice(0, 4) }}</i></a>
+          <input :id="`${railId}-types`" class="acc-radio" type="radio" :name="`${railId}-rail`">
+          <label class="acc-head" :for="`${railId}-types`">
+            Data types <i>{{ matchingTypes.length }}</i>
+          </label>
+          <div class="acc-body">
+            <a
+              v-for="t in matchingTypes"
+              :key="t.slug"
+              class="rail-kw"
+              :href="`#${t.anchor}`"
+            ><span class="nm"><b>{{ split(t.name).head }}</b>{{ split(t.name).rest }}</span><i>{{ KIND_SHORT[t.kind] ?? t.kind }}</i></a>
+            <p v-if="!matchingTypes.length" class="rail-none">No type matches.</p>
+          </div>
+        </div>
       </nav>
 
       <main class="main">
@@ -181,7 +218,6 @@ useHead({
   top: 3.25rem;
   max-height: calc(100vh - 3.25rem);
   overflow-y: auto;
-  padding-bottom: var(--sp-12);
   display: flex;
   flex-direction: column;
   font-size: 0.85rem;
@@ -247,28 +283,81 @@ useHead({
   color: var(--red-text);
 }
 
-.rail-heading {
+/* ---------- accordion ---------- */
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.acc-radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.acc-head {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: var(--sp-2);
-  margin: 0;
-  padding: var(--sp-4) var(--sp-3) var(--sp-1);
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--line);
   font-family: var(--font-display);
-  font-size: 0.625rem;
-  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  color: var(--dim);
+  cursor: pointer;
+  user-select: none;
+}
+
+.acc-head::after {
+  content: '▸';
+  color: var(--faint);
+  font-size: 0.7em;
+}
+
+.acc-head:hover {
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.acc-head i {
+  font-style: normal;
+  margin-left: auto;
+  margin-right: var(--sp-2);
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.acc-radio:checked + .acc-head {
+  color: var(--green);
+  background: var(--paper);
+}
+
+.acc-radio:checked + .acc-head::after {
+  content: '▾';
   color: var(--green);
 }
 
-.rail-heading i {
-  font-style: normal;
-  color: var(--faint);
+.acc-radio:focus-visible + .acc-head {
+  outline: 2px solid var(--red);
+  outline-offset: -2px;
 }
 
-.rail-link {
-  padding: var(--sp-2) var(--sp-3);
-  color: var(--dim);
-  border-bottom: 0;
+.acc-body {
+  display: none;
+  flex-direction: column;
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.acc-radio:checked + .acc-head + .acc-body {
+  display: flex;
 }
 
 .rail-kw {

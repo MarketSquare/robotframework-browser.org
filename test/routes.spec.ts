@@ -26,13 +26,17 @@ describe.skipIf(!built)('prerendered output', () => {
     expect(html).toMatch(/color:#[0-9A-F]{6}/)
   })
 
-  it('keeps the landing page free of competitor positioning', () => {
-    // The landing page sells the library on its own merits; the comparisons
-    // live under /why. This was the original page's stance, and reverting to
-    // it was explicit feedback.
+  it('keeps the landing page content free of competitor positioning', () => {
+    /*
+     * The landing page sells the library on its own merits; the comparisons
+     * live under /why. Scoped to the body below the header on purpose — the
+     * navbar links every comparison from every page, which is navigation, not
+     * positioning. What must stay clean is the copy.
+     */
     const html = page('')
+    const body = html.slice(html.indexOf('</header>'))
     for (const name of ['SeleniumLibrary', 'Cypress', 'Selenium']) {
-      expect(html, `landing page mentions ${name}`).not.toContain(name)
+      expect(body, `landing page copy mentions ${name}`).not.toContain(name)
     }
   })
 
@@ -69,5 +73,48 @@ describe.skipIf(!built)('prerendered output', () => {
         if (b.includes('class="line"')) expect(b, `${p}: unhighlighted block`).toContain('color:#')
       }
     }
+  })
+})
+
+describe.skipIf(!built)('navigation', () => {
+  const html = readFileSync(join(OUT, 'index.html'), 'utf8')
+
+  it('links every tool comparison from the navbar', () => {
+    // They were reachable only from /why before, which meant a reader had to
+    // know they existed.
+    for (const slug of ['vs-cypress', 'vs-playwright', 'vs-seleniumlibrary']) {
+      expect(html, slug).toContain(`/why/${slug}`)
+    }
+  })
+
+  it('opens the dropdown on focus as well as hover', () => {
+    const header = readFileSync(join(process.cwd(), 'app/components/SiteHeader.vue'), 'utf8')
+    // Hover alone is unreachable from a keyboard.
+    expect(header).toContain('.has-menu:focus-within .menu')
+  })
+
+  it('drives the small-screen menu without JavaScript', () => {
+    const header = readFileSync(join(process.cwd(), 'app/components/SiteHeader.vue'), 'utf8')
+    expect(header).toContain('.menu-toggle:checked ~ .nav')
+  })
+})
+
+describe.skipIf(!built)('keyword rail', () => {
+  const html = readFileSync(join(OUT, 'keywords/index.html'), 'utf8')
+
+  it('has exactly three sections', () => {
+    expect((html.match(/class="acc-head"/g) ?? []).length).toBe(3)
+    for (const label of ['Documentation', 'Keywords', 'Data types']) {
+      expect(html).toContain(label)
+    }
+  })
+
+  it('opens Keywords by default and only Keywords', () => {
+    // A radio group cannot have nothing selected, so one section is always
+    // open and closing one is the same action as opening another.
+    const radios = html.match(/class="acc-radio"[^>]*>/g) ?? []
+    expect(radios).toHaveLength(3)
+    expect(radios.filter(r => r.includes('checked'))).toHaveLength(1)
+    expect(radios[1]).toContain('checked')
   })
 })
