@@ -15,13 +15,14 @@
 const { version } = useKeywordIndex()
 
 /** Kept in step with content/compare/*.json rather than hard-coded twice. */
-const { data: tools } = await useAsyncData('nav-compare', async () =>
-  import.meta.server
-    ? (await queryCollection('compare').all()).map(t => ({
-        to: `/why/${t.slug}`,
-        label: `vs ${t.tool}`,
-      }))
-    : [],
+const { data: tools } = await useServerContent(
+  'nav-compare',
+  async () =>
+    (await queryCollection('compare').all()).map(t => ({
+      to: `/why/${t.slug}`,
+      label: `vs ${t.tool}`,
+    })),
+  [] as { to: string; label: string }[],
 )
 
 interface NavItem {

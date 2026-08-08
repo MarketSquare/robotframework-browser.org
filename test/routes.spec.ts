@@ -118,3 +118,34 @@ describe.skipIf(!built)('keyword rail', () => {
     expect(radios[1]).toContain('checked')
   })
 })
+
+describe('content queries', () => {
+  const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
+
+  it('routes every content query through the guarded composable', () => {
+    /*
+     * Guarding on `import.meta.server` alone shipped a bug that only appeared
+     * in dev: production carries the result in the prerendered payload, but
+     * `nuxt dev` has no payload extraction, so a client-side navigation ran
+     * the handler in the browser, got nothing, and the page threw its own 404
+     * — then rendered fine on reload. One composable states the rule once.
+     */
+    for (const f of [
+      'app/pages/guides/[...slug].vue',
+      'app/pages/why/index.vue',
+      'app/pages/why/[tool].vue',
+      'app/components/SiteHeader.vue',
+    ]) {
+      const src = read(f)
+      expect(src, `${f} should use useServerContent`).toContain('useServerContent(')
+      expect(src, `${f} still has a bare import.meta.server guard`).not.toMatch(
+        /import\.meta\.server\s*\?/,
+      )
+    }
+  })
+
+  it('lets the query run on the client in dev, so navigation works there', () => {
+    const src = read('app/composables/useServerContent.ts')
+    expect(src).toContain('import.meta.server || import.meta.dev')
+  })
+})

@@ -16,16 +16,10 @@ const path = computed(
   () => `/guides/${(route.params.slug as string[]).filter(Boolean).join('/')}`,
 )
 
-/*
- * Server-only on purpose. Every route here is prerendered and Nuxt's payload
- * extraction carries the result to the client, so the browser never needs to
- * run a content query — and Nuxt Content only ships its client-side SQLite
- * WASM engine (~540 KB: sqlite3-worker1, an OPFS proxy and support code) when
- * a query can execute in the browser. Guarding the call keeps that out of the
- * bundle; scripts/check-bundle.mjs fails the build if it comes back.
- */
-const { data: doc } = await useAsyncData(`guide-${path.value}`, async () =>
-  import.meta.server ? await queryCollection('guides').path(path.value).first() : null,
+const { data: doc } = await useServerContent(
+  `guide-${path.value}`,
+  () => queryCollection('guides').path(path.value).first(),
+  null,
 )
 
 if (!doc.value) {

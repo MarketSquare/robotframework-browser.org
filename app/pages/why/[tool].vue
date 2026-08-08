@@ -4,16 +4,10 @@ import type { EditorFile } from '~/components/Editor.vue'
 const route = useRoute()
 const slug = computed(() => String(route.params.tool))
 
-/*
- * Server-only on purpose. Every route here is prerendered and Nuxt's payload
- * extraction carries the result to the client, so the browser never needs to
- * run a content query — and Nuxt Content only ships its client-side SQLite
- * WASM engine (~540 KB: sqlite3-worker1, an OPFS proxy and support code) when
- * a query can execute in the browser. Guarding the call keeps that out of the
- * bundle; scripts/check-bundle.mjs fails the build if it comes back.
- */
-const { data: doc } = await useAsyncData(`compare-${slug.value}`, async () =>
-  import.meta.server ? await queryCollection('compare').where('slug', '=', slug.value).first() : null,
+const { data: doc } = await useServerContent(
+  `compare-${slug.value}`,
+  () => queryCollection('compare').where('slug', '=', slug.value).first(),
+  null,
 )
 
 if (!doc.value) {
