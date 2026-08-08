@@ -1,0 +1,117 @@
+{
+  "name": "rfb-plate",
+  "type": "dark",
+  "_comment": "Syntax theme for the dark code plate. Every colour here MUST equal the matching --term-* / --tok-* token in app/assets/css/tokens.css; test/highlight.spec.ts enforces it. Shiki emits inline colours, so this cannot read CSS variables — but because the plate tokens are frozen across light and dark, one theme is correct in both.",
+  "colors": {
+    "editor.background": "#14120f",
+    "editor.foreground": "#ede9e1"
+  },
+  "tokenColors": [
+    {
+      "name": "Comments",
+      "scope": ["comment", "comment.line", "comment.block", "punctuation.definition.comment"],
+      "settings": { "foreground": "#6f675c", "fontStyle": "italic" }
+    },
+    {
+      "name": "Robot Framework section headers",
+      "scope": ["keyword.other.header.robotframework", "keyword.other.header"],
+      "settings": { "foreground": "#ff6b5e", "fontStyle": "bold" }
+    },
+    {
+      "name": "Robot Framework keyword calls",
+      "scope": ["entity.name.function.keyword-call.robotframework", "entity.name.function"],
+      "settings": { "foreground": "#3fc9bc" }
+    },
+    {
+      "name": "Robot Framework settings (Library, Documentation, ...)",
+      "scope": [
+        "keyword.control.settings.robotframework",
+        "keyword.control.settings.documentation.robotframework",
+        "keyword.control.settings"
+      ],
+      "settings": { "foreground": "#c9a6e9" }
+    },
+    {
+      "name": "Control flow (FOR, IF, WHILE, TRY)",
+      "scope": ["keyword.control.flow", "keyword.control"],
+      "settings": { "foreground": "#c9a6e9" }
+    },
+    {
+      "name": "Arguments and strings",
+      "scope": ["string", "string.unquoted.argument.robotframework", "string.quoted"],
+      "settings": { "foreground": "#e0d3a3" }
+    },
+    {
+      "name": "Variables",
+      "scope": [
+        "variable",
+        "variable.name.readwrite.robotframework",
+        "meta.variable.simple.robotframework",
+        "meta.variable.env.robotframework",
+        "meta.variable.expression.robotframework",
+        "meta.variable.assign.robotframework"
+      ],
+      "settings": { "foreground": "#ffb86b" }
+    },
+    {
+      "name": "Variable braces and separators",
+      "scope": ["punctuation.definition.variable", "punctuation.definition.curly", "punctuation.separator"],
+      "settings": { "foreground": "#a39c90" }
+    },
+    {
+      "name": "Operators, including the assertion operators",
+      "scope": ["keyword.operator", "keyword.operator.robotframework"],
+      "settings": { "foreground": "#ff6b5e" }
+    },
+    {
+      "name": "Documentation markup",
+      "scope": ["markup.robotframework", "comment.line.rest.robotframework"],
+      "settings": { "foreground": "#a39c90" }
+    },
+    {
+      "name": "Bold documentation",
+      "scope": ["markup.bold.documentation.robotframework"],
+      "settings": { "foreground": "#ede9e1", "fontStyle": "bold" }
+    },
+    {
+      "name": "Italic documentation",
+      "scope": ["markup.italic.documentation.robotframework"],
+      "settings": { "foreground": "#ede9e1", "fontStyle": "italic" }
+    },
+    {
+      "name": "Illegal and deprecated",
+      "scope": ["invalid.illegal", "invalid.deprecated", "keyword.illegal"],
+      "settings": { "foreground": "#ff6b5e", "fontStyle": "underline" }
+    },
+    {
+      "name": "Numbers and constants",
+      "scope": ["constant.numeric", "constant.language", "constant.character"],
+      "settings": { "foreground": "#ffb86b" }
+    },
+    {
+      "name": "Types",
+      "scope": ["support.type", "storage.type", "entity.name.type"],
+      "settings": { "foreground": "#3fc9bc" }
+    },
+    {
+      "name": "Language keywords — Python, TypeScript, JavaScript in the comparison",
+      "scope": ["keyword", "storage.modifier", "keyword.control.import"],
+      "settings": { "foreground": "#c9a6e9" }
+    },
+    {
+      "name": "Function calls in other languages",
+      "scope": ["meta.function-call", "support.function", "variable.function"],
+      "settings": { "foreground": "#3fc9bc" }
+    },
+    {
+      "name": "Parameters",
+      "scope": ["variable.parameter", "meta.arguments"],
+      "settings": { "foreground": "#ede9e1" }
+    },
+    {
+      "name": "Punctuation",
+      "scope": ["punctuation", "meta.brace"],
+      "settings": { "foreground": "#a39c90" }
+    }
+  ]
+}

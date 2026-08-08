@@ -1,0 +1,23 @@
+robotframework-browser.org
+Copyright 2026 Robot Framework Foundation
+
+This product includes software developed by third parties.
+
+--------------------------------------------------------------------------
+Robot Framework TextMate grammars
+--------------------------------------------------------------------------
+Files:   syntaxes/robotframework.tmLanguage.json
+         syntaxes/robotframework-repl.tmLanguage.json
+Source:  https://github.com/robotcodedev/robotcode/tree/main/syntaxes
+Commit:  e9c075b2cf7159d0099e1e7e5c7df8c6afbc12f7
+License: Apache License 2.0
+
+Vendored unmodified. These grammars are maintained by the RobotCode
+project; the pinned commit is recorded in syntaxes/.pinned-commit.
+
+--------------------------------------------------------------------------
+IBM Plex Sans / IBM Plex Mono
+--------------------------------------------------------------------------
+Files:   app/assets/fonts/plex-*.woff2
+Source:  https://github.com/IBM/plex
+License: SIL Open Font License 1.1
