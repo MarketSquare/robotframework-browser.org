@@ -1,0 +1,176 @@
+/*
+ * Design tokens — robotframework-browser.org
+ * Spec: docs/superpowers/specs/2026-08-08-rfbrowser-site-design.md §5.2
+ *
+ * Light is the default. Dark is a designed token swap, never an inversion.
+ * No component may define a colour; every colour is read from here.
+ *
+ * The viewer has THREE theme states, not two:
+ *   - explicit light  -> [data-theme="light"]
+ *   - explicit dark   -> [data-theme="dark"]
+ *   - system (default)-> no attribute at all; only prefers-color-scheme separates them
+ * So the complete light palette lives on bare :root, and dark is redefined twice.
+ */
+
+/* ---------- fonts ---------- */
+
+@font-face {
+  font-family: 'OCR A';
+  src: url('~/assets/fonts/ocr-a.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  /* block, not swap: a fallback flash on a display face is very visible */
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('~/assets/fonts/plex-sans-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('~/assets/fonts/plex-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('~/assets/fonts/plex-mono-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- light: the complete palette ---------- */
+
+:root {
+  /* surfaces */
+  --paper: #fbfaf7;
+  --chrome: #f3f1ec;
+  --panel: #ffffff;
+  --line: #e2ded5;
+  --line-strong: #cfc9bc;
+
+  /* ink */
+  --ink: #1a1815;
+  --dim: #6e6860;
+  --faint: #948c80;
+
+  /* brand */
+  --red: #d63a2e;
+  --red-text: #b82e24; /* red as small body text; 5.96:1 on --paper */
+  --red-soft: #fbebe9;
+  --teal: #0f7f76; /* Robot Framework, structural */
+
+  /*
+   * Terminal / editor plate.
+   * Deliberately identical in both themes: code is dark everywhere, so the
+   * syntax palette is defined once and the two themes cannot drift apart.
+   */
+  --term-bg: #14120f;
+  --term-chrome: #1c1a16;
+  --term-tab: #211e19;
+  --term-line: #2e2a24;
+  --term-ink: #ede9e1;
+  --term-dim: #a39c90;
+  --term-faint: #6f675c;
+  --term-red: #ff6b5e;
+  --term-teal: #3fc9bc;
+
+  /* syntax tokens, on the plate */
+  --tok-sand: #e0d3a3;
+  --tok-amber: #ffb86b;
+  --tok-violet: #c9a6e9;
+
+  --shadow:
+    0 1px 2px rgb(26 24 21 / 5%),
+    0 10px 28px -18px rgb(26 24 21 / 35%);
+
+  /* type */
+  --font-display: 'OCR A', ui-monospace, monospace;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, sfmono-regular, menlo, monospace;
+
+  --step--2: 0.6875rem; /* 11px — smallest permitted OCR-A */
+  --step--1: 0.8125rem; /* 13px — code */
+  --step-0: 1rem; /* 16px — body */
+  --step-1: 1.125rem; /* 18px — lede */
+  --step-2: 1.5rem; /* 24px */
+  --step-3: 2rem; /* 32px */
+  --step-4: 2.75rem; /* 44px */
+  --step-5: 3.75rem; /* 60px — display */
+
+  /* space, 4px base */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
+  --sp-24: 6rem;
+
+  --measure: 66ch;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+
+  color-scheme: light;
+}
+
+/* ---------- dark: system preference, unless light was chosen explicitly ---------- */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #14120f;
+    --chrome: #1c1a16;
+    --panel: #201d19;
+    --line: #2e2a24;
+    --line-strong: #454038;
+
+    --ink: #ede9e1;
+    --dim: #a39c90;
+    --faint: #7a7266;
+
+    --red: #ff6b5e;
+    --red-text: #ff6b5e;
+    --red-soft: #2e1815;
+    --teal: #3fc9bc;
+
+    --shadow:
+      0 1px 2px rgb(0 0 0 / 50%),
+      0 10px 28px -18px rgb(0 0 0 / 90%);
+
+    color-scheme: dark;
+  }
+}
+
+/* ---------- dark: explicit choice, wins over a light OS ---------- */
+
+:root[data-theme='dark'] {
+  --paper: #14120f;
+  --chrome: #1c1a16;
+  --panel: #201d19;
+  --line: #2e2a24;
+  --line-strong: #454038;
+
+  --ink: #ede9e1;
+  --dim: #a39c90;
+  --faint: #7a7266;
+
+  --red: #ff6b5e;
+  --red-text: #ff6b5e;
+  --red-soft: #2e1815;
+  --teal: #3fc9bc;
+
+  --shadow:
+    0 1px 2px rgb(0 0 0 / 50%),
+    0 10px 28px -18px rgb(0 0 0 / 90%);
+
+  color-scheme: dark;
+}
