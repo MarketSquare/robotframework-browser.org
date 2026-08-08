@@ -21,7 +21,7 @@ import { type Lang, ROBOT, ROBOT_REPL, THEME } from '../app/utils/lang.ts'
 const ROOT = resolve(import.meta.dirname, '..')
 const read = (p: string) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'))
 
-const BUNDLED: BundledLanguage[] = ['python', 'typescript', 'javascript', 'bash', 'json', 'yaml']
+const BUNDLED: BundledLanguage[] = ['python', 'typescript', 'javascript', 'bash', 'json', 'yaml', 'dockerfile']
 
 let instance: Promise<Highlighter> | undefined
 

@@ -38,6 +38,8 @@ const LABEL: Record<string, string> = {
   bash: 'Shell',
   sh: 'Shell',
   shell: 'Shell',
+  dockerfile: 'Dockerfile',
+  yaml: 'YAML',
 }
 
 const ALIAS: Record<string, string> = {
@@ -47,6 +49,8 @@ const ALIAS: Record<string, string> = {
   ts: 'typescript',
   py: 'python',
   robotframework: 'robot',
+  docker: 'dockerfile',
+  yml: 'yaml',
 }
 
 const lang = computed(() => {

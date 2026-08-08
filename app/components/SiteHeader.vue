@@ -309,6 +309,29 @@ const uid = useId()
     display: flex;
   }
 
+  /*
+   * The open panel has to scroll itself.
+   *
+   * The header is sticky, so an open menu taller than the viewport does not
+   * scroll with the page — its lower items are simply unreachable, and the
+   * scroll gesture lands on the document behind it instead. Capping the header
+   * at the viewport makes it the scroll container; `overscroll-behavior:
+   * contain` stops a flick that reaches the end of the list from chaining into
+   * that document.
+   *
+   * Scrolling the whole header, brand row included, rather than just the list:
+   * the panel is a continuation of the bar, and one scroll container is easier
+   * to reason about than a capped list inside a wrapping flex row.
+   *
+   * Without :has support this is inert and the menu behaves as it did before,
+   * so there is nothing to fall back to.
+   */
+  .site:has(.menu-toggle:checked) {
+    max-height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
   .top {
     padding: var(--sp-3) 0;
     font-size: 0.95rem;

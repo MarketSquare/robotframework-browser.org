@@ -29,4 +29,5 @@ export const LANG_LABEL: Record<string, string> = {
   bash: 'Bash',
   json: 'JSON',
   yaml: 'YAML',
+  dockerfile: 'Dockerfile',
 }
