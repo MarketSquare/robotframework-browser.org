@@ -3,14 +3,14 @@
   "type": "dark",
   "_comment": "Syntax theme for the dark code plate. Every colour here MUST equal the matching --term-* / --tok-* token in app/assets/css/tokens.css; test/highlight.spec.ts enforces it. Shiki emits inline colours, so this cannot read CSS variables — but because the plate tokens are frozen across light and dark, one theme is correct in both.",
   "colors": {
-    "editor.background": "#14120f",
-    "editor.foreground": "#ede9e1"
+    "editor.background": "#12171a",
+    "editor.foreground": "#e2e1d7"
   },
   "tokenColors": [
     {
       "name": "Comments",
       "scope": ["comment", "comment.line", "comment.block", "punctuation.definition.comment"],
-      "settings": { "foreground": "#9a907f", "fontStyle": "italic" }
+      "settings": { "foreground": "#96a2a8", "fontStyle": "italic" }
     },
     {
       "name": "Robot Framework section headers",
@@ -20,7 +20,7 @@
     {
       "name": "Robot Framework keyword calls",
       "scope": ["entity.name.function.keyword-call.robotframework", "entity.name.function"],
-      "settings": { "foreground": "#3fc9bc" }
+      "settings": { "foreground": "#2bd9cc" }
     },
     {
       "name": "Robot Framework settings (Library, Documentation, ...)",
@@ -56,7 +56,7 @@
     {
       "name": "Variable braces and separators",
       "scope": ["punctuation.definition.variable", "punctuation.definition.curly", "punctuation.separator"],
-      "settings": { "foreground": "#b3aa9c" }
+      "settings": { "foreground": "#a9b4ba" }
     },
     {
       "name": "Operators, including the assertion operators",
@@ -66,17 +66,17 @@
     {
       "name": "Documentation markup",
       "scope": ["markup.robotframework", "comment.line.rest.robotframework"],
-      "settings": { "foreground": "#b3aa9c" }
+      "settings": { "foreground": "#a9b4ba" }
     },
     {
       "name": "Bold documentation",
       "scope": ["markup.bold.documentation.robotframework"],
-      "settings": { "foreground": "#ede9e1", "fontStyle": "bold" }
+      "settings": { "foreground": "#e2e1d7", "fontStyle": "bold" }
     },
     {
       "name": "Italic documentation",
       "scope": ["markup.italic.documentation.robotframework"],
-      "settings": { "foreground": "#ede9e1", "fontStyle": "italic" }
+      "settings": { "foreground": "#e2e1d7", "fontStyle": "italic" }
     },
     {
       "name": "Illegal and deprecated",
@@ -91,7 +91,7 @@
     {
       "name": "Types",
       "scope": ["support.type", "storage.type", "entity.name.type"],
-      "settings": { "foreground": "#3fc9bc" }
+      "settings": { "foreground": "#2bd9cc" }
     },
     {
       "name": "Language keywords — Python, TypeScript, JavaScript in the comparison",
@@ -101,17 +101,17 @@
     {
       "name": "Function calls in other languages",
       "scope": ["meta.function-call", "support.function", "variable.function"],
-      "settings": { "foreground": "#3fc9bc" }
+      "settings": { "foreground": "#2bd9cc" }
     },
     {
       "name": "Parameters",
       "scope": ["variable.parameter", "meta.arguments"],
-      "settings": { "foreground": "#ede9e1" }
+      "settings": { "foreground": "#e2e1d7" }
     },
     {
       "name": "Punctuation",
       "scope": ["punctuation", "meta.brace"],
-      "settings": { "foreground": "#b3aa9c" }
+      "settings": { "foreground": "#a9b4ba" }
     }
   ]
 }

@@ -35,6 +35,8 @@ const THEMED = [
   '--red',
   '--red-text',
   '--red-soft',
+  '--green',
+  '--green-soft',
   '--teal',
 ]
 

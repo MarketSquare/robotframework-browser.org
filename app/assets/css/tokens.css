@@ -8,8 +8,14 @@
  * The viewer has THREE theme states, not two:
  *   - explicit light  -> [data-theme="light"]
  *   - explicit dark   -> [data-theme="dark"]
- *   - system (default)-> no attribute at all; only prefers-color-scheme separates them
+ *   - system (default)-> no attribute at all; only prefers-color-scheme decides
  * So the complete light palette lives on bare :root, and dark is redefined twice.
+ *
+ * Palette lineage. The light side takes white page + muted creme panels from
+ * the Libdoc redesign. The dark side takes Robot Framework's own Libdoc
+ * palette — #1c2227 ground, #e2e1d7 ink, #00c0b5 turquoise — a cool blue-grey,
+ * replacing an earlier warm charcoal that read as brown. Red and green both
+ * come from the library logo.
  */
 
 /* ---------- fonts ---------- */
@@ -50,46 +56,45 @@
 /* ---------- light: the complete palette ---------- */
 
 :root {
-  /* surfaces */
-  --paper: #fbfaf7;
-  --chrome: #f3f1ec;
-  --panel: #ffffff;
-  --line: #e2ded5;
-  --line-strong: #cfc9bc;
+  /* surfaces — white page, muted creme panels */
+  --paper: #ffffff;
+  --chrome: #f2f1ec;
+  --panel: #faf8f3;
+  --line: #e3e1da;
+  --line-strong: #c9c6bc;
 
-  /* ink */
-  --ink: #1a1815;
-  --dim: #6e6860;
-  --faint: #948c80;
+  /* ink — very slightly cool, never warm */
+  --ink: #14181a;
+  --dim: #5a6468;
+  --faint: #8a9296;
 
-  /* brand */
+  /* brand: both accents come from the logo */
   --red: #d63a2e;
-  --red-text: #b82e24; /* red as small body text; 5.96:1 on --paper */
+  --red-text: #b82e24; /* red as small body text */
   --red-soft: #fbebe9;
-  --teal: #0f7f76; /* Robot Framework, structural */
+  --green: #1a831f; /* logo green, darkened to clear AA on white */
+  --green-soft: #edf6ed;
+  --teal: #00857d; /* Robot Framework turquoise, darkened for white */
 
   /*
    * Terminal / editor plate.
-   * Deliberately identical in both themes: code is dark everywhere, so the
+   * Identical in both themes on purpose: code is dark everywhere, so the
    * syntax palette is defined once and the two themes cannot drift apart.
-   *
-   * The chrome/tab/content steps are wide on purpose. At the original values
-   * (#1c1a16 bar over #14120f content) the bar barely separated from the code
-   * it sat on, and --term-faint at #6f675c left line numbers and status labels
-   * close to unreadable.
+   * It is also the darkest surface in BOTH themes, so a code block always
+   * reads as an inset — one rule, not two.
    *
    * --term-bg and --term-ink must stay in step with themes/rfb-plate.json;
    * test/highlight.spec.ts enforces it.
    */
-  --term-bg: #14120f; /* code surface — darkest */
-  --term-chrome: #2c2822; /* bar, status strip */
-  --term-tab: #383229; /* inactive tab — lighter still */
-  --term-line: #453f35;
-  --term-ink: #ede9e1;
-  --term-dim: #b3aa9c;
-  --term-faint: #9a907f; /* line numbers, status labels — 5.0:1 on the bar */
+  --term-bg: #12171a; /* code surface — darkest */
+  --term-chrome: #253039; /* bar, status strip */
+  --term-tab: #2f3c45; /* inactive tab — lighter still */
+  --term-line: #3a464e;
+  --term-ink: #e2e1d7;
+  --term-dim: #a9b4ba;
+  --term-faint: #96a2a8; /* line numbers, status labels */
   --term-red: #ff6b5e;
-  --term-teal: #3fc9bc;
+  --term-teal: #2bd9cc;
 
   /* syntax tokens, on the plate */
   --tok-sand: #e0d3a3;
@@ -97,8 +102,8 @@
   --tok-violet: #c9a6e9;
 
   --shadow:
-    0 1px 2px rgb(26 24 21 / 5%),
-    0 10px 28px -18px rgb(26 24 21 / 35%);
+    0 1px 2px rgb(20 24 26 / 5%),
+    0 10px 28px -18px rgb(20 24 26 / 30%);
 
   /* type */
   --font-display: 'OCR A', ui-monospace, monospace;
@@ -138,34 +143,26 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    /*
-     * These were #14120f — the exact value of --term-bg — so every code
-     * block and terminal was the same colour as the page behind it and
-     * disappeared entirely.
-     *
-     * The ground now sits ABOVE the plate. #14120f is so close to black that
-     * nothing can be placed below it with a perceptible step, so rather than
-     * a near-black page the dark theme uses a warm charcoal and the plate
-     * stays the darkest surface in BOTH themes — one rule, not two.
-     */
-    --paper: #322d26;
-    --chrome: #2a2620;
-    --panel: #3b352d;
-    --line: #4a4339;
-    --line-strong: #625a4d;
+    --paper: #1c2227;
+    --chrome: #232a30;
+    --panel: #222930;
+    --line: #38424a;
+    --line-strong: #4e5a63;
 
-    --ink: #ede9e1;
-    --dim: #b5ac9e;
-    --faint: #9e9484;
+    --ink: #e2e1d7;
+    --dim: #a3afb5;
+    --faint: #7c888e;
 
     --red: #ff6b5e;
     --red-text: #ff6b5e;
-    --red-soft: #2e1815;
-    --teal: #3fc9bc;
+    --red-soft: #2e1b19;
+    --green: #4cc253;
+    --green-soft: #17251a;
+    --teal: #00c0b5;
 
     --shadow:
-      0 1px 2px rgb(0 0 0 / 50%),
-      0 10px 28px -18px rgb(0 0 0 / 90%);
+      0 1px 2px rgb(0 0 0 / 45%),
+      0 10px 28px -18px rgb(0 0 0 / 85%);
 
     color-scheme: dark;
   }
@@ -174,24 +171,26 @@
 /* ---------- dark: explicit choice, wins over a light OS ---------- */
 
 :root[data-theme='dark'] {
-  --paper: #322d26;
-  --chrome: #2a2620;
-  --panel: #3b352d;
-  --line: #4a4339;
-  --line-strong: #625a4d;
+  --paper: #1c2227;
+  --chrome: #232a30;
+  --panel: #222930;
+  --line: #38424a;
+  --line-strong: #4e5a63;
 
-  --ink: #ede9e1;
-  --dim: #b5ac9e;
-  --faint: #9e9484;
+  --ink: #e2e1d7;
+  --dim: #a3afb5;
+  --faint: #7c888e;
 
   --red: #ff6b5e;
   --red-text: #ff6b5e;
-  --red-soft: #2e1815;
-  --teal: #3fc9bc;
+  --red-soft: #2e1b19;
+  --green: #4cc253;
+  --green-soft: #17251a;
+  --teal: #00c0b5;
 
   --shadow:
-    0 1px 2px rgb(0 0 0 / 50%),
-    0 10px 28px -18px rgb(0 0 0 / 90%);
+    0 1px 2px rgb(0 0 0 / 45%),
+    0 10px 28px -18px rgb(0 0 0 / 85%);
 
   color-scheme: dark;
 }

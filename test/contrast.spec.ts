@@ -63,12 +63,21 @@ describe('the plate is a distinct surface in both themes', () => {
     }
   })
 
-  it('separates from the dark page ground by a perceptible step', () => {
-    // --chrome is a page rail and never sits directly behind a plate, so it
-    // only needs to differ in value; --paper needs a real step.
-    // Adjacent dark surfaces cannot reach 3:1 without going light, so this is
-    // a floor on "visibly different", not a WCAG text threshold.
-    expect(ratio(plate, value(DARK, '--paper')!)).toBeGreaterThan(1.25)
+  it('separates from the dark page ground, by border as much as by value', () => {
+    /*
+     * The dark ground is Robot Framework's own #1c2227. Reaching even a 1.25
+     * luminance ratio below it would require the plate to be very near pure
+     * black — WCAG ratio is simply the wrong instrument for two adjacent dark
+     * surfaces. So the value step is a small floor, and the plate's border is
+     * what actually draws the edge. Both are required.
+     */
+    expect(ratio(plate, value(DARK, '--paper')!)).toBeGreaterThan(1.08)
+
+    const plateCss = readFileSync(join(process.cwd(), 'app/assets/css/plate.css'), 'utf8')
+    expect(plateCss).toMatch(/\.plate\s*\{[^}]*border:\s*1px solid var\(--term-line\)/)
+
+    // And that border must itself be visible against the plate it edges.
+    expect(ratio(value(LIGHT, '--term-line')!, plate)).toBeGreaterThan(1.6)
   })
 })
 
@@ -108,6 +117,11 @@ describe('text contrast', () => {
   it('meets AA for red used as small text', () => {
     expect(ratio(value(LIGHT, '--red-text')!, value(LIGHT, '--paper')!)).toBeGreaterThan(4.5)
     expect(ratio(value(DARK, '--red-text')!, value(DARK, '--paper')!)).toBeGreaterThan(4.5)
+  })
+
+  it('meets AA for the logo green used as an accent on both grounds', () => {
+    expect(ratio(value(LIGHT, '--green')!, value(LIGHT, '--paper')!)).toBeGreaterThan(4.5)
+    expect(ratio(value(DARK, '--green')!, value(DARK, '--paper')!)).toBeGreaterThan(4.5)
   })
 
   it('meets AA for the structural teal on both grounds', () => {

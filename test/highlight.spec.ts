@@ -43,7 +43,7 @@ describe('robot grammar', () => {
 
   it('colours keyword calls with the structural teal', async () => {
     const html = (await highlight(SUITE, ROBOT)).toLowerCase()
-    expect(html).toContain('#3fc9bc')
+    expect(html).toContain('#2bd9cc')
   })
 
   it('colours variables with amber', async () => {
@@ -70,7 +70,7 @@ describe('robot-repl grammar', () => {
     // This is the shape of every example extracted from Libdoc's HTML docs,
     // so if this regresses the whole keyword reference loses highlighting.
     const html = (await highlight(SNIPPET, ROBOT_REPL)).toLowerCase()
-    expect(html).toContain('#3fc9bc')
+    expect(html).toContain('#2bd9cc')
   })
 })
 

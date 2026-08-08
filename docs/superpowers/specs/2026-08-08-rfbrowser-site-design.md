@@ -122,11 +122,18 @@ The SVG also carries Inkscape metadata and references `OCRAStd` as a live font f
 
 ### 5.2 Colour tokens
 
-> **Open design note (2026-08-08).** The current warm neutral reads as too
-> brown. Next revision: take the dark theme's neutrals from robotframework.org's
-> own dark palette, and use the logo's red *and* green as heading accents rather
-> than red alone. Not yet applied — every colour is a token, so this is a change
-> to `tokens.css` and nothing else.
+> **Revision 2 (2026-08-08), applied.** The warm neutral read as brown, so the
+> dark theme now uses Robot Framework's own Libdoc palette — `#1c2227` ground,
+> `#e2e1d7` ink, `#00c0b5` turquoise — a cool blue-grey. Light is white page
+> with muted creme panels, taken from the Libdoc redesign. The logo's green
+> joins red as an accent: green marks *where you are* (section eyebrows), red
+> marks *what you can do* (actions). It was darkened from `#1d8d22` to
+> `#1a831f`, because the logo value is 4.30:1 on white and misses AA.
+>
+> One measured limit worth recording: the plate cannot sit a WCAG 1.25 step
+> below `#1c2227` — that would require near-pure black. For adjacent dark
+> surfaces the border does the separating, so `test/contrast.spec.ts` asserts a
+> small value step *and* a visible `--term-line` border.
 
 Light is the default. Dark is a designed second theme, not an inversion. Every colour is a custom property; no component is ever painted from inside a media query.
 

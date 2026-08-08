@@ -81,12 +81,24 @@ p {
   max-width: var(--measure);
 }
 
-/* Uppercase micro-label. OCR-A needs letter-spacing at this size. */
+/*
+ * Uppercase micro-label — the eyebrow above a section heading. OCR-A needs
+ * letter-spacing at this size.
+ *
+ * Set in the logo's green, which gives the mark's second colour a job:
+ * green marks where you are, red marks what you can do. Without this, red
+ * was carrying both and the page had only one accent.
+ */
 .label {
   font-family: var(--font-display);
   font-size: var(--step--2);
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--green);
+}
+
+/* Where a label is purely structural rather than a section eyebrow. */
+.label-quiet {
   color: var(--faint);
 }
 
