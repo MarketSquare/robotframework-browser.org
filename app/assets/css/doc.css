@@ -1,0 +1,121 @@
+/*
+ * Styles for Libdoc's own HTML. Spec §7.1.
+ *
+ * `docFormat` is HTML, so this markup is authored in Python docstrings and
+ * rendered by libdoc — we never control its structure, only its appearance.
+ * Global because it is injected with v-html and scoped styles would not reach it.
+ */
+
+.doc {
+  max-width: var(--measure);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.doc > * {
+  margin: 0;
+}
+
+.doc p,
+.doc li {
+  line-height: 1.7;
+}
+
+.doc a {
+  color: var(--teal);
+  border-bottom: 1px solid color-mix(in srgb, var(--teal) 35%, transparent);
+}
+
+.doc code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--chrome);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.05em 0.3em;
+}
+
+.doc ul,
+.doc ol {
+  margin: 0;
+  padding-left: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.doc h3,
+.doc h4,
+.doc h5 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  margin-top: var(--sp-2);
+}
+
+.doc h3 {
+  font-size: var(--step-1);
+}
+
+.doc h4,
+.doc h5 {
+  font-size: var(--step-0);
+}
+
+/* Libdoc emits wide tables; they scroll in their own box, never the page. */
+.doc table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.doc th,
+.doc td {
+  text-align: left;
+  padding: var(--sp-2) var(--sp-4) var(--sp-2) 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.doc th {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--step--2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  border-bottom-color: var(--line-strong);
+  white-space: nowrap;
+}
+
+/*
+ * Examples embedded in the docs. These are bare keyword sequences, so they are
+ * highlighted with the repl grammar, and they get the same dark plate as an
+ * <Editor> — minus the chrome, which would be noise at this size.
+ */
+.doc pre.doc-code {
+  margin: 0;
+  background: var(--term-bg);
+  border: 1px solid var(--term-line);
+  border-radius: var(--radius);
+  color: var(--term-ink);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  line-height: 1.75;
+  padding: var(--sp-3) var(--sp-4);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+@supports (corner-shape: bevel) {
+  .doc pre.doc-code {
+    corner-shape: bevel;
+  }
+}
+
+.doc pre.doc-code .line {
+  display: block;
+  min-height: 1.75em;
+}

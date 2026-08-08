@@ -198,3 +198,34 @@ describe('transform over the real spec', () => {
     expect(withExternal.doc).toContain('rel="noopener noreferrer"')
   })
 })
+
+describe('renderInline', () => {
+  it('renders Robot Framework inline markup in the summary', async () => {
+    const { renderInline } = await import('../lib/libdoc')
+    // shortdoc is the one field libdoc leaves as raw text.
+    expect(renderInline('Simulates a click on ``selector``.')).toBe(
+      'Simulates a click on <code>selector</code>.',
+    )
+    expect(renderInline('This is *bold* text')).toBe('This is <b>bold</b> text')
+    expect(renderInline('This is _italic_ text')).toBe('This is <i>italic</i> text')
+  })
+
+  it('escapes HTML before rendering markup', async () => {
+    const { renderInline } = await import('../lib/libdoc')
+    expect(renderInline('<script>x</script>')).toBe('&lt;script&gt;x&lt;/script&gt;')
+    expect(renderInline('a < b && c > d')).toBe('a &lt; b &amp;&amp; c &gt; d')
+  })
+
+  it('leaves lone asterisks and underscores alone', async () => {
+    const { renderInline } = await import('../lib/libdoc')
+    expect(renderInline('*** Test Cases ***')).toBe('*** Test Cases ***')
+    expect(renderInline('snake_case_name')).toBe('snake_case_name')
+  })
+
+  it('leaves no raw double-backticks anywhere in the index', async () => {
+    const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
+    for (const k of result.index) {
+      expect(k.shortdocHtml, k.name).not.toContain('``')
+    }
+  })
+})

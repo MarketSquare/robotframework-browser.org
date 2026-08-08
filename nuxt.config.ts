@@ -6,11 +6,12 @@ export default defineNuxtConfig({
   // Static output for GitHub Pages. No server, no runtime API.
   ssr: true,
   nitro: {
+    // 151 keyword + 81 type routes are discovered by crawling /keywords.
     preset: 'github-pages',
     prerender: { crawlLinks: true, routes: ['/'], failOnError: true },
   },
 
-  css: ['~/assets/css/tokens.css', '~/assets/css/base.css', '~/assets/css/plate.css'],
+  css: ['~/assets/css/tokens.css', '~/assets/css/base.css', '~/assets/css/plate.css', '~/assets/css/doc.css'],
 
   app: {
     head: {

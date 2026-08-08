@@ -3,9 +3,8 @@
 The website for the [Robot Framework Browser](https://github.com/MarketSquare/robotframework-browser)
 library. Nuxt 4 + Nuxt Content 3, prerendered to static files, served from GitHub Pages.
 
-> **Status: foundation (P1).** The design system and block components are built
-> and verified. Content pages and the keyword reference are not yet built — see
-> the plan below.
+> **Status: foundation (P1) and keyword reference (P2) built and verified.**
+> Content pages — landing, guides, comparison, community — are next.
 
 ## Commands
 
@@ -13,12 +12,14 @@ library. Nuxt 4 + Nuxt Content 3, prerendered to static files, served from GitHu
 pnpm install
 pnpm dev            # http://localhost:3000
 pnpm test           # vitest
-pnpm generate       # static output into .output/public
+pnpm libdoc         # transform content/libdoc/*.json into public/libdoc/
+pnpm generate       # runs libdoc, then static output into .output/public
 pnpm check:bundle   # fails if server-only weight reached the client
 pnpm verify         # test + generate + check:bundle
 ```
 
-`/styleguide` renders every design token and every component in every state.
+- `/styleguide` renders every design token and every component in every state.
+- `/keywords` is the keyword reference: 151 keyword pages and 81 type pages.
 
 ## Documents
 
@@ -40,6 +41,11 @@ pnpm verify         # test + generate + check:bundle
   (Apache-2.0, see `NOTICE`). No highlighter reaches the browser.
 - **Components** use radio inputs and CSS for state, so Editor tabs and the
   ComparisonSplit expansion work with JavaScript disabled.
+- **The keyword reference** is generated from Libdoc JSON at build time. Drop a
+  new `content/libdoc/Browser-<version>.json` in, point `LATEST` at it, and
+  `pnpm libdoc` emits a 36 KB index plus one payload per keyword and per type.
+  Groups come from each keyword's defining module via
+  `content/keyword-groups.json`, because Libdoc carries no group field.
 
 ## Deployment
 

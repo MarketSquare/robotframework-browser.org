@@ -76,7 +76,10 @@ export interface ResolvedArg {
 export interface ResolvedKeyword {
   name: string
   slug: string
+  /** Plain text, for meta descriptions and search. */
   shortdoc: string
+  /** The same sentence with Robot Framework's inline markup rendered. */
+  shortdocHtml: string
   /** Sanitized, link-rewritten, syntax-highlighted HTML. */
   doc: string
   tags: string[]
@@ -105,6 +108,7 @@ export interface IndexEntry {
   name: string
   slug: string
   shortdoc: string
+  shortdocHtml: string
   group: string
   groupSlug: string
   tags: string[]
@@ -153,6 +157,31 @@ export function moduleToName(module: string): string {
     .split('_')
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ')
+}
+
+/**
+ * `shortdoc` is the only field libdoc leaves as raw text: `doc` is rendered to
+ * HTML, but the one-line summary keeps Robot Framework's own inline markup.
+ * Left alone it renders as literal ``selector`` on all 151 keyword pages and
+ * again on the index.
+ *
+ * Robot Framework's inline syntax is ``code``, *bold* and _italic_.
+ */
+export function renderInline(text: string): string {
+  const escaped = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+  return (
+    escaped
+      .replace(/``([^`]+)``/g, '<code>$1</code>')
+      /*
+       * The `(?!\*)` / `(?<!\*)` guards matter: without them `*** Test Cases ***`
+       * — which appears in plenty of summaries — parses as bold-asterisk-bold.
+       */
+      .replace(/(^|\s)\*(?!\*)([^*]+?)(?<!\*)\*(?=\s|$|[.,;:!?])/g, '$1<b>$2</b>')
+      .replace(/(^|\s)_(?!_)([^_]+?)(?<!_)_(?=\s|$|[.,;:!?])/g, '$1<i>$2</i>')
+  )
 }
 
 const ALLOWED_TAGS = [
@@ -295,6 +324,7 @@ export async function transform(
       name: kw.name,
       slug: slug(kw.name),
       shortdoc: kw.shortdoc,
+      shortdocHtml: renderInline(kw.shortdoc),
       doc: await renderDoc(kw.doc, ctx, options.highlight),
       tags: [...new Set(kw.tags.map(normaliseTag))].sort(),
       group,
@@ -328,6 +358,7 @@ export async function transform(
     name: k.name,
     slug: k.slug,
     shortdoc: k.shortdoc,
+    shortdocHtml: k.shortdocHtml,
     group: k.group,
     groupSlug: k.groupSlug,
     tags: k.tags,

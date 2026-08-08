@@ -102,6 +102,14 @@ write(join(GEN, 'libdoc.json'), {
   libraryName: latestResult.libraryName,
   index: latestResult.index,
   groups: latestResult.groups,
+  // Name/kind/usage-count only. Enough for the type index and for route
+  // generation; the bodies stay in their own payloads.
+  types: latestResult.types.map(t => ({
+    name: t.name,
+    slug: t.slug,
+    kind: t.kind,
+    usedByCount: t.usedBy.length,
+  })),
 })
 
 console.log(`latest = ${latest}`)
