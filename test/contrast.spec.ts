@@ -152,3 +152,58 @@ describe('corner shape', () => {
     expect(plate).toMatch(/border-radius: var\(--radius\)/)
   })
 })
+
+describe('high contrast mode', () => {
+  const HC = blockAfter(":root[data-theme='contrast']")
+
+  it('defines every themed token', () => {
+    for (const t of ['--paper','--chrome','--panel','--line','--line-strong','--ink','--dim','--faint','--red','--red-text','--green','--teal']) {
+      expect(HC, `${t} missing from the contrast theme`).toContain(`${t}:`)
+    }
+  })
+
+  it('runs full white on full black', () => {
+    expect(value(HC, '--paper')).toBe('#000000')
+    expect(value(HC, '--ink')).toBe('#ffffff')
+    expect(ratio(value(HC, '--ink')!, value(HC, '--paper')!)).toBeGreaterThan(20)
+  })
+
+  it('clears AAA (7:1), not merely AA, for every ink and accent', () => {
+    // The whole point of the mode. AA would leave it no better than the
+    // default theme, which already passes AA everywhere.
+    const ground = value(HC, '--paper')!
+    for (const t of ['--ink', '--dim', '--faint', '--red', '--red-text', '--green', '--teal']) {
+      expect(ratio(value(HC, t)!, ground), `${t} on black`).toBeGreaterThan(7)
+    }
+  })
+
+  it('keeps accents distinguishable from each other, not just from the ground', () => {
+    // "Colourful" was the ask: red, green and teal must stay separable.
+    const [r, g, t] = ['--red', '--green', '--teal'].map(n => value(HC, n)!)
+    expect(new Set([r, g, t]).size).toBe(3)
+    for (const [a, b] of [[r, g], [g, t], [r, t]]) {
+      expect(Math.abs(luminance(a) - luminance(b))).toBeGreaterThan(0.001)
+    }
+  })
+
+  it('draws borders strongly enough to carry structure on black', () => {
+    // With no surface tint to speak of, the border does all the work.
+    expect(ratio(value(HC, '--line')!, value(HC, '--paper')!)).toBeGreaterThan(7)
+  })
+
+  it('keeps the code plate distinct from the page', () => {
+    expect(value(HC, '--panel')).not.toBe(value(HC, '--paper'))
+  })
+
+  it('is reachable automatically from the OS setting, not only by toggle', () => {
+    expect(TOKENS).toContain('@media (prefers-contrast: more)')
+    // ...and must not override an explicit light or dark choice.
+    expect(TOKENS).toMatch(/prefers-contrast: more[\s\S]{0,120}not\(\[data-theme='light'\]\)/)
+  })
+
+  it('cooperates with Windows High Contrast Mode', () => {
+    expect(TOKENS).toContain('@media (forced-colors: active)')
+    expect(TOKENS).toContain('CanvasText')
+    expect(TOKENS).toContain('Highlight')
+  })
+})

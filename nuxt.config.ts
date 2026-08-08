@@ -26,7 +26,7 @@ export default defineNuxtConfig({
           // Applies a stored theme choice before first paint. Without this the
           // page renders in the OS theme and then snaps — a visible flash.
           innerHTML:
-            "try{var t=localStorage.getItem('rfb-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}",
+            "try{var t=localStorage.getItem('rfb-theme');if(t==='light'||t==='dark'||t==='contrast')document.documentElement.dataset.theme=t}catch(e){}",
           tagPosition: 'head',
         },
       ],

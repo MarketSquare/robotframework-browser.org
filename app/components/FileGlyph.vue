@@ -2,9 +2,11 @@
 /**
  * Monochrome file-type pictograms for the Editor tab bar. Spec §5.4.
  *
- * Drawn here rather than pulled from an icon font: a coloured third-party
- * icon set would be the only thing on the plate not coming from our tokens,
- * and the tab bar is small enough that four marks cover everything.
+ * `.robot` and `.resource` use the official Robot Framework mark from
+ * robotframework/visual-identity. The rest are drawn here rather than pulled
+ * from an icon font: a coloured third-party icon set would be the only thing
+ * on the plate not coming from our tokens, and the tab bar is small enough
+ * that a handful of marks cover everything.
  *
  * Everything is `currentColor`, so the glyph dims and brightens with its tab.
  */
@@ -23,18 +25,12 @@ const kind = computed<Kind>(() => {
 </script>
 
 <template>
-  <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-    <!-- Robot head: the mark readers already associate with Robot Framework. -->
-    <template v-if="kind === 'robot'">
-      <path d="M8 1.3v2" />
-      <rect x="2.6" y="3.4" width="10.8" height="9.2" rx="1.6" />
-      <circle cx="6" cy="7.4" r=".95" />
-      <circle cx="10" cy="7.4" r=".95" />
-      <path d="M6 10.4h4" />
-    </template>
+  <!-- .robot and .resource get the official Robot Framework mark, not a redrawing. -->
+  <RobotMark v-if="kind === 'robot'" />
 
+  <svg v-else class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
     <!-- Python: the two interlocking bodies, reduced to their silhouette. -->
-    <template v-else-if="kind === 'python'">
+    <template v-if="kind === 'python'">
       <path d="M8 1.7c-2 0-2.6.9-2.6 1.9v1.5h2.7" />
       <path d="M5.4 5.1H3.7c-1 0-1.7.9-1.7 2.9s.7 2.9 1.7 2.9h1.1" />
       <path d="M8 14.3c2 0 2.6-.9 2.6-1.9v-1.5H7.9" />

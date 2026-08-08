@@ -1,24 +1,26 @@
 <script setup lang="ts">
 /**
  * Three states, matching how the tokens are written:
- *   system — no data-theme attribute; prefers-color-scheme decides
- *   light  — data-theme="light", beats a dark OS
- *   dark   — data-theme="dark",  beats a light OS
+ *   system   — no data-theme attribute; prefers-color-scheme and
+ *              prefers-contrast decide
+ *   light    — data-theme="light",  beats a dark OS
+ *   dark     — data-theme="dark",   beats a light OS
+ *   contrast — data-theme="contrast", WCAG AAA white-on-black
  *
  * The chosen state is applied before first paint by the inline script in
  * nuxt.config.ts, so there is no flash of the wrong theme.
  */
-export type Theme = 'system' | 'light' | 'dark'
+export type Theme = 'system' | 'light' | 'dark' | 'contrast'
 
 const STORAGE_KEY = 'rfb-theme'
-const ORDER: Theme[] = ['system', 'light', 'dark']
+const ORDER: Theme[] = ['system', 'light', 'dark', 'contrast']
 
 const theme = ref<Theme>('system')
 
 /** Server-rendered markup must not assume a theme, so read on mount only. */
 onMounted(() => {
   const stored = localStorage.getItem(STORAGE_KEY)
-  theme.value = stored === 'light' || stored === 'dark' ? stored : 'system'
+  theme.value = ORDER.includes(stored as Theme) && stored !== 'system' ? (stored as Theme) : 'system'
 })
 
 function apply(next: Theme) {
@@ -36,7 +38,12 @@ function cycle() {
   apply(ORDER[(ORDER.indexOf(theme.value) + 1) % ORDER.length]!)
 }
 
-const LABEL: Record<Theme, string> = { system: 'AUTO', light: 'LIGHT', dark: 'DARK' }
+const LABEL: Record<Theme, string> = {
+  system: 'AUTO',
+  light: 'LIGHT',
+  dark: 'DARK',
+  contrast: 'CONTRAST',
+}
 </script>
 
 <template>

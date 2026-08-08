@@ -21,3 +21,14 @@ IBM Plex Sans / IBM Plex Mono
 Files:   app/assets/fonts/plex-*.woff2
 Source:  https://github.com/IBM/plex
 License: SIL Open Font License 1.1
+
+--------------------------------------------------------------------------
+Robot Framework mark
+--------------------------------------------------------------------------
+File:    app/components/RobotMark.vue
+Source:  https://github.com/robotframework/visual-identity (logo/robot-framework.svg)
+Holder:  Robot Framework Foundation. All rights reserved.
+
+Used to identify Robot Framework files within this project, which is part of
+the Robot Framework ecosystem. Geometry is unmodified; only the fill is
+changed to currentColor so it inherits the surrounding text colour.

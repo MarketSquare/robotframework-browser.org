@@ -194,3 +194,94 @@
 
   color-scheme: dark;
 }
+
+
+/* =========================================================================
+   High contrast
+   =========================================================================
+   Two standards-based mechanisms plus one explicit choice:
+
+   1. `prefers-contrast: more` — the OS "increase contrast" setting. Applied
+      automatically, no UI needed. This is the mechanism most users with a
+      contrast need actually have switched on.
+   2. `[data-theme='contrast']` — the fourth state of the theme control, for
+      readers whose OS setting is off or who only want it on this site.
+   3. `forced-colors: active` — Windows High Contrast Mode replaces colours
+      wholesale. The correct response is to cooperate rather than fight it:
+      see the block at the end.
+
+   Contrast is orthogonal to light/dark, so strictly this should be a second,
+   independent control. It is folded into the one rotator because a fourth
+   state is far easier to find than a second control, and because the brief
+   asked for white-on-black specifically. If a light-ground high-contrast
+   variant is ever wanted, it becomes its own state rather than a modifier.
+
+   Target is WCAG AAA (7:1 for normal text), not AA. Body text is 21:1.
+   ========================================================================= */
+
+@media (prefers-contrast: more) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    --paper: #000000;
+    --chrome: #000000;
+    --panel: #0d0d0d;
+    --line: #b9b9b9;
+    --line-strong: #ffffff;
+
+    --ink: #ffffff;
+    --dim: #eaeaea;
+    --faint: #cfcfcf;
+
+    /* Accents lifted until every one clears AAA (7:1) on black. */
+    --red: #ff8a7f;
+    --red-text: #ff8a7f;
+    --red-soft: #3a0f0a;
+    --green: #57e05f;
+    --green-soft: #0b2a0d;
+    --teal: #2ee6d6;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='contrast'] {
+    --paper: #000000;
+    --chrome: #000000;
+    --panel: #0d0d0d;
+    --line: #b9b9b9;
+    --line-strong: #ffffff;
+
+    --ink: #ffffff;
+    --dim: #eaeaea;
+    --faint: #cfcfcf;
+
+    /* Accents lifted until every one clears AAA (7:1) on black. */
+    --red: #ff8a7f;
+    --red-text: #ff8a7f;
+    --red-soft: #3a0f0a;
+    --green: #57e05f;
+    --green-soft: #0b2a0d;
+    --teal: #2ee6d6;
+
+    color-scheme: dark;
+}
+
+/*
+ * Windows High Contrast Mode. The browser substitutes its own colours, so the
+ * job here is to make sure nothing depends on a background alone to be
+ * understood: every plate, card and control already carries a real border,
+ * and these keep them visible once our colours are discarded.
+ */
+@media (forced-colors: active) {
+  .plate,
+  .plate-bar,
+  .plate-status,
+  .plate-tab,
+  .plate-copy {
+    border-color: CanvasText;
+  }
+
+  /* The focus ring must survive colour substitution. */
+  :focus-visible {
+    outline-color: Highlight;
+  }
+}
