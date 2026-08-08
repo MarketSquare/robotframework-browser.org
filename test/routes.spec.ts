@@ -122,13 +122,17 @@ describe.skipIf(!built)('keyword rail', () => {
 describe('content queries', () => {
   const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
 
-  it('routes every content query through the guarded composable', () => {
+  it('guards every content query for the server and dev, inline', () => {
     /*
-     * Guarding on `import.meta.server` alone shipped a bug that only appeared
-     * in dev: production carries the result in the prerendered payload, but
-     * `nuxt dev` has no payload extraction, so a client-side navigation ran
-     * the handler in the browser, got nothing, and the page threw its own 404
-     * — then rendered fine on reload. One composable states the rule once.
+     * Two failures are guarded here at once — see app/utils/content-guard.md.
+     *
+     * Without `import.meta.dev` the page 404s on a client-side navigation in
+     * dev, because dev has no payload extraction to fall back on.
+     *
+     * And the guard has to be inline: extracting it into a composable put the
+     * query behind a function boundary, so it could no longer be eliminated
+     * as dead code and Nuxt Content's SQLite engine came back — reachable
+     * client JS went from 361 KB to 574 KB.
      */
     for (const f of [
       'app/pages/guides/[...slug].vue',
@@ -137,15 +141,10 @@ describe('content queries', () => {
       'app/components/SiteHeader.vue',
     ]) {
       const src = read(f)
-      expect(src, `${f} should use useServerContent`).toContain('useServerContent(')
-      expect(src, `${f} still has a bare import.meta.server guard`).not.toMatch(
-        /import\.meta\.server\s*\?/,
+      expect(src, `${f} is missing the inline guard`).toContain(
+        'import.meta.server || import.meta.dev',
       )
+      expect(src, `${f} hides the query behind a composable`).not.toContain('useServerContent(')
     }
-  })
-
-  it('lets the query run on the client in dev, so navigation works there', () => {
-    const src = read('app/composables/useServerContent.ts')
-    expect(src).toContain('import.meta.server || import.meta.dev')
   })
 })

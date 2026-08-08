@@ -16,11 +16,13 @@ const path = computed(
   () => `/guides/${(route.params.slug as string[]).filter(Boolean).join('/')}`,
 )
 
-const { data: doc } = await useServerContent(
-  `guide-${path.value}`,
-  () => queryCollection('guides').path(path.value).first(),
-  null,
-)
+const { data: doc } = await useAsyncData(`guide-${path.value}`, async () => {
+  // Server, plus the client in dev — see app/utils/content-guard.md
+  if (import.meta.server || import.meta.dev) {
+    return await queryCollection('guides').path(path.value).first()
+  }
+  return null
+})
 
 if (!doc.value) {
   throw createError({ statusCode: 404, statusMessage: 'Guide not found', fatal: true })

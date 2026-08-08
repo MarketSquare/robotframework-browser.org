@@ -9,11 +9,11 @@ import type { EditorFile } from '~/components/Editor.vue'
  * evidence. Written for someone deciding, so every claim is followed by the
  * code that demonstrates it: a claim that could not be shown as code was cut.
  */
-const { data: tools } = await useServerContent(
-  'why-tools',
-  () => queryCollection('compare').all(),
-  [],
-)
+const { data: tools } = await useAsyncData('why-tools', async () => {
+  // Server, plus the client in dev — see app/utils/content-guard.md
+  if (import.meta.server || import.meta.dev) return await queryCollection('compare').all()
+  return []
+})
 
 interface Concept {
   id: string

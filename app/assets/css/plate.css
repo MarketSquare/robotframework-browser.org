@@ -196,6 +196,12 @@
  * MAX_TABS in Editor.vue caps this at 6 and throws past it, so a seventh tab
  * fails loudly at build time rather than rendering a blank pane.
  */
+
+.editor {
+    color-scheme: dark;
+}
+
+
 .editor .pane {
   display: none;
 }

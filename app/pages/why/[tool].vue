@@ -4,11 +4,13 @@ import type { EditorFile } from '~/components/Editor.vue'
 const route = useRoute()
 const slug = computed(() => String(route.params.tool))
 
-const { data: doc } = await useServerContent(
-  `compare-${slug.value}`,
-  () => queryCollection('compare').where('slug', '=', slug.value).first(),
-  null,
-)
+const { data: doc } = await useAsyncData(`compare-${slug.value}`, async () => {
+  // Server, plus the client in dev — see app/utils/content-guard.md
+  if (import.meta.server || import.meta.dev) {
+    return await queryCollection('compare').where('slug', '=', slug.value).first()
+  }
+  return null
+})
 
 if (!doc.value) {
   throw createError({ statusCode: 404, statusMessage: 'No such comparison', fatal: true })
