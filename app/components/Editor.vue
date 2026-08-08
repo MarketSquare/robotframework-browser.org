@@ -27,11 +27,19 @@ export interface EditorFile {
   highlightLines?: number[]
 }
 
-const props = defineProps<{
-  files: EditorFile[]
-  /** Off for short snippets, on where line counts are the point. */
-  lineNumbers?: boolean
-}>()
+/**
+ * withDefaults is required, not stylistic: Vue casts an *absent* Boolean prop
+ * to `false`, never `undefined`. Defaulting via `props.lineNumbers !== false`
+ * therefore silently turned the gutter off everywhere the prop was omitted.
+ */
+const props = withDefaults(
+  defineProps<{
+    files: EditorFile[]
+    /** On by default; pass false for short snippets where counting is noise. */
+    lineNumbers?: boolean
+  }>(),
+  { lineNumbers: true },
+)
 
 /** Keep in step with the generated rules in plate.css. */
 const MAX_TABS = 6
@@ -43,7 +51,7 @@ if (props.files.length > MAX_TABS) {
 }
 
 const uid = useId()
-const showLines = computed(() => props.lineNumbers !== false)
+const showLines = computed(() => props.lineNumbers)
 
 const prepared = computed(() =>
   props.files.map(f => {

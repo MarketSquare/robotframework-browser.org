@@ -122,6 +122,21 @@ const uid = useId()
   display: inline-flex;
 }
 
+/*
+ * Focus. A radio group exposes only its *checked* member to the tab order and
+ * moves between members with the arrow keys. At rest that member is `even`,
+ * whose own label (⤡ restore) is display:none — so focusing the group used to
+ * show the reader nothing at all.
+ *
+ * Ringing every rendered control instead means the ring lands on whatever is
+ * actually on screen, and reads as "you are on the split controls; arrow keys
+ * change the split".
+ */
+.cmp-wrap:has(.cmp-radio:focus-visible) .cmp-exp {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
 .cmp-notes {
   display: flex;
   flex-wrap: wrap;

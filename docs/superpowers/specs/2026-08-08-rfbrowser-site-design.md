@@ -114,7 +114,7 @@ Older keyword versions are **not** separate routes. `/keywords/[keyword]?v=12.4.
 The existing `browser_lib_logo.svg` is kept as drawn. Two changes:
 
 1. Recolour `#E2574C` → `#D63A2E` and `#D65348` → `#B82E24` (the darker red is the shadow tone). Re-check the greens `#2EAD33` / `#1D8D22` and the slate `#324E5B` still balance against the new red.
-2. Produce a light-ground variant. The current mark fills `cls-1`, `cls-2` and `cls-3` with `#fff`, so it is invisible on paper — those become `#1A1815`.
+2. **One file, not a light/dark pair.** This originally called for darkening the white ink for a light ground. Rendering it disproved that: the white is a *keyline* that separates the two overlapping cards by contrasting with the black outline just inside it. Darkened on paper, keyline and outline merge and the cards collapse into a single blob. A near-white keyline reads correctly on both grounds — as a sticker edge on paper, as a halo on the plate — so it is not themed. Verified in both themes at `/styleguide`.
 
 The SVG also carries Inkscape metadata and references `OCRAStd` as a live font for the wordmark. Both are cleaned up: strip the editor metadata, convert the wordmark to outlines so it renders without the font installed.
 
@@ -465,7 +465,10 @@ The live site is untouched until step 5.
 |---|---|
 | Libdoc's HTML `doc` contains markup our sanitizer strips, silently losing content | Build-time check: assert no keyword's rendered output is shorter than a threshold ratio of its source; fail the build |
 | Keyword grouping breaks when a new module is added | Unmapped modules fall back to a title-cased filename and log a build warning (§7.1) |
-| Vendored robotcode grammars may not load cleanly into Shiki (scope embedding, `.template.json` confusion) | Spike this in P1, not P2 — it is one afternoon and it de-risks every code block on the site. Plain-text fallback if it slips |
+| ~~Vendored robotcode grammars may not load cleanly into Shiki~~ | **Retired.** Both grammars were verified self-contained — neither `include`s an external scope — and both tokenise correctly under Shiki. `test/highlight.spec.ts` guards it |
+| Server-only weight leaking into the client bundle | **Happened once**: a single static import of `LANG_LABEL` pulled 256 KB of grammar JSON into every page. Fixed by splitting `utils/lang.ts`; guarded by `test/bundle-purity.spec.ts` and `scripts/check-bundle.mjs` |
+| Vue casting an absent Boolean prop to `false` silently disabling a default-on feature | **Happened once** on `Editor.lineNumbers`; found only in the browser. All boolean props use `withDefaults`; guarded by `test/editor-props.spec.ts` |
+| A control that is focusable but shows no visible ring | **Happened once** on ComparisonSplit: a radio group exposes only its checked member to the tab order, and that member's label was `display:none`. Verified by tabbing the real page in P1 |
 | 206 build-time avatar downloads make builds slow or flaky | Cache in the repo; refresh on a schedule, not every build |
 | Full content rewrite (D15) becomes the long pole | Content is authored in Markdown from day one, so it can land incrementally after the components are done |
 | Libdoc JSON schema changes in a future RF release | `specversion` is asserted at build time; an unexpected version fails loudly |
