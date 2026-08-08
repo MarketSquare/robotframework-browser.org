@@ -146,6 +146,23 @@ describe('bevelled accents', () => {
 describe('code blocks look alike', () => {
   const read = (p: string) => readFileSync(process.cwd() + '/' + p, 'utf8')
 
+  it('clips the scrollbar to the bevel, as <Editor> does', () => {
+    const doc = read('app/assets/css/doc.css')
+    const lib = read('lib/libdoc.ts')
+    /*
+     * One element cannot both carry the bevel and scroll: the scrollbar is
+     * drawn in the padding box, which corner-shape does not clip, so it cuts
+     * across the bevelled bottom corners. The wrapper clips, the <pre> inside
+     * it scrolls — the same split as .plate / .plate-body.
+     */
+    expect(lib).toContain('<div class="doc-code"><pre>')
+    expect(doc).toMatch(/\.doc \.doc-code \{[^}]*overflow: hidden/)
+    expect(doc).toMatch(/\.doc \.doc-code > pre \{[^}]*overflow-x: auto/)
+    // The shape must be on the clipping element, never on the scroller.
+    const scroller = doc.slice(doc.indexOf('.doc .doc-code > pre {'), doc.indexOf('@supports', doc.indexOf('.doc .doc-code > pre {')))
+    expect(scroller).not.toContain('border-radius')
+  })
+
   it('draws dark scrollbars on every dark plate', async () => {
     const plate = read('app/assets/css/plate.css')
     const doc = read('app/assets/css/doc.css')
@@ -156,7 +173,7 @@ describe('code blocks look alike', () => {
      * they need it too.
      */
     expect(plate).toMatch(/\.plate \{[^}]*color-scheme: dark/)
-    expect(doc).toMatch(/pre\.doc-code \{[^}]*color-scheme: dark/)
+    expect(doc).toMatch(/\.doc-code \{[^}]*color-scheme: dark/)
   })
 
   it('gives a nameless block no chrome, but the same plate', () => {

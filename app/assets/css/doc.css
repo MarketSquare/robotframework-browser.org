@@ -117,35 +117,42 @@
  * Examples embedded in the docs. These are bare keyword sequences, so they are
  * highlighted with the repl grammar, and they get the same dark plate as an
  * <Editor> — minus the chrome, which would be noise at this size.
+ *
+ * Two elements, not one, exactly as <Editor> does it. The wrapper carries the
+ * bevel and clips; the <pre> inside it scrolls. Collapsed into a single
+ * element, the scrollbar is drawn in the padding box — which the corner shape
+ * does not clip — and slices across the bevelled bottom corners.
  */
-.doc pre.doc-code {
-  margin: 0;
+.doc .doc-code {
   background: var(--term-bg);
   border: 1px solid var(--term-line);
   border-radius: var(--radius);
+  box-shadow: var(--shadow);
   color: var(--term-ink);
+  /* Clips the scrollbar to the bevelled outline. */
+  overflow: hidden;
+  /* :root is color-scheme: light, so without this the scrollbar renders in
+     its light form on near-black. Matches .plate. */
+  color-scheme: dark;
+}
+
+.doc .doc-code > pre {
+  margin: 0;
   font-family: var(--font-mono);
   font-size: var(--step--1);
   line-height: 1.75;
   padding: var(--sp-3) var(--sp-4);
   overflow-x: auto;
   white-space: pre;
-  /*
-   * Matches a bare <Editor>: same plate, same padding, same scrollbar. These
-   * blocks come from Libdoc's HTML and cannot be components, so the styling
-   * has to agree by hand — see .plate in plate.css.
-   */
-  color-scheme: dark;
-  box-shadow: var(--shadow);
 }
 
 @supports (corner-shape: bevel) {
-  .doc pre.doc-code {
+  .doc .doc-code {
     corner-shape: bevel;
   }
 }
 
-.doc pre.doc-code .line {
+.doc .doc-code .line {
   display: block;
   min-height: 1.75em;
 }

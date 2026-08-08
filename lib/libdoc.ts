@@ -481,7 +481,16 @@ export async function renderDoc(
   for (const [full, body] of blocks) {
     const code = decodeEntities(body!.replace(/<[^>]+>/g, ''))
     const highlighted = await highlight(code)
-    out = out.replace(full, `<pre class="doc-code">${highlighted}</pre>`)
+    /*
+     * Wrapper plus inner <pre>, mirroring .plate / .plate-body.
+     *
+     * A single element cannot both carry the bevel and be the scroll
+     * container: browsers draw the scrollbar in the padding box, which the
+     * corner shape does not clip, so it cuts straight across the bevelled
+     * bottom corners. The wrapper owns the shape and clips; the <pre> scrolls
+     * inside it.
+     */
+    out = out.replace(full, `<div class="doc-code"><pre>${highlighted}</pre></div>`)
   }
   return out
 }
