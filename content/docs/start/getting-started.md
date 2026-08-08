@@ -1,6 +1,7 @@
 ---
 title: Getting started
 description: Install Browser, write a first test, and run it.
+section: start
 order: 1
 ---
 

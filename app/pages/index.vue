@@ -210,7 +210,7 @@ useHead({
       </ol>
 
       <p class="next">
-        Next: the <NuxtLink to="/guides/getting-started">getting-started guide</NuxtLink>, or the
+        Next: the <NuxtLink to="/docs/start/getting-started">getting-started guide</NuxtLink>, or the
         <NuxtLink to="/keywords">keyword reference</NuxtLink>.
       </p>
     </section>

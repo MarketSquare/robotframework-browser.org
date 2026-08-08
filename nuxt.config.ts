@@ -1,6 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-08',
   modules: ['@nuxt/content'],
+
   devtools: { enabled: false },
 
   // Static output for GitHub Pages. No server, no runtime API.

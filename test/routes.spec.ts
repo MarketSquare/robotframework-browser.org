@@ -7,8 +7,8 @@ const OUT = join(ROOT, '.output/public')
 const built = existsSync(OUT)
 
 describe('catch-all routes tolerate a trailing slash', () => {
-  it('normalises empty segments out of the guide path', () => {
-    const src = readFileSync(join(ROOT, 'app/pages/guides/[...slug].vue'), 'utf8')
+  it('normalises empty segments out of the docs path', () => {
+    const src = readFileSync(join(ROOT, 'app/pages/docs/[...slug].vue'), 'utf8')
     // A static host serves /guides/x/ with the slash, and a catch-all splits
     // that into a trailing empty segment. Without filtering, the content query
     // misses and the page renders blank for every direct visitor.
@@ -58,7 +58,7 @@ describe.skipIf(!built)('prerendered output', () => {
   })
 
   it('renders the guide with its MDC-embedded components', () => {
-    const html = page('guides/getting-started')
+    const html = page('docs/start/getting-started')
     expect(html).toContain('plate term')
     expect(html).toContain('plate editor')
   })
@@ -66,7 +66,7 @@ describe.skipIf(!built)('prerendered output', () => {
   it('never emits an unhighlighted fallback block in a prerendered page', () => {
     // The fallback is escaped plain text with no colour. Seeing it in the
     // output means highlighting failed at build.
-    for (const p of ['', 'why/vs-cypress', 'guides/getting-started']) {
+    for (const p of ['', 'why/vs-cypress', 'docs/start/getting-started']) {
       const html = page(p)
       const bodies = html.match(/<pre[^>]*>[\s\S]{0,400}?<\/pre>/g) ?? []
       for (const b of bodies) {
@@ -135,7 +135,7 @@ describe('content queries', () => {
      * client JS went from 361 KB to 574 KB.
      */
     for (const f of [
-      'app/pages/guides/[...slug].vue',
+      'app/pages/docs/[...slug].vue',
       'app/pages/why/index.vue',
       'app/pages/why/[tool].vue',
       'app/components/SiteHeader.vue',

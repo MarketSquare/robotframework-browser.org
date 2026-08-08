@@ -17,12 +17,15 @@ export default defineContentConfig({
       }),
     }),
 
-    guides: defineCollection({
+    docs: defineCollection({
       type: 'page',
-      source: 'guides/**/*.md',
+      source: 'docs/**/*.md',
       schema: z.object({
         title: z.string(),
         description: z.string(),
+        /** Chapter this page belongs to; see DOC_SECTIONS in the docs route. */
+        section: z.string(),
+        /** Position within the chapter. */
         order: z.number().default(99),
       }),
     }),

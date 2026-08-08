@@ -41,9 +41,14 @@ const nav = computed<NavItem[]>(() => [
     ],
   },
   {
-    to: '/guides/getting-started',
-    label: 'Guides',
-    children: [{ to: '/guides/getting-started', label: 'Getting started', note: 'Install, write a test, run it' }],
+    to: '/docs/start/getting-started',
+    label: 'Docs',
+    children: [
+      { to: '/docs/start/getting-started', label: 'Getting started', note: 'Install, write a test, run it' },
+      { to: '/docs/concepts/selectors', label: 'Finding elements', note: 'Which selector to reach for, and why' },
+      { to: '/docs/concepts/architecture', label: 'How Browser works', note: 'Python, Node and Playwright' },
+      { to: '/docs/extending/python-plugins', label: 'Extending Browser', note: 'Python plugins and JavaScript' },
+    ],
   },
   { to: '/keywords', label: 'Keywords' },
   { to: '/styleguide', label: 'Styleguide' },

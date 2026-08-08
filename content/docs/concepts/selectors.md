@@ -1,0 +1,280 @@
+---
+title: Finding elements
+description: Which selector strategy to reach for, why the order matters, and how to chain across iframes and shadow DOM.
+section: concepts
+order: 2
+---
+
+Every keyword that touches the page takes a `selector`. Which strategy you choose
+decides how often your suite breaks for reasons that have nothing to do with the
+software under test.
+
+This page covers the strategies, the order I would reach for them in, and the
+syntax for chaining, iframes and shadow DOM.
+
+## Pick a strategy in this order
+
+The ranking below is opinionated. It optimises for one thing: **a selector that
+keeps working when the page is redesigned but the feature is unchanged.**
+
+::doc-table
+---
+head: [Rank, Strategy, Reach for it when]
+rows:
+  - ['1', 'role=', 'The element has a proper accessible role and name. This is the default choice.']
+  - ['2', 'data-test-id=', 'Stability matters more than testing the interface as a user meets it.']
+  - ['3', 'text=', 'The visible text is the thing you actually mean, and the app is single-language.']
+  - ['4', 'css=', 'None of the above identify the element.']
+  - ['5', 'id=', 'You know the id is contractual, not incidental.']
+  - ['6', 'xpath=', 'Genuinely nothing else can select it.']
+---
+::
+
+### 1. `role=` — how the user finds it
+
+```robot-repl
+Click    role=button[name="Save"]
+Click    role=link[name="Get started"]
+Fill Text    role=textbox[name="Email"]    admin@example.com
+```
+
+A role selector matches on what the element *is* and what it is *called* —
+the same two things a screen-reader user navigates by. It is semantic rather
+than structural, so it survives a redesign that moves the button, restyles it,
+or rebuilds the surrounding markup.
+
+The name here is the **accessible name**, which the browser computes in this
+order:
+
+1. `aria-labelledby`
+2. `aria-label`
+3. An associated `<label>`
+4. Visible text content
+5. `title`
+
+There is a bonus that is easy to miss. If you cannot write a role selector
+because the element has no proper role or no accessible name, **you have found
+an accessibility bug**. A screen-reader user cannot identify that control
+either. That is worth an issue, not a workaround.
+
+### 2. `data-test-id=` — the one attribute that belongs to us
+
+```robot-repl
+Click    [data-test-id="checkout-submit"]
+```
+
+Every other attribute on the page belongs to someone else. Classes belong to the
+designers, ids to the developers, text to the copywriters — and all three of
+them are entitled to change their minds without telling you.
+
+A dedicated test id is the only hook that exists for testing, and the only one
+nobody will change by accident. If long-term stability is what you are buying,
+buy this one.
+
+Be clear-eyed about what it costs, though. A test id is invisible to the user,
+so a suite built on test ids is **using the interface to test the functionality
+behind it**, not testing the interface. That is often exactly the right trade —
+just make it deliberately rather than by default.
+
+::doc-note
+---
+kind: aside
+---
+This is where this page differs from
+[Simon Meggle's article on web selectors](https://www.robotmk.org/en/blog/web-selectors),
+which ranks automation ids first and role second. Both orders are defensible. If
+your priority is a suite that never breaks, put `data-test-id=` first. If your
+priority is testing what the user actually meets — and getting accessibility
+feedback for free — put `role=` first, which is what this page does.
+::
+
+### 3. `text=` — what is written on it
+
+```robot-repl
+Click    text=Sign in
+Click    "Sign in"
+Click    text=/^Sign in$/i
+```
+
+Text selectors use a user-facing property, like `role=`, which is why they rank
+above anything structural. They are one step behind `role=` because text alone
+does not say what the element *is*, and because text is language-dependent: the
+moment the app is localised, every text selector is a translation away from
+failing.
+
+`text=Sign in` matches by substring, case-insensitively, and trims whitespace.
+Quoting the value — `"Sign in"` — makes it an exact, case-sensitive match.
+
+### 4. `css=` — acceptable, not preferable
+
+```robot-repl
+Click    css=button.primary
+Click    .checkout > button
+```
+
+CSS is web-native and every web developer reads it, which is a real advantage:
+a developer looking at your selector understands it immediately and can tell
+you when a change will break it.
+
+It ranks below the three above because it selects on *structure and styling* —
+exactly the things a redesign changes. A class name is a styling decision, not a
+contract with you.
+
+CSS is the implicit default: a selector that is not obviously something else is
+treated as CSS.
+
+### 5. `id=` — less stable than it looks
+
+```robot-repl
+Click    id=submit-button
+Click    \#submit-button
+```
+
+An id feels like a stable, unique handle, and sometimes it is. But ids belong to
+the developers, they are frequently generated by a framework, and nothing stops
+them changing in a refactor that nobody thought was user-visible. The stability
+is a **false sense of safety** unless you have agreed with the developers that
+these particular ids are contractual.
+
+::doc-note
+---
+kind: warning
+---
+`#` starts a comment in Robot Framework syntax, so a CSS id selector must be
+escaped as `\#submit-button`, or written as `id=submit-button`.
+::
+
+### 6. `xpath=` — the ugly cousin
+
+```robot-repl
+Click    xpath=//button[@type="submit"]
+Click    //div[@class="row"]//button
+```
+
+XPath is CSS's powerful, unpleasant relative. It is more verbose for the same
+result, many web developers do not read it fluently, it is not web-native, and
+it invites selecting by document position — which is the most brittle thing you
+can possibly do.
+
+It is genuinely more powerful, and occasionally something is unselectable
+without it. Use it then, and only then. It is the last resort, not a
+general-purpose tool.
+
+And if you are about to paste something like this out of your browser's
+devtools:
+
+```robot-repl
+Click    /html/body/div[3]/div/div[2]/button
+```
+
+...that selector describes where the button sits today, not what it is. It will
+break on the next layout change, and the failure will look like a bug in the
+software rather than in the test.
+
+## How a strategy is chosen
+
+You can always be explicit with a `strategy=value` prefix. Spaces around the
+separator are ignored, so `css=foo`, `css= foo` and `css = foo` are equivalent.
+
+Without a prefix, the strategy is inferred:
+
+::doc-table
+---
+head: [Selector looks like, Treated as]
+rows:
+  - ['Starts with `//` or `..`', 'XPath']
+  - ['Starts and ends with a quote', 'Text']
+  - ['Anything else', 'CSS']
+---
+::
+
+```robot-repl
+Get Element    //html/body/div      # xpath
+Get Element    "foo"                # text
+Get Element    div                  # css
+```
+
+## Chaining with `>>`
+
+This is the part that makes Browser's selectors worth learning. Strategies
+combine in a single string, left to right, with `>>`. Each step searches inside
+the result of the previous one.
+
+```robot-repl
+# Find the element with text "Login", then its parent input
+Click    "Login" >> xpath=../input
+
+# Find a css element, then a button inside it by text
+Click    css=.checkout >> text=Confirm
+
+# Start with a role, narrow with css
+Get Text    role=listitem[name="Basket"] >> css=.price
+```
+
+That means you rarely need one clever selector. You need two obvious ones.
+
+## Crossing into iframes with `>>>`
+
+Selector chains stop at frame boundaries by default. To cross one, use `>>>`:
+
+```robot-repl
+Get Text    iframe#preview >>> h1
+Click       iframe[name="editor"] >>> role=button[name="Bold"]
+```
+
+No context switching, and no switching back afterwards — the frame boundary is
+just another step in the chain.
+
+## Shadow DOM
+
+Browser pierces open shadow roots automatically, so a normal chain reaches into
+a web component without any special syntax:
+
+```robot-repl
+Get Text    css=my-widget >> css=button
+```
+
+This is one of the places Browser is genuinely ahead of older tools: automatic
+piercing means a component-based frontend does not need a different approach
+from any other page.
+
+Closed shadow roots cannot be pierced by anything, by design — if you hit one,
+that is a conversation with the developers rather than a selector problem.
+
+## Strict mode
+
+By default, a selector that matches more than one element is an error rather
+than a silent pick of the first one.
+
+```robot
+*** Settings ***
+Library    Browser    strict=False    # opt out globally
+```
+
+Leave it on. A selector matching three elements when you meant one is a bug in
+the selector, and strict mode tells you immediately instead of at some later
+point when the order changes.
+
+## Element references
+
+`Get Element` returns a reference you can pass to other keywords, so an
+expensive lookup is done once:
+
+```robot-repl
+${button} =    Get Element    role=button[name="Save"]
+Get Element States    ${button}    contains    enabled
+Click    ${button}
+```
+
+What you get back is a Playwright *locator*, not a snapshot of the DOM node. It
+captures *how to find* the element, and re-resolves when used — so it stays
+valid across a re-render that would invalidate a stored node.
+
+## In short
+
+- Reach for `role=` first. If you cannot, you may have found an accessibility bug.
+- Use `data-test-id=` when stability is the priority, knowing what it trades away.
+- `text=` is fine until you localise.
+- `css=` is acceptable; `id=` is less stable than it looks.
+- `xpath=` last, and never by document position.
+- Two obvious selectors chained with `>>` beat one clever one.
