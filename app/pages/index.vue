@@ -430,6 +430,7 @@ h1 {
 
 .steps p {
   color: var(--dim);
+  max-width: var(--measure);
 }
 
 .next {

@@ -225,3 +225,12 @@ describe('reading column and section indent', () => {
     expect(kwCss).toMatch(/\.block > \*:not\(h4\) \{\s*margin-left: var\(--section-indent\)/)
   })
 })
+
+describe('reading measure', () => {
+  it('never caps paragraphs globally', () => {
+    const base = readFileSync(join(process.cwd(), 'app/assets/css/base.css'), 'utf8')
+    // A blanket `p { max-width }` stopped .doc and .kw filling their own
+    // 1000px column. Measure belongs to the container, not the element.
+    expect(base).not.toMatch(/^p \{[^}]*max-width/m)
+  })
+})

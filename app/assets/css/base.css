@@ -76,8 +76,20 @@ h4 {
   font-size: var(--step-1);
 }
 
+/*
+ * No blanket measure on <p>.
+ *
+ * A global `max-width: var(--measure)` here capped every paragraph at 66ch
+ * whatever it sat in, so documentation and keyword panels could not fill their
+ * own 1000px column. Measure is a property of a reading column, not of the
+ * paragraph element — so it is set on the container that wants it.
+ */
 p {
   margin: 0;
+}
+
+/* Opt in where a genuine reading column is wanted. */
+.measure {
   max-width: var(--measure);
 }
 

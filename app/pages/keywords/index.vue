@@ -344,6 +344,7 @@ useHead({
 
 .lede {
   color: var(--dim);
+  max-width: var(--measure);
 }
 
 .meta {

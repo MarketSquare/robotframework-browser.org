@@ -104,7 +104,6 @@
 .kw-short {
   margin: 0;
   color: var(--dim);
-  max-width: var(--measure);
 }
 
 .kw-short code {
