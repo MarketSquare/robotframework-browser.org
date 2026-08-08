@@ -9,7 +9,8 @@ defineProps<{ head: string[]; rows: string[][] }>()
       <thead><tr><th v-for="h in head" :key="h">{{ h }}</th></tr></thead>
       <tbody>
         <tr v-for="(row, i) in rows" :key="i">
-          <td v-for="(cell, j) in row" :key="j" v-html="cell.replace(/`([^`]+)`/g, '<code>$1</code>')" />
+          <!-- Cells come from YAML, so Markdown in them is inert until we render it. -->
+          <td v-for="(cell, j) in row" :key="j" v-html="inlineMarkdown(cell)" />
         </tr>
       </tbody>
     </table>

@@ -1,7 +1,7 @@
 # Where documentation lives: library vs site
 
 **Date:** 2026-08-08
-**Status:** Concept for discussion — nothing implemented
+**Status:** Tier 1 targets built on the site; the library PR is not written yet
 **Question:** What stays in the library's Libdoc documentation, what moves to Docs on the site, and how are the two linked?
 
 ---
@@ -194,3 +194,31 @@ I would start with 1.
 4. **Version skew:** inline "since" notes to start, or a version selector from day one?
 
 Once these are settled, the work is: build the Docs shell, write the pages that receive moved content, then a single library PR that deletes the moved sections and leaves stubs — in that order, so no link is ever published before its target exists.
+
+---
+
+## 9. Progress
+
+The Docs shell exists, and **every Tier 1 target is now written**, so the library
+PR is unblocked. Two of the destinations moved from where §4 predicted:
+
+| Library section | Concept said | Actually built | Why |
+|---|---|---|---|
+| ENVIRONMENT VARIABLES | `/docs/reference/environment-variables` | `/docs/operations/environment-variables` | There is no `reference` chapter; these are operational settings |
+| Re-using same node process | `/docs/ci/node-process` | `/docs/operations/node-process` | Merged with the parameters section below — one process, one page |
+| Provide parameters to node process | `/docs/ci/node-process` | same page, "Passing Node flags" | |
+| Language (translations) | `/docs/translations` | `/docs/extending/translations` | A translation is a Python package implementing a plugin API. Authoring one is extending; *using* one is two lines, covered at the top of the same page |
+| Extending with a JavaScript module | `/docs/extending/javascript-modules` | `/docs/extending/javascript-extensions` | Written earlier, alongside `javascript-basics` |
+
+Use the **Actually built** column when writing the stubs. These paths are the
+API now, per §6.
+
+Tier 2 is partly done: `Finding elements` has its expanded site page at
+`/docs/concepts/selectors`, which is what makes the library's 1,945-word version
+the duplication §3 warns about. Assertions and the object model have not been
+split yet.
+
+Still undecided, and still needed before the library PR: questions 2, 3 and 4 in
+§8, and core-team sign-off on the selector ranking in
+`/docs/concepts/selectors`, which currently states one contributor's opinion as
+the project's recommendation.
