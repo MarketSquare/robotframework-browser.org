@@ -18,11 +18,13 @@ const LABEL = { note: 'Note', warning: 'Watch out', aside: 'Aside' }
 </template>
 
 <style scoped>
+/* Painted, not bordered — see the note on .pillar in pages/index.vue. */
 .callout {
   border: 1px solid var(--line);
-  border-left: 2px solid var(--teal);
   border-radius: var(--radius-sm);
-  background: var(--panel);
+  background:
+    linear-gradient(var(--teal), var(--teal)) top left / 2px 100% no-repeat,
+    var(--panel);
   padding: var(--sp-3) var(--sp-4);
   display: flex;
   flex-direction: column;
@@ -30,13 +32,15 @@ const LABEL = { note: 'Note', warning: 'Watch out', aside: 'Aside' }
 }
 
 .callout.is-warning {
-  border-left-color: var(--red);
-  background: var(--red-soft);
+  background:
+    linear-gradient(var(--red), var(--red)) top left / 2px 100% no-repeat,
+    var(--red-soft);
 }
 
 .callout.is-aside {
-  border-left-color: var(--line-strong);
-  background: var(--chrome);
+  background:
+    linear-gradient(var(--line-strong), var(--line-strong)) top left / 2px 100% no-repeat,
+    var(--chrome);
 }
 
 .callout-label {

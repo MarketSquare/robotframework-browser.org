@@ -109,13 +109,15 @@ h1 {
   max-width: var(--measure);
 }
 
+/* Painted, not bordered — see the note on .pillar in pages/index.vue. */
 .scenario {
   display: flex;
   flex-direction: column;
   gap: var(--sp-1);
   padding: var(--sp-3) var(--sp-4);
-  background: var(--chrome);
-  border-left: 2px solid var(--red);
+  background:
+    linear-gradient(var(--red), var(--red)) top left / 2px 100% no-repeat,
+    var(--chrome);
   border-radius: var(--radius-sm);
   max-width: var(--measure);
   margin-bottom: var(--sp-2);

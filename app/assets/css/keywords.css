@@ -16,7 +16,7 @@
 /* ---------- headings between groups ---------- */
 
 .group-heading {
-  max-width: var(--reading-max);
+  max-width: var(--measure);
   font-size: var(--step-2);
   display: flex;
   align-items: baseline;
@@ -35,7 +35,7 @@
 }
 
 .intro-section {
-  max-width: var(--reading-max);
+  max-width: var(--measure);
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
@@ -66,7 +66,7 @@
   /* Clear of the sticky header when jumped to by anchor. */
   scroll-margin-top: 5rem;
   min-width: 0;
-  max-width: var(--reading-max);
+  max-width: var(--measure);
 }
 
 @supports (corner-shape: bevel) {

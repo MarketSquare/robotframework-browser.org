@@ -349,10 +349,19 @@ h1 {
   margin-top: var(--sp-8);
 }
 
+/*
+ * The green accent is painted, not bordered.
+ *
+ * As `border-top: 2px solid var(--green)` against 1px side borders, the bevel
+ * has to transition between two colours AND two widths along the diagonal, and
+ * renders a visible notch at each corner — worse the wider the card gets.
+ * A background layer is clipped to the bevelled shape and stops cleanly.
+ */
 .pillar {
-  background: var(--panel);
+  background:
+    linear-gradient(var(--green), var(--green)) top left / 100% 2px no-repeat,
+    var(--panel);
   border: 1px solid var(--line);
-  border-top: 2px solid var(--green);
   border-radius: var(--radius);
   padding: var(--sp-6);
   display: flex;

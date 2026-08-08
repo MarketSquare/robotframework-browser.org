@@ -133,13 +133,13 @@
   --radius: 7px;
   --radius-sm: 4px;
 
-  --measure: 66ch;
   /*
-   * Reading column for documentation and keyword panels. Wider than --measure
-   * because these carry argument tables and code, which a 66ch column forces
-   * into horizontal scrolling.
+   * The content column. One value for prose, documentation and keyword panels
+   * alike — previously prose was capped at 66ch while panels ran to 1000px,
+   * which left ledes and body text visibly narrower than the panels beneath
+   * them on the same page.
    */
-  --reading-max: 1000px;
+  --measure: 1000px;
   /* Indent for a keyword section's content; matches the Libdoc redesign. */
   --section-indent: 1.4rem;
   --gutter: clamp(1.25rem, 5vw, 4rem);

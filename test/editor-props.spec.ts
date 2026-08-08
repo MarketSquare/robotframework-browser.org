@@ -105,3 +105,38 @@ describe('Terminal wrapping', () => {
     expect(block).toContain('min-width: 100%')
   })
 })
+
+describe('Editor highlighting in dev', () => {
+  it('renders highlighted after a client-side navigation in dev', async () => {
+    const { readFileSync } = await import('node:fs')
+    const src = readFileSync(process.cwd() + '/app/components/Editor.vue', 'utf8')
+    /*
+     * `nuxt dev` has no payload extraction, so on a client-side navigation the
+     * handler runs in the browser. Guarded on import.meta.server alone it
+     * returned nothing and every block fell back to plain text until reload —
+     * the same failure the content queries had.
+     */
+    expect(src).toContain('import.meta.server || import.meta.dev')
+  })
+})
+
+describe('bevelled accents', () => {
+  it('paints single-side accents rather than bordering them', async () => {
+    const { readFileSync } = await import('node:fs')
+    /*
+     * A 2px accent border against 1px side borders forces the bevel to change
+     * both colour and width along the diagonal, which renders a notch at each
+     * corner. Painting the accent as a background layer clips to the bevelled
+     * shape instead.
+     */
+    for (const [file, sel] of [
+      ['app/pages/index.vue', '.pillar {'],
+      ['app/components/content/DocNote.vue', '.callout {'],
+    ] as const) {
+      const src = readFileSync(process.cwd() + '/' + file, 'utf8')
+      const block = src.slice(src.indexOf(sel), src.indexOf('}', src.indexOf(sel)))
+      expect(block, `${file} still borders its accent`).not.toMatch(/border-(top|left): 2px solid var\(--(green|teal|red)\)/)
+      expect(block, `${file} should paint the accent`).toContain('linear-gradient(')
+    }
+  })
+})

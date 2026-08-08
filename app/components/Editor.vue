@@ -12,9 +12,14 @@
  * JavaScript disabled. The radios are direct children of .plate so a general
  * sibling selector can reach the panes; see MAX_TABS in plate.css.
  *
- * Highlighting runs at prerender only. The dynamic import sits behind
- * `import.meta.server`, which Nuxt strips from the client build, so Shiki
- * and ~250 KB of grammars never reach the browser.
+ * Highlighting runs at prerender. The dynamic import sits behind
+ * `import.meta.server || import.meta.dev`, which Nuxt replaces with literals
+ * per module, so in production the branch is dead and neither Shiki nor the
+ * ~250 KB of grammars reaches the browser.
+ *
+ * The dev half is required: `nuxt dev` has no payload extraction, so on a
+ * client-side navigation the handler runs in the browser. Without it, every
+ * block fell back to unhighlighted plain text until the reader hit reload.
  */
 import { LANG_LABEL, type Lang } from '~/utils/lang'
 
@@ -88,7 +93,8 @@ const prepared = computed(() =>
 )
 
 const { data: rendered } = await useAsyncData(payloadKey, async () => {
-  if (import.meta.server) {
+  // Server, plus the client in dev — see app/utils/content-guard.md
+  if (import.meta.server || import.meta.dev) {
     const { highlight } = await import('~/utils/highlight')
     return Promise.all(
       prepared.value.map(f => highlight(f.code, f.lang, { highlightLines: f.highlightLines })),

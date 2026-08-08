@@ -212,10 +212,14 @@ describe('reading column and section indent', () => {
   const kwCss = readFileSync(join(process.cwd(), 'app/assets/css/keywords.css'), 'utf8')
   const docCss = readFileSync(join(process.cwd(), 'app/assets/css/doc.css'), 'utf8')
 
-  it('sets one reading width for documentation and keyword panels', () => {
-    expect(TOKENS).toContain('--reading-max: 1000px')
-    expect(docCss).toMatch(/\.doc \{[^}]*max-width: var\(--reading-max\)/)
-    expect(kwCss).toMatch(/\.kw \{[^}]*max-width: var\(--reading-max\)/)
+  it('sets one content width, used by prose and panels alike', () => {
+    // Two tokens for the same intent was the confusion: prose was capped at
+    // 66ch while panels ran to 1000px, so body text sat visibly narrower than
+    // the panel beneath it on the same page.
+    expect(TOKENS).toContain('--measure: 1000px')
+    expect(TOKENS).not.toContain('--reading-max')
+    expect(docCss).toMatch(/\.doc \{[^}]*max-width: var\(--measure\)/)
+    expect(kwCss).toMatch(/\.kw \{[^}]*max-width: var\(--measure\)/)
   })
 
   it('indents section content but not its heading', () => {
