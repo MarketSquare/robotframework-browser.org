@@ -134,6 +134,14 @@
   --radius-sm: 4px;
 
   --measure: 66ch;
+  /*
+   * Reading column for documentation and keyword panels. Wider than --measure
+   * because these carry argument tables and code, which a 66ch column forces
+   * into horizontal scrolling.
+   */
+  --reading-max: 1000px;
+  /* Indent for a keyword section's content; matches the Libdoc redesign. */
+  --section-indent: 1.4rem;
   --gutter: clamp(1.25rem, 5vw, 4rem);
 
   color-scheme: light;

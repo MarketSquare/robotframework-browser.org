@@ -16,6 +16,7 @@
 /* ---------- headings between groups ---------- */
 
 .group-heading {
+  max-width: var(--reading-max);
   font-size: var(--step-2);
   display: flex;
   align-items: baseline;
@@ -34,6 +35,7 @@
 }
 
 .intro-section {
+  max-width: var(--reading-max);
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
@@ -64,6 +66,7 @@
   /* Clear of the sticky header when jumped to by anchor. */
   scroll-margin-top: 5rem;
   min-width: 0;
+  max-width: var(--reading-max);
 }
 
 @supports (corner-shape: bevel) {
@@ -113,11 +116,23 @@
   padding: 0.05em 0.3em;
 }
 
+/*
+ * A section within a keyword: Arguments, Returns, Tags, Documentation.
+ *
+ * The heading sits flush with the keyword name and only the content is
+ * indented, by 1.4rem. That is what the Libdoc redesign does — measured from
+ * `.section-content` in its stylesheet — and it is what makes a stack of
+ * sections read as one keyword rather than four separate blocks.
+ */
 .block {
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
   min-width: 0;
+}
+
+.block > *:not(h4) {
+  margin-left: var(--section-indent);
 }
 
 .block.inline-block {

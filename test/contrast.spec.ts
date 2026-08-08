@@ -207,3 +207,21 @@ describe('high contrast mode', () => {
     expect(TOKENS).toContain('Highlight')
   })
 })
+
+describe('reading column and section indent', () => {
+  const kwCss = readFileSync(join(process.cwd(), 'app/assets/css/keywords.css'), 'utf8')
+  const docCss = readFileSync(join(process.cwd(), 'app/assets/css/doc.css'), 'utf8')
+
+  it('sets one reading width for documentation and keyword panels', () => {
+    expect(TOKENS).toContain('--reading-max: 1000px')
+    expect(docCss).toMatch(/\.doc \{[^}]*max-width: var\(--reading-max\)/)
+    expect(kwCss).toMatch(/\.kw \{[^}]*max-width: var\(--reading-max\)/)
+  })
+
+  it('indents section content but not its heading', () => {
+    // Measured from the Libdoc redesign: .section-content is margin-left
+    // 1.4rem and the h4 sits flush with the keyword name.
+    expect(TOKENS).toContain('--section-indent: 1.4rem')
+    expect(kwCss).toMatch(/\.block > \*:not\(h4\) \{\s*margin-left: var\(--section-indent\)/)
+  })
+})

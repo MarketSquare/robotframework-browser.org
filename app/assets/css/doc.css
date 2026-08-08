@@ -7,7 +7,7 @@
  */
 
 .doc {
-  max-width: var(--measure);
+  max-width: var(--reading-max);
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
