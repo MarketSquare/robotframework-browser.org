@@ -246,6 +246,25 @@ Get Text    role=listitem[name="Basket"] >> css=.price
 
 That means you rarely need one clever selector. You need two obvious ones.
 
+### When the chain returns the wrong element
+
+By default a chain returns what the *last* step matched. Prefix a step with `*`
+to return that step's element instead, while still requiring the rest of the
+chain to match:
+
+```robot-repl
+# The article that contains "Hello" — not the text node inside it
+Get Element    *css=article >> text=Hello
+```
+
+### When `>>` appears in the text you are matching
+
+Escape it by quoting the value, or the chain splits in the wrong place:
+
+```robot-repl
+Get Text    text="some >> text"
+```
+
 ## Filter selectors
 
 Some prefixes do not find elements at all. They take what the previous step
@@ -403,6 +422,41 @@ from any other page.
 
 Closed shadow roots cannot be pierced by anything, by design — if you hit one,
 that is a conversation with the developers rather than a selector problem.
+
+Piercing is what the `css` and `text` engines do: every descendant combinator,
+including the implicit one at the start of a selector, crosses any number of
+open shadow roots. Elements are searched in the light DOM first, then inside
+open shadow roots, in document order. Neither engine enters an iframe — that
+needs [`>>>`](#crossing-into-iframes-with-).
+
+### Turning piercing off
+
+Two engines behave like the plain DOM APIs and stop at the shadow boundary:
+
+::doc-table
+---
+head: [Engine, Behaves like]
+nowrap: [0]
+rows:
+  - ['`css:light=`', '`document.querySelector` — the CSS spec, no piercing']
+  - ['`text:light=`', 'The text engine, no piercing']
+---
+::
+
+```robot-repl
+# Matches the button inside the component's shadow root
+Get Text    css=my-widget .label
+
+# Matches only if .label is in the light DOM
+Get Text    css:light=my-widget .label
+```
+
+The attribute engines have the same pair: `id=` pierces, `id:light=` does not,
+and the same for `data-testid`, `data-test-id` and `data-test`.
+
+Reach for `:light` when you specifically need to assert that something is *not*
+inside a shadow root. The rest of the time the piercing default is what you
+want.
 
 ## Strict mode
 

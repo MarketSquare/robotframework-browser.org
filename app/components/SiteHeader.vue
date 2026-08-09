@@ -46,6 +46,8 @@ const nav = computed<NavItem[]>(() => [
     children: [
       { to: '/docs/start/getting-started', label: 'Getting started', note: 'Install, write a test, run it' },
       { to: '/docs/concepts/selectors', label: 'Finding elements', note: 'Which selector to reach for, and why' },
+      { to: '/docs/concepts/assertions', label: 'Assertions', note: 'Every getter can assert, and every assertion retries' },
+      { to: '/docs/concepts/browser-context-page', label: 'Browser, context, page', note: 'The three layers, and which one to open' },
       { to: '/docs/concepts/architecture', label: 'How Browser works', note: 'Python, Node and Playwright' },
       { to: '/docs/mobile/responsive', label: 'Mobile web', note: 'Responsiveness, devices, touch and permissions' },
       { to: '/docs/extending/python-plugins', label: 'Extending Browser', note: 'Python plugins, JavaScript, translations' },
