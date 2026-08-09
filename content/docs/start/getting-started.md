@@ -16,7 +16,7 @@ sessions:
     steps:
       - command: pip install robotframework-browser
         output:
-          - Successfully installed robotframework-browser-20.2.0
+          - Successfully installed robotframework-browser-%%browser%%
       - command: rfbrowser init
         status:
           - ok: true

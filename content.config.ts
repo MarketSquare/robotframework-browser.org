@@ -47,6 +47,20 @@ export default defineContentConfig({
       }),
     }),
 
+    /** Release notes, imported from the library by scripts/build-releases.ts. */
+    releases: defineCollection({
+      type: 'page',
+      source: 'releases/*.md',
+      schema: z.object({
+        title: z.string(),
+        version: z.string(),
+        date: z.string(),
+        playwright: z.string(),
+        supports: z.string(),
+        headline: z.string(),
+      }),
+    }),
+
     docs: defineCollection({
       type: 'page',
       source: 'docs/**/*.md',

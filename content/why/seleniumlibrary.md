@@ -4,7 +4,7 @@ tool: SeleniumLibrary
 slug: vs-seleniumlibrary
 order: 3
 tagline: The long-standing Robot Framework web library, built on Selenium WebDriver.
-comparedAgainst: SeleniumLibrary 6.7 on Selenium 4, Browser 20.2.0
+comparedAgainst: SeleniumLibrary 6.7 on Selenium 4, Browser %%browser%%
 ---
 
 Some of us maintained SeleniumLibrary for years before starting Browser, and its
@@ -265,7 +265,7 @@ each, sharing everything else. Starting Browser has never required abandoning
 SeleniumLibrary.
 
 ::doc-note
-Checked against SeleniumLibrary 6.7 on Selenium 4 and Browser 20.2.0. If
+Checked against SeleniumLibrary 6.7 on Selenium 4 and Browser %%browser%%. If
 anything here is wrong or has aged badly,
 [tell us](https://github.com/MarketSquare/robotframework-browser/issues) —
 we would rather fix it than let an unfair comparison stand.

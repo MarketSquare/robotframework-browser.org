@@ -13,8 +13,15 @@ import {
 } from '../lib/libdoc'
 
 const ROOT = process.cwd()
+
+/*
+ * Whichever version the site currently documents — pinning the filename here
+ * meant this whole file failed to load the day the library was upgraded, and
+ * the failure said "no such file" rather than anything about libdoc.
+ */
+const LATEST = readFileSync(join(ROOT, 'content/libdoc/LATEST'), 'utf8').trim()
 const SPEC: LibdocSpec = JSON.parse(
-  readFileSync(join(ROOT, 'content/libdoc/Browser-20.2.0.json'), 'utf8'),
+  readFileSync(join(ROOT, `content/libdoc/Browser-${LATEST}.json`), 'utf8'),
 )
 const GROUPS = JSON.parse(readFileSync(join(ROOT, 'content/keyword-groups.json'), 'utf8')).groups
 

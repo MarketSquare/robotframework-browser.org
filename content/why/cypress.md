@@ -4,7 +4,7 @@ tool: Cypress
 slug: vs-cypress
 order: 1
 tagline: A JavaScript end-to-end runner that lives inside the browser it tests.
-comparedAgainst: Cypress 15, Browser 20.2.0
+comparedAgainst: Cypress 15, Browser %%browser%%
 ---
 
 Cypress made end-to-end testing pleasant when it was not, and a lot of people
@@ -213,7 +213,7 @@ the report, testers who are not JavaScript developers — the constraints start 
 cost you, and Robot Framework was built for the job you actually have.
 
 ::doc-note
-Facts on this page are checked against Cypress 15 and Browser 20.2.0. If
+Facts on this page are checked against Cypress 15 and Browser %%browser%%. If
 something here has become wrong,
 [tell us](https://github.com/MarketSquare/robotframework-browser/issues) —
 a comparison page that quietly rots is worse than none.

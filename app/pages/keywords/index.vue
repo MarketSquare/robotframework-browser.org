@@ -186,6 +186,8 @@ useHead({
             <span>{{ groups.length }} modules</span>
             <span>{{ types.length }} argument types</span>
           </p>
+
+          <VersionPicker />
         </header>
 
         <KeywordPanels />

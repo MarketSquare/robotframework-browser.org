@@ -16,7 +16,7 @@ image that looks fine and fails at runtime.
 ## Add your dependencies
 
 ```dockerfile [Dockerfile]
-FROM marketsquare/robotframework-browser:20.2.0
+FROM marketsquare/robotframework-browser:%%browser%%
 
 USER pwuser
 COPY --chown=pwuser requirements.txt /home/pwuser/
@@ -87,14 +87,14 @@ things must agree:
 3. the browser binaries baked into the image.
 
 The published image gets this right by construction: it starts from
-`mcr.microsoft.com/playwright:v1.62.0-noble` and installs the Browser release
-built against Playwright 1.62.0.
+`%%playwrightDockerImage%%` and installs the Browser release
+built against Playwright %%playwrightDocker%%.
 
 **Upgrading Browser inside a derived image breaks that.** This looks harmless and
 is not:
 
 ```dockerfile
-FROM marketsquare/robotframework-browser:20.2.0
+FROM marketsquare/robotframework-browser:%%browser%%
 RUN pip install --upgrade robotframework-browser   # don't
 ```
 
@@ -128,7 +128,7 @@ jobs:
   robot:
     runs-on: ubuntu-latest
     container:
-      image: marketsquare/robotframework-browser:20.2.0
+      image: marketsquare/robotframework-browser:%%browser%%
       options: --ipc=host --user pwuser
     steps:
       - uses: actions/checkout@v5

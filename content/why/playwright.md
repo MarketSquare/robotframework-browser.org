@@ -4,7 +4,7 @@ tool: Playwright Test
 slug: vs-playwright
 order: 2
 tagline: Microsoft's browser automation framework, and its TypeScript test runner.
-comparedAgainst: Playwright 1.62, Browser 20.2.0
+comparedAgainst: Playwright %%playwright%%, Browser %%browser%%
 ---
 
 This is not really a competition, because **Browser library is built on

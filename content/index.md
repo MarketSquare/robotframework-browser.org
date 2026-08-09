@@ -84,7 +84,7 @@ sessions:
   - shell: bash
     steps:
       - command: pip install robotframework-browser
-        output: [Successfully installed robotframework-browser-20.2.0]
+        output: [Successfully installed robotframework-browser-%%browser%%]
       - command: rfbrowser init
         output: [Installing Playwright browser binaries…]
         status:
@@ -94,7 +94,7 @@ sessions:
   - shell: powershell
     steps:
       - command: py -m pip install robotframework-browser
-        output: [Successfully installed robotframework-browser-20.2.0]
+        output: [Successfully installed robotframework-browser-%%browser%%]
       - command: py -m Browser.entry init
         output: [Installing Playwright browser binaries…]
         status:

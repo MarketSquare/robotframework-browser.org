@@ -1,0 +1,79 @@
+/**
+ * Collects the version numbers the site quotes, from the places that own them.
+ *
+ * Every one of these used to be typed into prose and code fences by hand,
+ * which meant a release left the site quietly wrong in a dozen places — a
+ * `docker pull` line for a tag that exists, describing a version nobody runs.
+ * Content refers to them as `%{browser}` and friends, and the Nuxt Content
+ * `beforeParse` hook substitutes them at build time.
+ *
+ * Sources, in order of authority:
+ *   browser           content/libdoc/LATEST — the version whose Libdoc we render
+ *   playwright        the newest release note: "tested with Playwright X"
+ *   playwrightDocker  the library's Dockerfile FROM line, which lags the above
+ *                     whenever a Browser release does not rebuild the image
+ *
+ * Usage: pnpm versions [path-to-library-checkout]
+ */
+import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs'
+import { join, resolve } from 'node:path'
+
+const ROOT = process.cwd()
+const libraryRoot = process.argv[2] ?? resolve(ROOT, '../robotframework-browser')
+
+/** The release we document. */
+const browser = readFileSync(join(ROOT, 'content/libdoc/LATEST'), 'utf8').trim()
+
+/** `20.3.0` → `20.3`, the Docker tag that follows the minor. */
+const browserMinor = browser.split('.').slice(0, 2).join('.')
+
+/**
+ * The Playwright the newest release was tested against, read out of the note
+ * the importer already parsed rather than guessed at here.
+ */
+function playwrightFromNotes(): string {
+  const dir = join(ROOT, 'content/releases')
+  const note = join(dir, `${browser}.md`)
+  const files = readdirSync(dir)
+  const src = readFileSync(files.includes(`${browser}.md`) ? note : join(dir, files[0]!), 'utf8')
+  const found = /^playwright: "([^"]+)"/m.exec(src)?.[1]
+  if (!found) throw new Error(`No playwright version in the release note for ${browser}`)
+  return found
+}
+
+/**
+ * The base image, e.g. `mcr.microsoft.com/playwright:v1.62.0-noble`.
+ *
+ * Deliberately separate from the version above: the published image is only
+ * rebuilt when the Dockerfile changes, so a patch release can be tested
+ * against a Playwright the image does not carry. Quoting one for the other
+ * would be wrong in exactly the situation a reader is trying to debug.
+ */
+function dockerBase(): { image: string; playwright: string } {
+  const path = join(libraryRoot, 'docker/Dockerfile.latest_release')
+  const from = /^FROM\s+(\S+)/m.exec(readFileSync(path, 'utf8'))?.[1]
+  if (!from) throw new Error(`No FROM line in ${path}`)
+  const version = /:v(\d+\.\d+\.\d+)/.exec(from)?.[1]
+  if (!version) throw new Error(`Cannot read a Playwright version from "${from}"`)
+  return { image: from, playwright: version }
+}
+
+const docker = dockerBase()
+
+const versions = {
+  browser,
+  browserMinor,
+  browserMajor: browser.split('.')[0]!,
+  playwright: playwrightFromNotes(),
+  playwrightDockerImage: docker.image,
+  playwrightDocker: docker.playwright,
+}
+
+mkdirSync(join(ROOT, 'app/generated'), { recursive: true })
+writeFileSync(
+  join(ROOT, 'app/generated/versions.json'),
+  `${JSON.stringify(versions, null, 2)}\n`,
+)
+
+console.log('versions →  app/generated/versions.json')
+for (const [k, v] of Object.entries(versions)) console.log(`  ${k.padEnd(22)} ${v}`)

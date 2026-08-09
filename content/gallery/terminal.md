@@ -10,7 +10,7 @@ sessions:
   - shell: bash
     steps:
       - command: pip install robotframework-browser
-        output: [Successfully installed robotframework-browser-20.2.0]
+        output: [Successfully installed robotframework-browser]
       - command: rfbrowser init
         status:
           - { ok: true, text: chromium downloaded }

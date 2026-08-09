@@ -20,8 +20,8 @@ already authenticates against — the contents are identical, built from one
 Dockerfile in the same release job.
 
 ```bash
-docker pull marketsquare/robotframework-browser:20.2.0
-docker pull ghcr.io/marketsquare/robotframework-browser/rfbrowser-stable:20.2.0
+docker pull marketsquare/robotframework-browser:%%browser%%
+docker pull ghcr.io/marketsquare/robotframework-browser/rfbrowser-stable:%%browser%%
 ```
 
 ::doc-table
@@ -30,11 +30,11 @@ head:
   - Tag
   - Points at
 rows:
-  - - "`20.2.0`"
+  - - "`%%browser%%`"
     - That exact release. **Use this in CI.**
-  - - "`20.2`"
+  - - "`%%browserMinor%%`"
     - Latest patch of that minor. Picks up fixes, not features.
-  - - "`20`"
+  - - "`%%browserMajor%%`"
     - Latest release of that major.
   - - "`latest`"
     - Whatever released most recently. Fine for a local experiment; a moving
@@ -53,7 +53,7 @@ docker run --rm \
   --ipc=host \
   --user pwuser \
   --security-opt seccomp=seccomp_profile.json \
-  marketsquare/robotframework-browser:20.2.0 \
+  marketsquare/robotframework-browser:%%browser%% \
   bash -c "robot --outputdir /test/output /test"
 ```
 
@@ -135,7 +135,7 @@ head:
   - Layer
   - What it provides
 rows:
-  - - "`mcr.microsoft.com/playwright:v1.62.0-noble`"
+  - - "`%%playwrightDockerImage%%`"
     - Ubuntu Noble, Node.js, the browser binaries and every system library they
       need. The Playwright version here is pinned to the one Browser is built
       against.
@@ -158,7 +158,7 @@ Playwright version cannot drift from what Browser expects.
 ## Checking what you got
 
 ```bash
-docker run --rm marketsquare/robotframework-browser:20.2.0 rfbrowser --version
+docker run --rm marketsquare/robotframework-browser:%%browser%% rfbrowser --version
 ```
 
 Prints the Browser library version, the Robot Framework version and the
