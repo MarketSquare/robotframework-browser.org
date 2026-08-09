@@ -114,10 +114,21 @@
   --step--1: 0.8125rem; /* 13px — code */
   --step-0: 1rem; /* 16px — body */
   --step-1: 1.125rem; /* 18px — lede */
-  --step-2: 1.5rem; /* 24px */
-  --step-3: 2rem; /* 32px */
-  --step-4: 2.75rem; /* 44px */
-  --step-5: 3.75rem; /* 60px — display */
+  /*
+   * Display sizes are fluid.
+   *
+   * CSS has no "shrink the text until it fits" — nothing measures the string.
+   * What it has is size as a function of available width, which reaches the
+   * same place for a heading: the upper bound of each clamp is the size this
+   * scale always used, and it is reached around 900px, so nothing changes on a
+   * desktop. Below that they scale down, which is what keeps a long word like
+   * "SeleniumLibrary" inside a phone screen instead of pushing the page
+   * sideways.
+   */
+  --step-2: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem); /* → 24px */
+  --step-3: clamp(1.5rem, 1.15rem + 1.7vw, 2rem); /* → 32px */
+  --step-4: clamp(1.75rem, 1.2rem + 2.9vw, 2.75rem); /* → 44px */
+  --step-5: clamp(2rem, 1.4rem + 4.2vw, 3.75rem); /* → 60px, display */
 
   /* space, 4px base */
   --sp-1: 0.25rem;

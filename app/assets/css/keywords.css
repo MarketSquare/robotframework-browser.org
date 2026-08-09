@@ -34,6 +34,28 @@
   color: var(--faint);
 }
 
+/*
+ * Long unbreakable tokens.
+ *
+ * This content is generated from the library's docstrings, so it contains
+ * things no CSS author chose: ROBOT_FRAMEWORK_BROWSER_NODE_DEBUG_OPTIONS,
+ * and links whose text is a full URL. On a phone those are wider than the
+ * column, and each one pushed the whole page sideways — measured at 347px of
+ * horizontal scroll at 390px wide.
+ *
+ * `break-word` only breaks what cannot fit, so ordinary prose is untouched.
+ */
+.intro-section,
+.kw {
+  overflow-wrap: break-word;
+}
+
+.intro-section :is(code, a),
+.kw :is(code, a) {
+  /* Anywhere, not break-word: these have no spaces to break at. */
+  overflow-wrap: anywhere;
+}
+
 .intro-section {
   max-width: var(--measure);
   display: flex;
@@ -250,7 +272,19 @@ table.args tr:last-child td {
   border: 1px solid var(--line-strong);
   border-radius: 999px;
   color: var(--dim);
+  /*
+   * nowrap keeps a pill from splitting mid-name, which is right whenever
+   * there is room. On a narrow phone some keyword names are simply wider
+   * than the screen, and then a wrapped pill beats a page that scrolls
+   * sideways.
+   */
   white-space: nowrap;
+}
+
+@media (max-width: 26rem) {
+  .pill {
+    white-space: normal;
+  }
 }
 
 .pill.link {

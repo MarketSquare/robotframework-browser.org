@@ -66,6 +66,16 @@ a:hover {
 
 /* ---------- display type: OCR-A, never running text ---------- */
 
+/*
+ * Last resort for a single word longer than its column. The fluid scale above
+ * handles the ordinary case; this catches the one that is still too wide at
+ * the smallest size, and only then — `break-word` leaves everything that fits
+ * alone.
+ */
+:is(h1, h2, h3) {
+  overflow-wrap: break-word;
+}
+
 h1,
 h2,
 h3,

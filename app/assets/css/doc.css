@@ -41,7 +41,13 @@
   border-bottom-color: color-mix(in srgb, currentcolor 30%, transparent);
 }
 
+/*
+ * Inline code is often one long unbreakable token — an image tag, an env var,
+ * a URL — and at phone width one of those pushes the whole page sideways.
+ * `anywhere` because there is nothing in them to break at.
+ */
 .doc code {
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 0.9em;
   background: var(--chrome);
