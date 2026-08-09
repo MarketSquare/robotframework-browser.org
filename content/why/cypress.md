@@ -51,7 +51,7 @@ The Buyer Sees The Seller's Price Change
 ```
 
 Two contexts are two isolated profiles — separate cookies, separate storage,
-separate logins — in one browser, created in milliseconds. Cypress has one
+separate logins — in one browser, each created in a few milliseconds. Cypress has one
 browser session per test and no way to run two of them side by side, so this
 scenario is not something you write awkwardly there. It is something you do not
 write.

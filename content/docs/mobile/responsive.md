@@ -66,7 +66,8 @@ learn the same thing twice.
 ## The viewport is the input
 
 Browser's default viewport is **1280×720**. Every context can have its own, and
-that is the whole mechanism.
+it is the main lever — `deviceScaleFactor`, `isMobile` and `hasTouch` sit
+alongside it on the same keyword.
 
 ```robot
 *** Test Cases ***
@@ -74,10 +75,10 @@ Navigation Collapses On A Phone
     New Context    viewport={'width': 390, 'height': 844}
     New Page    ${URL}
     Get Element States    id=menu-button    contains    visible
-    Get Element States    nav.desktop        contains    hidden
+    Get Element States    nav.desktop        contains    hidden    attached
 ```
 
-Contexts are cheap — a fresh, isolated profile in milliseconds — so a viewport
+Contexts are cheap — a fresh, isolated profile in a few milliseconds — so a viewport
 per context is the natural unit. Nothing leaks between them: no cookies, no
 storage, no permissions.
 
@@ -92,7 +93,7 @@ Get Element States    nav.desktop    contains    hidden
 ```
 
 ::doc-note{kind="warning"}
-`Set Viewport Size` changes the window, not the device. A page that renders
+`Set Viewport Size` changes the page's viewport, not the emulated device. A page that renders
 differently because of `isMobile` or touch support will not change just because
 you made the window narrow. For that you want a device descriptor —
 [Emulating a device](/docs/mobile/devices).

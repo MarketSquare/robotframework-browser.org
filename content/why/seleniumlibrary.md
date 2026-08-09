@@ -232,7 +232,7 @@ faster are stateable without one:
 - **No per-element round trips for waiting.** Actionability is evaluated in the
   browser rather than polled from outside.
 - **Contexts instead of browsers for isolation.** `New Context` gives a clean,
-  isolated profile in milliseconds; a fresh Selenium session starts a browser.
+  isolated profile in a few milliseconds; a fresh Selenium session starts a browser.
 - **One Node process for all three engines**, rather than a driver process per
   browser.
 

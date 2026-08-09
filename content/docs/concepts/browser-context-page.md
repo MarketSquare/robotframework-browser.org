@@ -90,7 +90,7 @@ costs a process start. Here it is one call inside a process that is already
 warm:
 
 ```robot-repl
-New Context    # a clean slate, in milliseconds
+New Context    # a clean slate, in a few milliseconds
 ```
 
 So "log in as a different user" costs a few milliseconds of context creation

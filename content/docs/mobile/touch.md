@@ -67,7 +67,9 @@ rows:
     - "`Scroll To`, or `Mouse Wheel`. Neither needs touch."
   - - Drag-style reordering
     - "`Drag And Drop`, which uses mouse events"
-  - - A genuine swipe gesture
+  - - A swipe-like drag
+    - "`Drag And Drop Relative To` — mouse-based, so it fires pointer events, not touch"
+  - - A genuine touch swipe
     - "`Evaluate JavaScript`, dispatching TouchEvents yourself"
   - - Pinch to zoom
     - Nothing. This is a real-device test.
@@ -96,7 +98,9 @@ Grant Permissions    camera    microphone    origin=https://example.com
 Clear Permissions
 ```
 
-Available permissions:
+Available permissions — though support is per-browser. Chromium and WebKit
+accept nearly all of these; **Firefox supports only `geolocation` and
+`notifications`**, and passing any other value makes the keyword fail outright.
 
 ::doc-table
 ---
@@ -115,7 +119,7 @@ rows:
   - - Sensors
     - "`accelerometer`, `gyroscope`, `magnetometer`, `ambient-light-sensor`"
   - - Other
-    - "`background-sync`, `midi`, `midi-sysex`, `accessibility-events`,
+    - "`background-sync`, `midi`, `midi-sysex`,
       `local-network-access`"
 ---
 ::
