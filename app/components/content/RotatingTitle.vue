@@ -135,14 +135,30 @@ onMounted(() => {
   if (reduced) return
 
   /*
-   * The random start. The prerendered HTML can only contain one headline, so
-   * the pick has to happen here — and arriving as a scramble makes it read as
-   * the rotation beginning rather than as the page correcting itself.
+   * The random start, applied instantly rather than as a scramble.
+   *
+   * This headline is the largest text on the page, so it is what the browser
+   * measures as the Largest Contentful Paint — and every time it changes, that
+   * measurement starts again. Animating into it at load, and then rotating
+   * twice more while the page was still settling, put LCP at 10.1s on the
+   * deployed site against 1.9s on a page without it.
+   *
+   * Swapping without animation costs one paint at hydration and nothing after.
    */
   const pick = Math.floor(Math.random() * titles.value.length)
-  if (pick !== 0) advance(pick)
+  if (pick !== 0) {
+    index.value = pick
+    shown.value = titles.value[pick] ?? ''
+  }
 
-  start()
+  /*
+   * And the rotation waits for the page to be done loading. Motion during load
+   * is worth nothing to a reader who is still waiting for the page, and it is
+   * exactly what the metric punishes.
+   */
+  const begin = () => setTimeout(start, 2000)
+  if (document.readyState === 'complete') begin()
+  else window.addEventListener('load', begin, { once: true })
 })
 
 onBeforeUnmount(() => {

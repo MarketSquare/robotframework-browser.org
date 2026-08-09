@@ -14,7 +14,12 @@ defineProps<{ logo?: string }>()
 
 <template>
   <section class="hero">
-    <img v-if="logo" class="mark" :src="logo" alt="" width="1664" height="1219">
+    <!--
+      The largest thing on the page, so it is what LCP measures. Without a
+      priority it queued behind sixty lazy avatars and took 2.8s to arrive on
+      a throttled connection — for a 6 KB file.
+    -->
+    <img v-if="logo" class="mark" :src="logo" alt="" width="1664" height="1219" fetchpriority="high">
     <div class="hero-text">
       <h1><slot name="title" /></h1>
       <slot />
