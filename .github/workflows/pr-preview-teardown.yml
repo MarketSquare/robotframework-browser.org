@@ -1,0 +1,36 @@
+name: PR preview teardown
+
+# Removes the preview when its pull request closes, merged or not.
+#
+# Without this the previews accumulate silently: one surge domain per PR
+# forever, each serving a snapshot of the site that will drift further from
+# reality every week and is indistinguishable, from the outside, from the real
+# thing.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  teardown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Take the preview down
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+        run: |
+          if [ -z "$SURGE_TOKEN" ]; then
+            echo "No SURGE_TOKEN; nothing to tear down."
+            exit 0
+          fi
+
+          DOMAIN="rfbrowser-pr-${{ github.event.pull_request.number }}.surge.sh"
+
+          # A PR that never got a preview — a draft, or a fork — has no domain
+          # to remove, and that is not a failure.
+          npx --yes surge teardown "$DOMAIN" --token "$SURGE_TOKEN" \
+            || echo "::notice::No preview existed for ${DOMAIN}."

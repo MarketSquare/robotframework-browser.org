@@ -68,13 +68,19 @@ sibling checkout and no network.
 
 ## Phase 2 — Connect the repository
 
-| # | Task | Notes |
-|---|---|---|
-| 2.1 | `git remote add origin` and push `main` | New branch; touches nothing that is live |
-| 2.2 | Rename `master` → `legacy-site` | Keeps the old site and its history addressable |
-| 2.3 | Set the default branch to `main` | Affects PRs and clones, not the live site |
-| 2.4 | Add repository secrets: `SURGE_TOKEN`, `SURGE_LOGIN` | For PR previews |
-| 2.5 | Protect `main`: require the test workflow to pass | The release bot opens PRs against it |
+| # | Task | Notes | Status |
+|---|---|---|---|
+| 2.1 | `git remote add origin` and push `main` | New branch; touches nothing that is live | **done** — `main` at `ef4812e` |
+| 2.2 | Branch `legacy-site` off `master` | Keeps the old site and its history addressable | **done** — both at `7d82a58`; `master` kept, not renamed |
+| 2.3 | Set the default branch to `main` | Affects PRs and clones, not the live site | open |
+| 2.4 | Add repository secrets: `SURGE_TOKEN`, `SURGE_LOGIN` | For PR previews | open |
+| 2.5 | Protect `main`: require the test workflow to pass | The release bot opens PRs against it | open |
+
+The first push proved Phase 1: `Deploy` ran on `main` and went green — `test`
+(full `pnpm verify`) and `build` succeeded, the two Pages steps and the `deploy`
+job skipped on `vars.PAGES_LIVE`, and the live domain still served the old site.
+Each of the four clean-clone blockers found in Phase 1 would have failed that
+run.
 
 **The live site is untouched through all of Phase 2.** It is still served from
 `legacy-site` because the Pages source has not changed.
@@ -83,12 +89,19 @@ sibling checkout and no network.
 
 ## Phase 3 — Build and deployment
 
-| # | Task |
-|---|---|
-| 3.1 | Fix `deploy.yml`: pin pnpm, cache correctly, run `pnpm verify` (tests + build + bundle check) rather than `pnpm test` alone |
-| 3.2 | Add `pr-preview.yml` — surge preview per pull request, commented on the PR, following the reference repo's gated `pull_request_target` pattern |
-| 3.3 | Add `pr-preview-teardown.yml` — tear the preview down when the PR closes |
-| 3.4 | Run the whole thing once on a throwaway PR and confirm the preview URL works |
+| # | Task | Status |
+|---|---|---|
+| 3.1 | Fix `deploy.yml`: pin pnpm, cache correctly, run `pnpm verify` (tests + build + bundle check) rather than `pnpm test` alone | **done**, proven green in CI |
+| 3.2 | Add `pr-preview.yml` — surge preview per pull request, commented on the PR | **done** |
+| 3.3 | Add `pr-preview-teardown.yml` — tear the preview down when the PR closes | **done** |
+| 3.4 | Run the whole thing once on a throwaway PR and confirm the preview URL works | needs 2.4 |
+
+**`pull_request`, not the reference repo's `pull_request_target`.** That trigger
+runs with the base repository's secrets, and the pattern normally copied with it
+checks out the pull request's code — handing a fork's code our surge token. The
+cost is that fork PRs get no preview; a maintainer who wants one pushes the
+branch here instead. The preview step skips with a warning rather than failing
+when `SURGE_TOKEN` is absent, so PRs are not blocked on a secret being present.
 
 **Done when:** a PR gets a working preview link automatically, and `main` builds
 green — while the live domain is still on `legacy-site`.
