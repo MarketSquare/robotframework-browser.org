@@ -351,3 +351,60 @@ table.args tr:last-child td {
 .group-heading[hidden] {
   display: none;
 }
+
+
+/* ---------- a data type opens as a dialog ---------- */
+
+/*
+ * Jumping to a type from a keyword's argument list dropped the reader
+ * hundreds of panels further down the page with no obvious way back. The
+ * original Libdoc showed types in a modal for exactly that reason.
+ *
+ * `:target` does it without a line of JavaScript: following the link opens
+ * the panel over the page, and Back closes it. The panel is still an ordinary
+ * article in the Data types section when it is not the target, so the section
+ * remains browsable by scrolling.
+ */
+/*
+ * Centred with auto margins, not with a transform.
+ *
+ * A transformed element becomes the containing block for `position: fixed`
+ * descendants, so the backdrop below stopped covering the viewport and tinted
+ * only the dialog itself — the page behind stayed bright and the panel looked
+ * grey.
+ */
+.type:target {
+  position: fixed;
+  z-index: 60;
+  inset: var(--sp-4);
+  margin: auto;
+  width: min(52rem, calc(100vw - 2 * var(--sp-4)));
+  height: fit-content;
+  max-height: min(80dvh, 52rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
+  border-color: var(--line-strong);
+}
+
+/*
+ * The backdrop is not here.
+ *
+ * A ::before on this panel is inside the panel's own stacking context and its
+ * overflow, and it would not reliably cover the page. It is rendered by the
+ * page instead — which also lets clicking it close the dialog, something a
+ * pseudo-element could never do.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .type:target {
+    animation: type-in 0.14s ease-out;
+  }
+}
+
+/* Opacity only — a transform here would break the backdrop again. */
+@keyframes type-in {
+  from {
+    opacity: 0;
+  }
+}

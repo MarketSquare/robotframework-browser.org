@@ -17,6 +17,34 @@ const props = defineProps<{ data: KeywordIndex }>()
 const { index, groups, types, version, introSections } = props.data
 
 const railId = useId()
+
+/**
+ * Which rail section is open.
+ *
+ * Still exactly one at a time — collapsing a section is the same action as
+ * expanding its fallback, so the rail is never a row of three closed headings
+ * with nothing under them. Clicking the open section falls back to the one a
+ * reader most likely wants next: away from documentation and types you want
+ * the keywords, and away from the keywords you want the documentation.
+ */
+const FALLBACK: Record<string, string> = {
+  docs: 'kw',
+  types: 'kw',
+  kw: 'docs',
+}
+
+const open = ref<'docs' | 'kw' | 'types'>('kw')
+
+/*
+ * The radios drive the CSS, so without JavaScript a click still switches
+ * section — it simply cannot collapse, which is the lesser loss. With
+ * JavaScript, clicking the open one moves to its fallback instead.
+ */
+function toggle(section: 'docs' | 'kw' | 'types', event: Event) {
+  if (open.value !== section) return
+  event.preventDefault()
+  open.value = FALLBACK[section] as typeof open.value
+}
 const query = ref('')
 const tag = ref('')
 
@@ -90,6 +118,33 @@ function split(name: string) {
 }
 
 const isLatest = version === LATEST_VERSION
+
+/*
+ * The dialog a data type opens in is pure CSS (`:target`), so it works without
+ * JavaScript and Back closes it. What CSS cannot do is offer a *visible* way
+ * back to the keyword you were reading, because the anchor that opened it is
+ * unknowable from the target. This adds one: a close button that goes back in
+ * history, which restores the scroll position rather than dumping you at the
+ * top of the Data types section.
+ */
+const route = useRoute()
+const router = useRouter()
+
+const openType = computed(() => route.hash.startsWith('#type--'))
+
+function closeType() {
+  if (window.history.length > 1) router.back()
+  // Nothing to go back to — drop the hash rather than leaving it open.
+  else router.replace({ hash: '' })
+}
+
+onMounted(() => {
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && openType.value) closeType()
+  }
+  window.addEventListener('keydown', onKey)
+  onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
+})
 
 /*
  * Which of the three sections the reader is currently in.
@@ -216,8 +271,8 @@ useHead({
           next. It is also CSS-only, so it works without JavaScript.
         -->
         <div class="accordion">
-          <input :id="`${railId}-docs`" class="acc-radio" type="radio" :name="`${railId}-rail`">
-          <label class="acc-head" :for="`${railId}-docs`">
+          <input :id="`${railId}-docs`" v-model="open" class="acc-radio" type="radio" value="docs" :name="`${railId}-rail`">
+          <label class="acc-head" :for="`${railId}-docs`" @click="toggle('docs', $event)">
             Documentation <i>{{ introSections.length }}</i>
           </label>
           <div class="acc-body">
@@ -230,8 +285,8 @@ useHead({
             ><span class="nm">{{ s.title }}</span></a>
           </div>
 
-          <input :id="`${railId}-kw`" class="acc-radio" type="radio" :name="`${railId}-rail`" checked>
-          <label class="acc-head" :for="`${railId}-kw`">
+          <input :id="`${railId}-kw`" v-model="open" class="acc-radio" type="radio" value="kw" :name="`${railId}-rail`">
+          <label class="acc-head" :for="`${railId}-kw`" @click="toggle('kw', $event)">
             Keywords <i>{{ matches.length }}</i>
           </label>
           <div class="acc-body">
@@ -245,8 +300,8 @@ useHead({
             <p v-if="!matches.length" class="rail-none">No keyword matches.</p>
           </div>
 
-          <input :id="`${railId}-types`" class="acc-radio" type="radio" :name="`${railId}-rail`">
-          <label class="acc-head" :for="`${railId}-types`">
+          <input :id="`${railId}-types`" v-model="open" class="acc-radio" type="radio" value="types" :name="`${railId}-rail`">
+          <label class="acc-head" :for="`${railId}-types`" @click="toggle('types', $event)">
             Data types <i>{{ matchingTypes.length }}</i>
           </label>
           <div class="acc-body">
@@ -279,6 +334,17 @@ useHead({
         </header>
 
         <KeywordPanels :version="version" />
+
+        <!--
+          Rendered by the page rather than by the island, because it needs
+          history and an island is static markup. Without JavaScript it never
+          appears and Back is the way out, which is why the dialog does not
+          depend on it.
+        -->
+        <div v-if="openType" class="type-backdrop" @click="closeType" />
+        <button v-if="openType" type="button" class="type-close" @click="closeType">
+          <span aria-hidden="true">×</span> Close
+        </button>
       </main>
     </div>
   </div>
@@ -577,6 +643,54 @@ useHead({
 @supports (corner-shape: bevel) {
   .field input,
   .field select {
+    corner-shape: bevel;
+  }
+}
+
+/*
+ * Dims the page behind the dialog, and closes it when clicked — which is what
+ * a reader tries first. Rendered here rather than as a pseudo-element on the
+ * panel so it is not trapped in the panel's stacking context, and so it can
+ * carry a handler at all.
+ */
+.type-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgb(0 0 0 / 45%);
+}
+
+/*
+ * Sits above the dialog, pinned to the viewport rather than to the panel, so
+ * it stays reachable however far the type's documentation scrolls.
+ */
+.type-close {
+  position: fixed;
+  z-index: 61;
+  /* Clear of the sticky header, which owns the top-right corner. */
+  top: calc(var(--header-h, 3.85rem) + var(--sp-3));
+  right: var(--sp-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.type-close:hover {
+  border-color: var(--red);
+}
+
+@supports (corner-shape: bevel) {
+  .type-close {
     corner-shape: bevel;
   }
 }

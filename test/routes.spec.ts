@@ -115,12 +115,38 @@ describe.skipIf(!built)('keyword rail', () => {
   })
 
   it('opens Keywords by default and only Keywords', () => {
-    // A radio group cannot have nothing selected, so one section is always
-    // open and closing one is the same action as opening another.
-    const radios = html.match(/class="acc-radio"[^>]*>/g) ?? []
+    /*
+     * The whole tag, not everything after the class: `checked` is bound now,
+     * and Vue renders it *before* the class attribute, so a pattern anchored
+     * on the class stopped seeing it.
+     */
+    const radios = html.match(/<input[^>]*acc-radio[^>]*>/g) ?? []
     expect(radios).toHaveLength(3)
     expect(radios.filter(r => r.includes('checked'))).toHaveLength(1)
     expect(radios[1]).toContain('checked')
+  })
+
+  it('collapses a section by opening its fallback', () => {
+    /*
+     * Clicking the open section closes it, and closing one is the same action
+     * as opening another — so the rail is never three shut headings with
+     * nothing under them. Away from docs or types you want the keywords; away
+     * from the keywords you want the docs.
+     */
+    const src = readFileSync(join(process.cwd(), 'app/components/KeywordReference.vue'), 'utf8')
+    expect(src).toMatch(/docs:\s*'kw'/)
+    expect(src).toMatch(/types:\s*'kw'/)
+    expect(src).toMatch(/kw:\s*'docs'/)
+  })
+
+  it('opens a data type as a dialog with a way back', () => {
+    // `:target` so it works without JavaScript; Back closes it either way.
+    expect(readFileSync(join(process.cwd(), 'app/assets/css/keywords.css'), 'utf8'))
+      .toMatch(/\.type:target\s*\{[^}]*position:\s*fixed/)
+    const src = readFileSync(join(process.cwd(), 'app/components/KeywordReference.vue'), 'utf8')
+    expect(src).toContain('type-backdrop')
+    expect(src).toContain('router.back()')
+    expect(src).toContain("e.key === 'Escape'")
   })
 })
 
