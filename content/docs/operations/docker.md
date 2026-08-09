@@ -11,12 +11,13 @@ runner, a colleague's machine, or a distribution nobody tested, it is the part
 that goes wrong.
 
 The published image removes that problem: Python, Node, Robot Framework, Browser
-and all three browser engines, in versions known to work together.
+and the browser binaries that ship in Playwright's base image, in versions
+known to work together.
 
 ## Pull it
 
 The same image is published to two registries. Pick whichever your infrastructure
-already authenticates against — the contents are identical, built from one
+already authenticates against — the same recipe, built from one
 Dockerfile in the same release job.
 
 ```bash
@@ -62,16 +63,24 @@ that same mount — which is what gets `log.html` back onto your machine after t
 container exits. A container writing its report to its own filesystem and then
 being removed is the classic first mistake.
 
+The container writes as `pwuser`, not as your user, so the mounted directory has
+to be writable by that account. If it is not, the run dies trying to create
+`output/`. Create it up front and open it up — this project's own CI does
+`mkdir output && chmod -R 777 output` — or skip the mount and `docker cp` the
+results out afterwards.
+
 ## The flags, and why each one is there
 
 None of these are ceremony. Each fixes a specific, confusing failure.
 
 ### `--user pwuser`
 
-**Run as `pwuser`.** The image installs everything for that user: the virtualenv
-at `/home/pwuser/.venv`, the caches, the file permissions. Chromium's sandbox
-also does not run as root without being explicitly disabled, and the error you
-get says the browser crashed rather than anything about your user.
+**Insurance, not a requirement.** The image already ends on `USER pwuser`, so it
+runs as that user by default and this flag changes nothing — keep it only if
+your platform is liable to force root. What matters is not overriding it with
+`--user root`: everything is installed for `pwuser`, from the virtualenv at
+`/home/pwuser/.venv` to the caches and file permissions, and running as root
+causes failures that look like browser crashes.
 
 ::doc-note{kind="warning"}
 Running as root, or as any user other than `pwuser`, is unsupported and causes
@@ -81,7 +90,10 @@ step, switch back with `USER pwuser` before the image is used.
 
 ### `--ipc=host`
 
-Chromium allocates shared memory through `/dev/shm`. Docker's default is 64 MB,
+`--ipc=host` is what this project recommends for Chromium, and it is what its
+own container tests use. The reason comes from
+[Playwright's Docker guide](https://playwright.dev/docs/docker) rather than from
+Browser: Chromium allocates shared memory through `/dev/shm`, Docker's default is 64 MB,
 which a real page will exhaust — and Chromium's response to running out is to
 crash a renderer, mid-test, non-deterministically. It presents as flakiness, and
 you will look for it in your test before you look for it in your container
@@ -93,7 +105,7 @@ second-best answer.
 
 ### `--security-opt seccomp=seccomp_profile.json`
 
-Chromium's own sandbox needs syscalls that Docker's default seccomp profile
+Chromium's sandbox needs syscalls that Docker's default seccomp profile
 blocks. Playwright publishes a profile that permits exactly those:
 
 ```bash
@@ -119,10 +131,13 @@ accumulates them until the disk fills.
 ## Headless and headful
 
 The image is built on Microsoft's Playwright image, which includes the
-dependencies for **headful** runs as well as headless. Headless is the default
-and is what you want in CI. Headful in a container needs a display; that is an
-X server or VNC sidecar, and it is worth setting up only when you are debugging
-something that genuinely behaves differently with a visible window.
+dependencies for **headful** runs as well as headless. `New Browser` is headless
+by default and that is what you want in CI — note that `Open Browser` defaults
+the other way.
+
+Headful needs a display, and the image already carries Xvfb: prefix the command
+with `xvfb-run`, which is exactly what this project's own headful container
+tests do. A VNC sidecar is only needed if you want to *watch* the run.
 
 ## What is actually in the image
 
@@ -137,14 +152,17 @@ head:
 rows:
   - - "`%%playwrightDockerImage%%`"
     - Ubuntu Noble, Node.js, the browser binaries and every system library they
-      need. The Playwright version here is pinned to the one Browser is built
+      need. The Playwright in the base image is whatever the Dockerfile's `FROM` line
+pins, currently %%playwrightDocker%%, and that can lag the Playwright the
+release is built
       against.
   - - Python 3.14 in a virtualenv
     - "`/home/pwuser/.venv`, already on `PATH`. `pip` inside the container
       installs into it."
   - - Robot Framework and Browser
-    - Installed from PyPI at the pinned version.
-  - - "`rfbrowser init --skip-browsers`"
+    - Browser is installed from PyPI at an exact pin. Robot Framework is not
+      pinned — the image gets whatever was current when it was built.
+  - - "`init --skip-browsers`"
     - Browser's Node dependencies, **without** downloading browser binaries — the
       base image already has them.
 ---
@@ -152,7 +170,8 @@ rows:
 
 That last row is the non-obvious one. The browsers in this image come from the
 Playwright base image, not from `rfbrowser init`. It is why the image is far
-smaller than an install plus a 700 MB browser download, and it is why the
+smaller than an install that also downloads its own browser binaries, and it is
+why the
 Playwright version cannot drift from what Browser expects.
 
 ## Checking what you got

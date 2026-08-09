@@ -9,7 +9,8 @@ The published image runs a plain Robot Framework suite. As soon as your suite
 imports another library, needs a driver, or wants a specific Python version, you
 need an image of your own.
 
-The good news is that it is a three-line Dockerfile. The thing to be careful
+The good news is that it is a two-line Dockerfile — the published image already
+runs as `pwuser`, so the `USER` line below is only insurance. The thing to be careful
 about is the version lock described further down — it is the one way to build an
 image that looks fine and fails at runtime.
 
@@ -41,8 +42,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends your-package \
 USER pwuser
 ```
 
-An image whose final `USER` is root will fail at runtime when Chromium's sandbox
-refuses to start. See [Running in Docker](/docs/operations/docker).
+Keep `pwuser` as the final `USER`. Running as root is unsupported and produces
+failures that look like browser crashes rather than permission problems. See
+[Running in Docker](/docs/operations/docker).
 ::
 
 ## Bake your suite in, or mount it?
@@ -87,8 +89,10 @@ things must agree:
 3. the browser binaries baked into the image.
 
 The published image gets this right by construction: it starts from
-`%%playwrightDockerImage%%` and installs the Browser release
-built against Playwright %%playwrightDocker%%.
+`%%playwrightDockerImage%%`, and the Browser release it installs is built
+against Playwright %%playwrightBundled%%. Those two can differ by a patch — the
+`FROM` line is bumped by hand — so if you are chasing a binary-level mismatch,
+compare them rather than assuming they agree.
 
 **Upgrading Browser inside a derived image breaks that.** This looks harmless and
 is not:
@@ -108,13 +112,17 @@ upgrade procedure, and it is the reason the tag exists.
 
 If you genuinely must install a different Browser version in the same image, you
 own the whole chain: reinstall the Node side and let it fetch matching binaries
-(`rfbrowser clean-node && rfbrowser init`), or install browsers separately and
+(`rfbrowser clean-node && rfbrowser init`, which *adds* a matching browser set
+inside the library while the base image's binaries stay where they are — so you
+pay for both), or install browsers separately and
 point `PLAYWRIGHT_BROWSERS_PATH` at them. Both give up what the image was for.
 
 ::doc-note
-Verify with `rfbrowser --version`, which prints all three versions together. In a
-build, run it as the last `RUN` step so a mismatch fails the build rather than
-the suite.
+Verify with `rfbrowser --version`: it prints the Browser library, Robot Framework
+and Playwright npm versions. It does **not** report the browser binaries, so it
+cannot detect a base-image mismatch on its own, and it always exits 0 — running
+it as a build step records the versions in the log rather than catching
+anything.
 ::
 
 ## As a CI job container
@@ -131,9 +139,9 @@ jobs:
       image: marketsquare/robotframework-browser:%%browser%%
       options: --ipc=host --user pwuser
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - run: robot --outputdir output tests/
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: robot-results
