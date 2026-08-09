@@ -1,8 +1,16 @@
 name: Deploy
 
 # Builds the static site and publishes it to GitHub Pages.
-# No CNAME is committed yet — the custom domain moves here at cutover
-# (see spec §14), so until then this deploys to the github.io preview URL.
+#
+# Deployment is gated on a repository variable, PAGES_LIVE. Until it is set to
+# "true", this workflow builds and tests on every push to main but publishes
+# nothing — because this repository already serves the live site from the
+# legacy branch, and GitHub Pages has one source. Publishing before the
+# cutover would replace the live site the moment main was first pushed.
+#
+# At cutover: set the Pages source to "GitHub Actions", then set the repository
+# variable PAGES_LIVE to true. To roll back, unset it and point Pages at the
+# legacy branch again.
 
 on:
   push:
@@ -30,7 +38,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test
+      # Builds first, so the assertions about prerendered output actually run.
+      - run: pnpm verify
 
   build:
     needs: test
@@ -44,13 +53,17 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm generate
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v4
+      - if: vars.PAGES_LIVE == 'true'
+        uses: actions/configure-pages@v5
+      - if: vars.PAGES_LIVE == 'true'
+        uses: actions/upload-pages-artifact@v4
         with:
           path: .output/public
 
   deploy:
     needs: build
+    # The cutover switch. Unset or "false" means build, test, publish nothing.
+    if: vars.PAGES_LIVE == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
