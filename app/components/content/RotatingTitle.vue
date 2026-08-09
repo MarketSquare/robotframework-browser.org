@@ -43,7 +43,9 @@ const props = withDefaults(
   { titles: () => [], every: 5_000 },
 )
 
-const titles = computed(() => props.titles.map(t => String(t).trim()).filter(Boolean))
+const titles = computed(() =>
+  props.titles.map(t => withLineBreaks(String(t).trim())).filter(Boolean),
+)
 
 /* Server-rendered index. The random pick happens on mount — see below. */
 const index = ref(0)
@@ -75,7 +77,10 @@ function scrambleTo(from: string, to: string) {
   stopScramble()
 
   const settleAt = [...to].map((ch, i) => {
-    if (ch === ' ' || from[i] === ch) return 0
+    // Spaces and line breaks hold still: scrambling them would reflow the
+    // headline on every frame, and the shape of the line is what makes a
+    // half-resolved headline readable rather than noise.
+    if (ch === ' ' || ch === '\n' || from[i] === ch) return 0
     // Staggered left to right, with a little jitter so it is not a wipe.
     return 0.15 + (i / to.length) * 0.55 + Math.random() * 0.3
   })
@@ -183,6 +188,8 @@ const release = () => {
 .rot-line {
   grid-area: 1 / 1;
   visibility: hidden;
+  /* Honours the author's line breaks; still collapses runs of spaces. */
+  white-space: pre-line;
 }
 
 .rot-line.on {

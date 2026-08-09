@@ -12,8 +12,6 @@
  * behind a menu button. Both the panel and the dropdowns are driven by a
  * checkbox and CSS, so navigation works with JavaScript disabled.
  */
-const { version } = useKeywordIndex()
-
 /** Kept in step with content/why/*.md rather than hard-coded twice. */
 const { data: tools } = await useAsyncData('nav-compare', async () => {
   // Server, plus the client in dev — see app/utils/content-guard.md
@@ -124,7 +122,12 @@ onMounted(() => {
     </nav>
 
     <span class="right">
-      <span class="ver" :title="`Documenting Browser ${version}`">v{{ version }}</span>
+      <!--
+        No version badge here. It rode along on every page while meaning
+        something only on one, and on a version page it actively contradicted
+        what you were reading. The landing page states it properly, alongside
+        the Node and Playwright it ships with.
+      -->
       <ThemeToggle />
     </span>
   </header>
@@ -260,16 +263,6 @@ onMounted(() => {
   flex: none;
 }
 
-.ver {
-  font-family: var(--font-display);
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
-  color: var(--teal);
-  border: 1px solid color-mix(in srgb, var(--teal) 40%, transparent);
-  padding: 0.2rem 0.45rem;
-  border-radius: var(--radius-sm);
-}
-
 /* ---------- small screens ---------- */
 
 .menu-toggle,
@@ -278,7 +271,6 @@ onMounted(() => {
 }
 
 @supports (corner-shape: bevel) {
-  .ver,
   .menu,
   .menu-link {
     corner-shape: bevel;

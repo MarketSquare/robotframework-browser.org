@@ -91,6 +91,48 @@ function split(name: string) {
 
 const isLatest = version === LATEST_VERSION
 
+/*
+ * Which of the three sections the reader is currently in.
+ *
+ * The body has exactly three landmarks — #introduction, #keywords, #types —
+ * so this is "the last one that has passed under the header", which is what a
+ * reader means by "where am I". Cheaper and steadier than an
+ * IntersectionObserver over 230 panels, and it cannot disagree with itself
+ * when several are on screen at once.
+ */
+const SECTIONS = [
+  { id: 'introduction', label: 'Documentation' },
+  { id: 'keywords', label: 'Keywords' },
+  { id: 'types', label: 'Data types' },
+] as const
+
+const here = ref<string>(SECTIONS[0].label)
+
+onMounted(() => {
+  const marks = SECTIONS.map(s => ({ ...s, el: document.getElementById(s.id) }))
+  let queued = false
+
+  const update = () => {
+    queued = false
+    const line = (document.querySelector('.site')?.getBoundingClientRect().height ?? 60) + 8
+    let current = marks[0]
+    for (const m of marks) {
+      if (m.el && m.el.getBoundingClientRect().top <= line) current = m
+    }
+    here.value = current!.label
+  }
+
+  const onScroll = () => {
+    if (queued) return
+    queued = true
+    requestAnimationFrame(update)
+  }
+
+  update()
+  window.addEventListener('scroll', onScroll, { passive: true })
+  onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+})
+
 useHead({
   title: isLatest
     ? 'Keyword reference — Robot Framework Browser'
@@ -118,9 +160,16 @@ useHead({
         the hash off #kw-nav, the panel stops matching :target, and the browser
         jumps to the keyword. No JavaScript, and nothing to keep in sync.
       -->
-      <a class="rail-open" href="#kw-nav" aria-label="Open the keyword list">
+      <!--
+        Sticky, and it says where you are rather than what it opens. A bar that
+        reads "Documentation" while you are reading the introduction is worth
+        more than one that reads "Keywords" everywhere, and it still opens the
+        list.
+      -->
+      <a class="rail-open" href="#kw-nav">
         <span class="bars" aria-hidden="true"><i /><i /><i /></span>
-        Keywords
+        <span class="rail-open-label">{{ here }}</span>
+        <span class="sr">— open the keyword list</span>
       </a>
 
       <nav id="kw-nav" class="rail" aria-label="Keywords">
@@ -130,9 +179,17 @@ useHead({
             both pinned to top: 0 simply overlap, and the close button lost —
             it was in the right place and behind the search field.
           -->
-          <a class="rail-close" href="#kw-top" aria-label="Close the keyword list">
-            <span aria-hidden="true">×</span> Close
-          </a>
+          <!--
+            Close and the version picker share a row: on a phone this bar is
+            the only chrome the panel has, and the picker belongs with the
+            thing it changes.
+          -->
+          <div class="rail-bar">
+            <a class="rail-close" href="#kw-top" aria-label="Close the keyword list">
+              <span aria-hidden="true">×</span> Close
+            </a>
+            <VersionPicker :current="version" />
+          </div>
           <div class="field">
             <label class="sr" for="kw-filter">Filter keywords</label>
             <input id="kw-filter" v-model="query" type="search" placeholder="Search…" autocomplete="off">
@@ -219,8 +276,6 @@ useHead({
             <span>{{ groups.length }} modules</span>
             <span>{{ types.length }} argument types</span>
           </p>
-
-          <VersionPicker :current="version" />
         </header>
 
         <KeywordPanels :version="version" />
@@ -246,21 +301,28 @@ useHead({
 
 /* ---------- rail ---------- */
 
+/*
+ * A column of fixed height, not a long page that scrolls with the document.
+ *
+ * The rail used to scroll with the page, which meant the search field drifted
+ * up under the header and lost its margin as you read. It is its own viewport
+ * now: search and section headings stay put, and the only thing that scrolls
+ * is the body of whichever section is open.
+ */
 .rail {
-  border-right: 1px solid var(--line);
-  background: var(--chrome);
   position: sticky;
-  top: 3.25rem;
-  max-height: calc(100vh - 3.25rem);
-  overflow-y: auto;
+  top: var(--header-h, 3.85rem);
+  height: calc(100dvh - var(--header-h, 3.85rem));
   display: flex;
   flex-direction: column;
-  font-size: 0.85rem;
+  overflow: hidden;
+  border-right: 1px solid var(--line);
+  background: var(--chrome);
+  min-width: 0;
 }
 
 .rail-top {
-  position: sticky;
-  top: 0;
+  flex: none;
   background: var(--chrome);
   padding: var(--sp-3);
   border-bottom: 1px solid var(--line);
@@ -323,7 +385,30 @@ useHead({
 .accordion {
   display: flex;
   flex-direction: column;
+  flex: 1;
   min-height: 0;
+}
+
+.acc-head {
+  flex: none;
+}
+
+/*
+ * Exactly one body is open, and it takes whatever height is left. The three
+ * headings are therefore always on screen — you can see the other two
+ * sections exist without scrolling to find them, which is the point of
+ * putting them in one rail.
+ */
+.acc-body {
+  display: none;
+  min-height: 0;
+}
+
+.acc-radio:checked + .acc-head + .acc-body {
+  display: flex;
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .acc-radio {
@@ -391,9 +476,8 @@ useHead({
   border-bottom: 1px solid var(--line);
 }
 
-.acc-radio:checked + .acc-head + .acc-body {
-  display: flex;
-}
+/* Folded into the rule above; a second one here reset display and lost the
+   scrolling that makes the headings stay put. */
 
 .rail-kw {
   display: flex;
@@ -515,20 +599,37 @@ useHead({
     grid-template-columns: 1fr;
   }
 
+  /*
+   * A bar rather than a button: it is stuck under the header for the whole
+   * page, and it names the section you are in.
+   */
   .rail-open {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: var(--sp-2);
-    align-self: start;
-    margin: var(--sp-4) var(--gutter) 0;
-    padding: var(--sp-2) var(--sp-3);
-    border: 1px solid var(--line-strong);
-    border-radius: var(--radius-sm);
+    gap: var(--sp-3);
+    position: sticky;
+    top: var(--header-h, 6.2rem);
+    z-index: 14;
+    margin: 0;
+    padding: var(--sp-2) var(--gutter);
+    border-bottom: 1px solid var(--line);
+    background: var(--chrome);
     font-family: var(--font-display);
     font-size: 0.7rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--dim);
+    border-radius: 0;
+  }
+
+  .rail-open-label {
+    color: var(--ink);
+  }
+
+  .rail-open::after {
+    content: '▾';
+    margin-left: auto;
+    color: var(--faint);
   }
 
   .bars {
@@ -578,6 +679,14 @@ useHead({
   .rail:target {
     visibility: visible;
     opacity: 1;
+  }
+
+  .rail-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
   }
 
   /* Sticks with the filter block it lives in; needs no offset of its own. */

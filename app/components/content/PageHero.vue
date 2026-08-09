@@ -44,7 +44,9 @@ defineProps<{ logo?: string }>()
   gap: var(--sp-4);
 }
 
+/* `\n` in a title becomes a line break; see app/utils/line-breaks.ts. */
 h1 {
+  white-space: pre-line;
   font-size: clamp(2rem, 5.5vw, 3.5rem);
   line-height: 1.08;
 }

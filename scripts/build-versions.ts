@@ -58,6 +58,27 @@ function dockerBase(): { image: string; playwright: string } {
   return { image: from, playwright: version }
 }
 
+/**
+ * The NodeJS shipped inside the BrowserBatteries wheel — the runtime that ends
+ * up on a user's machine, which is not the same as whatever Node built the
+ * library. `nodejs_pin.toml` says so itself, in those words.
+ */
+function bundledNode(): string {
+  const path = join(libraryRoot, 'nodejs_pin.toml')
+  const found = /^version\s*=\s*"([^"]+)"/m.exec(readFileSync(path, 'utf8'))?.[1]
+  if (!found) throw new Error(`No version in ${path}`)
+  return found
+}
+
+/** The Playwright the library depends on, from its own package.json. */
+function bundledPlaywright(): string {
+  const path = join(libraryRoot, 'package.json')
+  const dep = JSON.parse(readFileSync(path, 'utf8')).dependencies?.playwright as string | undefined
+  const found = dep && /(\d+\.\d+\.\d+)/.exec(dep)?.[1]
+  if (!found) throw new Error(`No playwright dependency in ${path}`)
+  return found
+}
+
 const docker = dockerBase()
 
 /*
@@ -80,6 +101,8 @@ const versions = {
   browserMinor,
   browserMajor: browser.split('.')[0]!,
   playwright: playwrightFromNotes(),
+  node: bundledNode(),
+  playwrightBundled: bundledPlaywright(),
   playwrightDockerImage: docker.image,
   playwrightDocker: docker.playwright,
 }

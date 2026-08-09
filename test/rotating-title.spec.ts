@@ -14,12 +14,28 @@ const titles = landing
   .slice(landing.indexOf('titles:'), landing.indexOf('---\n:::', landing.indexOf('titles:')))
   .split('\n')
   .slice(1)
-  .map(l => l.replace(/^\s*-\s*/, '').trim())
+  /*
+   * Strip the list marker and any surrounding quotes. Quoted is the form to
+   * keep: a formatter once rewrote these as `- |` block scalars, which
+   * preserve the newline, so every headline rendered with a line break in it.
+   */
+  .map(l => l.replace(/^\s*-\s*/, '').trim().replace(/^"(.*)"$/, '$1'))
   .filter(Boolean)
 
 describe('the rotating headline', () => {
   it('has several headlines to rotate through', () => {
     expect(titles.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('may break a headline where the author wants it', () => {
+    /*
+     * `\n` in a title is a deliberate break, rendered by `white-space:
+     * pre-line`. Before that was wired up a formatter rewrote these as `- |`
+     * block scalars and the newline simply collapsed to a space — the break
+     * was written and silently ignored.
+     */
+    expect(read('app/components/content/RotatingTitle.vue')).toContain('white-space: pre-line')
+    expect(read('app/utils/line-breaks.ts')).toContain('withLineBreaks')
   })
 
   it('keeps every headline within the two-line budget', () => {
@@ -30,7 +46,9 @@ describe('the rotating headline', () => {
      * empty space under *every* other one.
      */
     for (const t of titles) {
-      expect(t.length, `"${t}" is ${t.length} characters`).toBeLessThanOrEqual(40)
+      // Per line, since a headline may be broken deliberately.
+      const longest = Math.max(...t.split(/\\n|\n/).map(l => l.length))
+      expect(longest, `"${t}" has a ${longest}-character line`).toBeLessThanOrEqual(40)
     }
   })
 
@@ -45,8 +63,8 @@ describe('RotatingTitle behaviour', () => {
   it('renders every headline server-side, so there is one without JavaScript', () => {
     const html = read('.output/public/index.html')
     for (const t of titles) {
-      // Apostrophes are escaped in the output.
-      expect(html).toContain(t.replace(/'/g, '&#39;'))
+      // Apostrophes are escaped in the output; a `\n` escape is a real newline.
+      expect(html).toContain(t.replace(/\\n/g, '\n').replace(/'/g, '&#39;'))
     }
   })
 

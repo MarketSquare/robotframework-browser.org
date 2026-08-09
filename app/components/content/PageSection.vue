@@ -22,7 +22,8 @@ withDefaults(
 <template>
   <section class="page-section" :class="[`tone-${tone}`, { 'is-last': last }]">
     <p v-if="label" class="label">{{ label }}</p>
-    <h2 v-if="title">{{ title }}</h2>
+    <!-- `\n` in the title is a deliberate break — see app/utils/line-breaks.ts -->
+    <h2 v-if="title">{{ withLineBreaks(title) }}</h2>
     <div class="body"><slot /></div>
   </section>
 </template>
@@ -41,7 +42,9 @@ withDefaults(
   border-bottom: 0;
 }
 
+/* `\n` in a title becomes a line break; see app/utils/line-breaks.ts. */
 h2 {
+  white-space: pre-line;
   font-size: var(--step-3);
   margin-top: var(--sp-1);
 }
