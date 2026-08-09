@@ -3,8 +3,9 @@
 The website for the [Robot Framework Browser](https://github.com/MarketSquare/robotframework-browser)
 library. Nuxt 4 + Nuxt Content 3, prerendered to static files, served from GitHub Pages.
 
-> **Status: foundation (P1) and keyword reference (P2) built and verified.**
-> Content pages — landing, guides, comparison, community — are next.
+**Maintaining it? Read [CONTRIBUTING.md](CONTRIBUTING.md).** It covers editing
+content, what is generated and must not be hand-edited, and how a release
+reaches the site.
 
 ## Commands
 
@@ -49,6 +50,15 @@ pnpm verify         # test + generate + check:bundle
 
 ## Deployment
 
-Pushing to `main` runs the tests, generates the site, and deploys to GitHub Pages.
-No `CNAME` is committed yet — the custom domain moves here at cutover (spec §14),
-so until then this deploys to the `github.io` preview URL.
+Pushing to `main` runs the tests, generates the site, and deploys to GitHub
+Pages. Every pull request gets its own surge.sh preview, commented on the PR.
+When the library releases, a scheduled workflow opens a pull request here with
+the new keyword reference, release note and version numbers.
+
+`public/CNAME` carries the custom domain, which is what preserves it across a
+deployment from an artifact.
+
+Deployment is gated on the repository variable `PAGES_LIVE`. Until the cutover
+it builds and tests on every push and publishes nothing, because Pages has one
+source per repository and this one still serves the previous site from
+`legacy-site`.
