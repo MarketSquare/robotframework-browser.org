@@ -61,15 +61,15 @@ reason a fix does not help.
 
 ::doc-table
 ---
-head: [Operator, Aliases, True when]
+head: [Operator, Also written, True when]
 nowrap: [0, 1]
 rows:
-  - ['`==`', '`equal`, `should be`', '`value == expected`']
+  - ['`==`', '`equal`, `equals`, `should be`', '`value == expected`']
   - ['`!=`', '`inequal`, `should not be`', '`value != expected`']
   - ['`>`', '`greater than`', '`value > expected`']
-  - ['`>=`', '', '`value >= expected`']
+  - ['`>=`', '— none —', '`value >= expected`']
   - ['`<`', '`less than`', '`value < expected`']
-  - ['`<=`', '', '`value <= expected`']
+  - ['`<=`', '— none —', '`value <= expected`']
 ---
 ::
 
@@ -83,13 +83,13 @@ Get Style            body      width    !=    0px
 
 ::doc-table
 ---
-head: [Operator, Aliases, True when]
+head: [Operator, Also written, True when]
 nowrap: [0, 1]
 rows:
   - ['`*=`', '`contains`', '`expected in value`']
-  - ['`not contains`', '', '`expected not in value`']
-  - ['`^=`', '`starts`', 'Value starts with expected — a literal, not a pattern']
-  - ['`$=`', '`ends`', 'Value ends with expected — literal too']
+  - ['`not contains`', '— none —', '`expected not in value`']
+  - ['`^=`', '`starts`, `should start with`', 'Value starts with expected — a literal, not a pattern']
+  - ['`$=`', '`ends`, `should end with`', 'Value ends with expected — literal too']
 ---
 ::
 
@@ -105,8 +105,13 @@ dot, not any character.
 
 ### `matches` — regular expressions
 
-`matches` (also written `$`) runs `re.search` over the value. What it *returns*
-depends on the groups in your pattern, and this catches people out:
+`matches` runs `re.search` over the value. It is spelled `matches` and nothing
+else — unlike the other operators it has no symbolic alias. In particular it is
+**not** `$`: that character is the operator's internal value, Robot Framework
+rejects it as input, and `$=` is a different operator entirely (*ends with*).
+
+What `matches` *returns* depends on the groups in your pattern, and this catches
+people out:
 
 ::doc-table
 ---
@@ -346,5 +351,6 @@ rows:
 - Lists and dictionaries only take `==` `!=` `contains` `validate` `then`, and
   `==` ignores order.
 - `validate` for whatever the operators do not cover, `then` when you want a
-  value rather than a check, `matches` when you want both.
+  value rather than a check, `matches` when you want both — and it is only ever
+  spelled `matches`.
 - Reach for formatters before you reach for a regular expression.
