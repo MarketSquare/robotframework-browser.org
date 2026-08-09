@@ -8,16 +8,16 @@ description: A browser automation library for Robot Framework, powered by Playwr
 :::rotating-title
 ---
 titles:
-  - "Browser automation that doesn't flake."
-  - "Browser automation that doesn't suck."
-  - "Browser automation faster than sound."
-  - "Browser automation ready for the future."
+  - "Browser automation\nthat doesn't flake."
+  - "Browser automation\nthat doesn't suck."
+  - "Browser automation\nfaster than sound."
+  - "Browser automation\nready for the future."
   - "Browser automation that sees shadow DOM."
-  - "Browser automation that waits for you."
-  - "Browser automation your team can read."
-  - "Browser automation with zero sleeps."
-  - "Browser automation built to outlast CSS."
-  - "Browser automation that says what broke."
+  - "Browser automation\nthat waits for you."
+  - "Browser automation\nyour team can read."
+  - "Browser automation\nwith zero sleeps."
+  - "Browser automation\nbuilt to outlast CSS."
+  - "Browser automation\nthat says what broke."
 ---
 :::
 

@@ -98,7 +98,17 @@ function scrambleTo(from: string, to: string) {
     if (t >= 1) shown.value = to
   }
 
-  frame = requestAnimationFrame(step)
+  /*
+   * Paint frame zero now, not on the next animation frame.
+   *
+   * `index` has already moved by the time we get here, so the template is
+   * about to render the new headline — but `shown` still holds the previous
+   * one until a frame runs. Vue therefore painted the old string once, in the
+   * new slot: a single frame of the wrong text, which showed up as a flicker
+   * of a headline without its line break. Rendering t=0 synchronously means
+   * the first paint after the switch is already the scramble.
+   */
+  step(start)
 }
 
 function advance(to = (index.value + 1) % titles.value.length) {
