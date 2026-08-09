@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -60,7 +60,7 @@ describe('the rotating headline', () => {
 })
 
 describe('RotatingTitle behaviour', () => {
-  it('renders every headline server-side, so there is one without JavaScript', () => {
+  it.skipIf(!existsSync(join(ROOT, '.output/public/index.html')))('renders every headline server-side, so there is one without JavaScript', () => {
     const html = read('.output/public/index.html')
     for (const t of titles) {
       // Apostrophes are escaped in the output; a `\n` escape is a real newline.

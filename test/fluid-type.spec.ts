@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -70,7 +70,16 @@ describe('long unbreakable words cannot push a page sideways', () => {
   })
 })
 
-describe('no prerendered page scrolls sideways', () => {
+
+/*
+ * These assertions read the prerendered output, so they only run after a
+ * build. CI generates before it tests, which is why `pnpm verify` builds
+ * first; on a developer machine `pnpm test` alone simply skips them rather
+ * than failing on a missing directory.
+ */
+const BUILT = existsSync(join(process.cwd(), '.output/public'))
+
+describe.skipIf(!BUILT)('no prerendered page scrolls sideways', () => {
   /*
    * A cheap structural proxy for the browser sweep: every wide thing in the
    * markup should sit inside something that scrolls, and .scroll-x is how this

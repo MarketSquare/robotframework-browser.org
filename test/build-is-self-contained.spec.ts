@@ -67,6 +67,29 @@ describe('the build is self-contained', () => {
     expect(tracked('public/avatars'), 'avatars are not committed').toBe(true)
   })
 
+  it.skipIf(!inGitRepo)('vendors every asset it renders', () => {
+    /*
+     * The Robot Framework mark, the OCR-A and IBM Plex faces, the robotcode
+     * grammars and the plate theme all originate in other repositories. They
+     * are copies here on purpose: a build must not depend on
+     * robotframework/visual-identity or on the library checkout being present.
+     *
+     * The mark is inlined as geometry in RobotMark.vue rather than kept as a
+     * file, so it is checked separately below.
+     */
+    const tracked = (path: string) =>
+      execFileSync('git', ['ls-files', '--', path], { cwd: ROOT, encoding: 'utf8' }).trim().length > 0
+
+    for (const path of ['syntaxes', 'themes', 'public/fonts', 'public/logo']) {
+      expect(tracked(path), `${path} is not vendored`).toBe(true)
+    }
+    for (const font of ['ocr-a.woff', 'plex-sans-400.woff2', 'plex-sans-600.woff2', 'plex-mono-400.woff2']) {
+      expect(tracked(`public/fonts/${font}`), `${font} is not vendored`).toBe(true)
+    }
+    // Geometry, not a fetch or a build-time copy.
+    expect(read('app/components/RobotMark.vue')).toContain('<path d="m 0,0 c 0,7.6')
+  })
+
   it('carries the custom domain in the published output', () => {
     // Pages deployed from an artifact drops the domain without this.
     expect(read('public/CNAME').trim()).toBe('robotframework-browser.org')

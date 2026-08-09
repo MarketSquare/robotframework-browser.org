@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -86,7 +86,7 @@ describe('content quotes versions by token, not by hand', () => {
   })
 })
 
-describe('the built site', () => {
+describe.skipIf(!existsSync(join(ROOT, '.output/public')))('the built site', () => {
   it('leaves no token unsubstituted', () => {
     const dist = join(ROOT, '.output/public')
     const pages: string[] = []
