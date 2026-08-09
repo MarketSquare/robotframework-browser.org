@@ -377,8 +377,8 @@ useHead({
  */
 .rail {
   position: sticky;
-  top: var(--header-h, 3.85rem);
-  height: calc(100dvh - var(--header-h, 3.85rem));
+  top: var(--header-h);
+  height: calc(100dvh - var(--header-h));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -687,7 +687,7 @@ useHead({
   position: fixed;
   z-index: 61;
   /* Clear of the sticky header, which owns the top-right corner. */
-  top: calc(var(--header-h, 3.85rem) + var(--sp-3));
+  top: calc(var(--header-h) + var(--sp-3));
   right: var(--sp-4);
   display: inline-flex;
   align-items: center;
@@ -741,7 +741,7 @@ useHead({
     align-items: center;
     gap: var(--sp-3);
     position: sticky;
-    top: var(--header-h, 6.2rem);
+    top: var(--header-h);
     z-index: 14;
     margin: 0;
     /* 44px minimum: this is the main control on a phone. */
@@ -806,7 +806,7 @@ useHead({
    */
   .rail {
     position: fixed;
-    top: var(--header-h, 6.2rem);
+    top: var(--header-h);
     right: 0;
     bottom: 0;
     left: 0;

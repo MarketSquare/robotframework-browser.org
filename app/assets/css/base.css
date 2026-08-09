@@ -11,6 +11,19 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+
+  /*
+   * The sticky header's height, as a value that is right before any script
+   * runs. SiteHeader re-publishes the measured height on mount, which normally
+   * matches — the point of declaring it here is that anything positioned under
+   * the header is correct on the first paint.
+   *
+   * It was only set from JavaScript, with a fallback in each consumer. On the
+   * keyword reference — a large page, so hydration is not instant — the
+   * section bar sat at the fallback for about half a second and then jumped up
+   * to meet the header.
+   */
+  --header-h: 3.8rem;
 }
 
 body {

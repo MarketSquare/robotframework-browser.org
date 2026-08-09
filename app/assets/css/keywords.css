@@ -408,3 +408,21 @@ table.args tr:last-child td {
     opacity: 0;
   }
 }
+
+
+/*
+ * Anchors clear the two sticky bars.
+ *
+ * On a phone there are two: the site header and the keyword reference's own
+ * section bar. Landing a keyword at the top of the viewport therefore put its
+ * heading and top border underneath them. The desktop value only has to clear
+ * the header.
+ */
+@media (max-width: 900px) {
+  .kw,
+  .intro-section,
+  .group-heading,
+  .anchor-top {
+    scroll-margin-top: calc(var(--header-h) + 3.6rem);
+  }
+}
