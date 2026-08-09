@@ -14,15 +14,15 @@ head: [Where, What it holds, When to open it]
 rows:
   - ['`log.html`', 'The Python side: keywords, arguments, status', 'First. Always.']
   - ['`playwright-log.txt`', 'The Node side of the library', 'A keyword failed and log.html does not say why']
-  - ['`trace.zip`', 'Every Playwright call, with DOM snapshots', 'Something failed and you need to see the page as it was']
+  - ['`browser/traces/trace_*.zip`', 'Every Playwright call, with DOM snapshots', 'Something failed and you need to see the page as it was']
   - ['Coverage report', 'Which code the run actually exercised', 'Asking what the suite does not touch']
 ---
 ::
 
 ## log.html
 
-Robot Framework's log contains mostly the Python half. Some keywords log a
-little from the Node side — usually just the status.
+Most Browser keywords log a message produced by the Node side — often
+including the selector and the value used. More of them appear at DEBUG level.
 
 When a keyword fails, the info level already shows the error from the Playwright
 call. Running at debug level shows a good deal more:
@@ -33,26 +33,39 @@ robot --loglevel debug --outputdir output tests/
 
 ## playwright-log.txt
 
-`${OUTPUT_DIR}/playwright-log.txt` is always written and holds the Node side.
+`${OUTPUT_DIR}/playwright-log.txt` holds the Node side. It is written by
+default, created when the Node process starts, and not written at all if you
+import with `enable_playwright_debug=disabled`.
 The Robot log level does not affect it.
 
-For much more detail, enable Playwright's own logging at import:
+The argument takes three values: `library` (the default — only Browser's own
+Node messages), `playwright` (those plus Playwright's `DEBUG=pw:api` output), and
+`disabled` (no file at all). `False` and `True` are older aliases for the first
+two. For much more detail:
 
 ```robot
 *** Settings ***
-Library    Browser    enable_playwright_debug=True
+Library    Browser    enable_playwright_debug=playwright
 ```
 
 ::doc-note
 ---
 kind: warning
 ---
-Playwright debug logging writes **everything as plain text, including secrets**.
-A value passed with `Fill Secret` is masked in `log.html` but not here. Do not
+The file mixes two formats: the library's own Node messages are JSON lines, and
+Playwright's `DEBUG=pw:api` output is plain text.
+
+That Playwright output includes **the values passed to `fill` and `type`, in
+clear text**. `Fill Secret` and `Type Secret` never write the value to
+`log.html` — the response is not logged and error messages are scrubbed — but
+they cannot stop Playwright's own debug log, and the value also lands in
+`trace.zip`. Treat both as secret-bearing. Do not
 enable this on a run that touches real credentials.
 ::
 
-Each run overwrites the file.
+Each run replaces the file. If the old one cannot be deleted — still open on
+Windows, for instance — the new log is written beside it as
+`playwright-log-<nanoseconds>.txt`.
 
 ## Traces
 
@@ -64,16 +77,23 @@ cannot reproduce.
 New Context    tracing=True
 ```
 
-Only recording when you need it is easy:
+The zip is written when the **context closes** — automatically at the
+auto-closing level, or when you call `Close Context`. Do not go looking for it
+while the browser is still open.
+
+To record for a whole run without touching the tests, set the environment
+variable `ROBOT_FRAMEWORK_BROWSER_TRACING=True`. And
+`auto_delete_passed_tracing=True` at import keeps only the traces of failed
+tests, which is what makes this affordable in CI:
 
 ```robot-repl
-New Context    tracing=${{$LOGLEVEL == 'TRACE'}}
+New Context    tracing=True
 ```
 
 Open the result either way:
 
 ```bash
-rfbrowser show-trace output/trace.zip
+rfbrowser show-trace output/browser/traces/trace_context=<id>.zip
 ```
 
 or drop it on [trace.playwright.dev](https://trace.playwright.dev/), which runs
@@ -91,7 +111,7 @@ Coverage is enabled **per page**:
 *** Test Cases ***
 Checkout Coverage
     New Page    https://example.com/checkout
-    Start Coverage
+    Start Coverage    raw=True
     Take Screenshot
     Stop Coverage
 ```
@@ -101,6 +121,11 @@ Combine the per-page data into one report:
 ```bash
 rfbrowser coverage output/browser/coverage/ output/report
 ```
+
+Combining needs the raw data, which is why `Start Coverage` above passes
+`raw=True` — without it there is nothing to merge and the command fails with
+`No raw reports found`. The same thing is available as the
+`Merge Coverage Reports` keyword.
 
 Monocart takes a [config file](https://www.npmjs.com/package/monocart-coverage-reports#config-file)
 if you need filtering, which you probably will — third-party bundles otherwise
