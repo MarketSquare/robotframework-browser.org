@@ -11,6 +11,33 @@ const ROOT = process.cwd()
 const GEN = join(ROOT, 'app/generated/libdoc.json')
 const ready = existsSync(GEN)
 
+describe('the committed libdoc sources are machine-independent', () => {
+  /*
+   * Libdoc records every keyword's `source` as an absolute path into whichever
+   * throwaway environment generated it. Left alone, the twelve committed files
+   * carried 1804 of them — so regenerating a version on another machine
+   * produced a 150-line diff that meant nothing, which is precisely the noise
+   * that makes the release bot's pull request unreviewable. It also published
+   * the generating machine's directory layout to anyone reading the repo.
+   *
+   * scripts/fetch-libdoc.sh rewrites them to `Browser/keywords/<file>.py`,
+   * which is all the renderer ever wanted: it takes basename(source).
+   */
+  const dir = join(ROOT, 'content/libdoc')
+  const sources = readdirSync(dir).filter(f => /^Browser-.+\.json$/.test(f))
+
+  it('has files to check', () => expect(sources.length).toBeGreaterThan(0))
+
+  it.each(sources)('%s records relative source paths only', file => {
+    const spec = JSON.parse(readFileSync(join(dir, file), 'utf8'))
+    const paths = [...spec.keywords, ...spec.inits].map((k: { source: string | null }) => k.source)
+    for (const path of paths) {
+      if (path === null) continue
+      expect(path, `${file}: absolute source path`).toMatch(/^Browser\/[\w/-]+\.py$/)
+    }
+  })
+})
+
 describe.skipIf(!ready)('generated payloads', () => {
   const gen = JSON.parse(readFileSync(GEN, 'utf8'))
   const dir = join(ROOT, 'public/libdoc', gen.version)

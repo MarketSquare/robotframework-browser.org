@@ -7,7 +7,7 @@
   "type": "LIBRARY",
   "scope": "GLOBAL",
   "docFormat": "HTML",
-  "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/browser.py",
+  "source": "Browser/browser.py",
   "lineno": 121,
   "tags": [
     "Assertion",
@@ -443,7 +443,7 @@
       "doc": "<p>Browser library can be taken into use with optional arguments:</p>\n<table border=\"1\">\n<tr>\n<th>Argument</th>\n<th>Description</th>\n</tr>\n<tr>\n<td><code>auto_closing_level</code></td>\n<td>Configure context and page automatic closing. Default is <code>TEST</code>, for more details, see <a href=\"#type-AutoClosingLevel\" class=\"name\">AutoClosingLevel</a></td>\n</tr>\n<tr>\n<td><code>auto_delete_passed_tracing</code></td>\n<td>If <code>auto_closing_level</code> is set to <code>SUITE</code> or <code>TEST</code> and <code>tracing</code> of <a href=\"#New%20Context\" class=\"name\">New Context</a> active, traces of passed tests or suites, depending on the context scope, not be saved. Also temp files will all be deleted after the whole execution ends.</td>\n</tr>\n<tr>\n<td><code>enable_playwright_debug</code></td>\n<td>Enable low level debug information from the playwright to playwright-log.txt file. For more details, see <a href=\"#type-PlaywrightLogTypes\" class=\"name\">PlaywrightLogTypes</a>.</td>\n</tr>\n<tr>\n<td><code>enable_presenter_mode</code></td>\n<td>Automatic highlights the interacted components, slowMo and a small pause at the end. Can be enabled by giving True or can be customized by giving a dictionary: <span class=\"name\">{\"duration\": \"2 seconds\", \"width\": \"2px\", \"style\": \"dotted\", \"color\": \"blue\"}</span> Where <span class=\"name\">duration</span> is time format in Robot Framework format, defaults to 2 seconds. <span class=\"name\">width</span> is width of the marker in pixels, defaults the <span class=\"name\">2px</span>. <span class=\"name\">style</span> is the style of border, defaults to <span class=\"name\">dotted</span>. <span class=\"name\">color</span> is the color of the marker, defaults to <span class=\"name\">blue</span>. By default, the call banner keyword is also enabled unless explicitly disabled.</td>\n</tr>\n<tr>\n<td><code>external_browser_executable</code></td>\n<td>Dict mapping name of browser to path of executable of a browser. Will make opening new browsers of the given type use the set executablePath. Currently only configuring of <span class=\"name\">chromium</span> to a separate executable (chrome, chromium and Edge executables all work with recent versions) works.</td>\n</tr>\n<tr>\n<td><code>highlight_on_failure</code></td>\n<td>If set to <code>True</code>, will highlight the element in the screenshot when a keyword fails, by highlighting the selector used in the failed keyword. If set to <code>False</code>, will not highlight the element.</td>\n</tr>\n<tr>\n<td><code>jsextension</code></td>\n<td>Path to Javascript modules exposed as extra keywords. The modules must be in CommonJS. It can either be a single path, a comma-separated lists of path or a real list of strings</td>\n</tr>\n<tr>\n<td><code>language</code></td>\n<td>Defines language which is used to translate keyword names and documentation.</td>\n</tr>\n<tr>\n<td><code>playwright_process_host</code></td>\n<td>Hostname / Host address which should be used when spawning the Playwright process. Defaults to 127.0.0.1.</td>\n</tr>\n<tr>\n<td><code>playwright_process_port</code></td>\n<td>Experimental reusing of playwright process. <code>playwright_process_port</code> is preferred over environment variable <code>ROBOT_FRAMEWORK_BROWSER_NODE_PORT</code>. See <a href=\"#Experimental%3A%20Re-using%20same%20node%20process\" class=\"name\">Experimental: Re-using same node process</a> for more details.</td>\n</tr>\n<tr>\n<td><code>plugins</code></td>\n<td>Allows extending the Browser library with external Python classes. Can either be a single class/module, a comma-separated list or a real list of strings</td>\n</tr>\n<tr>\n<td><code>retry_assertions_for</code></td>\n<td>Timeout for retrying assertions on keywords before failing the keywords. This timeout starts counting from the first failure. Global <code>timeout</code> will still be in effect. This allows stopping execution faster to assertion failure when element is found fast.</td>\n</tr>\n<tr>\n<td><code>run_on_failure</code></td>\n<td>Sets the keyword to execute in case of a failing Browser keyword. It can be the name of any keyword. If the keyword has arguments those must be separated with two spaces for example <code>My keyword \\ arg1 \\ arg2</code>. If no extra action should be done after a failure, set it to <code>None</code> or any other robot falsy value. Run on failure is not applied when library methods are executed directly from Python.</td>\n</tr>\n<tr>\n<td><code>selector_prefix</code></td>\n<td>Prefix for all selectors. This is useful when you need to use add an iframe selector before each selector.</td>\n</tr>\n<tr>\n<td><code>show_keyword_call_banner</code></td>\n<td>If set to <code>True</code>, will show a banner with the keyword name and arguments before the keyword is executed at the bottom of the page. If set to <code>False</code>, will not show the banner. If set to None, which is the default, will show the banner only if the presenter mode is enabled. <a href=\"#Get%20Page%20Source\" class=\"name\">Get Page Source</a> and <a href=\"#Take%20Screenshot\" class=\"name\">Take Screenshot</a> will not show the banner, because that could negatively affect your test cases/tasks. This feature may be super helpful when you are debugging your tests and using tracing from <a href=\"#New%20Context\" class=\"name\">New Context</a> or <span class=\"name\">Video recording</span> features.</td>\n</tr>\n<tr>\n<td><code>strict</code></td>\n<td>If keyword selector points multiple elements and keywords should interact with one element, keyword will fail if <code>strict</code> mode is true. Strict mode can be changed individually in keywords or by <code>Set Strict Mode</code> keyword.</td>\n</tr>\n<tr>\n<td><code>timeout</code></td>\n<td>Timeout for keywords that operate on elements. The keywords will wait for this time for the element to appear into the page. Defaults to \"10s\" =&gt; 10 seconds.</td>\n</tr>\n<tr>\n<td><code>tracing_group_mode</code></td>\n<td>Defines how Robot Framework keyword calls are logged in Playwright trace log. Default is <span class=\"name\">Full</span>. For more details, see <a href=\"#type-TracingGroupMode\" class=\"name\">TracingGroupMode</a>.</td>\n</tr>\n</table>",
       "shortdoc": "Browser library can be taken into use with optional arguments:",
       "tags": [],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/browser.py",
+      "source": "Browser/browser.py",
       "lineno": 796
     }
   ],
@@ -673,7 +673,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/cookie.py",
+      "source": "Browser/keywords/cookie.py",
       "lineno": 90
     },
     {
@@ -799,7 +799,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/locator_handler.py",
+      "source": "Browser/keywords/locator_handler.py",
       "lineno": 24
     },
     {
@@ -885,7 +885,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/locator_handler.py",
+      "source": "Browser/keywords/locator_handler.py",
       "lineno": 99
     },
     {
@@ -912,7 +912,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/evaluation.py",
+      "source": "Browser/keywords/evaluation.py",
       "lineno": 138
     },
     {
@@ -952,7 +952,7 @@
         "Clock",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/clock.py",
+      "source": "Browser/keywords/clock.py",
       "lineno": 95
     },
     {
@@ -992,7 +992,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1717
     },
     {
@@ -1032,7 +1032,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 668
     },
     {
@@ -1045,7 +1045,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 632
     },
     {
@@ -1072,7 +1072,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 118
     },
     {
@@ -1112,7 +1112,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 305
     },
     {
@@ -1295,7 +1295,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 333
     },
     {
@@ -1335,7 +1335,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 117
     },
     {
@@ -1362,7 +1362,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 547
     },
     {
@@ -1449,7 +1449,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 164
     },
     {
@@ -1572,7 +1572,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 268
     },
     {
@@ -1646,7 +1646,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 379
     },
     {
@@ -1719,7 +1719,7 @@
       "tags": [
         "Crawling"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/crawling.py",
+      "source": "Browser/keywords/crawling.py",
       "lineno": 13
     },
     {
@@ -1732,7 +1732,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/cookie.py",
+      "source": "Browser/keywords/cookie.py",
       "lineno": 151
     },
     {
@@ -1759,7 +1759,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 784
     },
     {
@@ -1842,7 +1842,7 @@
       "tags": [
         "Page Content"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/evaluation.py",
+      "source": "Browser/keywords/evaluation.py",
       "lineno": 154
     },
     {
@@ -1895,7 +1895,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1072
     },
     {
@@ -1974,7 +1974,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1117
     },
     {
@@ -2040,7 +2040,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1151
     },
     {
@@ -2050,7 +2050,7 @@
       "doc": "<p>Eat all cookies for all easter.</p>\n<p><a href=\"https://forum.robotframework.org/t//4250\">Comment &gt;&gt;</a></p>",
       "shortdoc": "Eat all cookies for all easter.",
       "tags": [],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/cookie.py",
+      "source": "Browser/keywords/cookie.py",
       "lineno": 161
     },
     {
@@ -2168,7 +2168,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/pdf.py",
+      "source": "Browser/keywords/pdf.py",
       "lineno": 152
     },
     {
@@ -2253,7 +2253,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/evaluation.py",
+      "source": "Browser/keywords/evaluation.py",
       "lineno": 28
     },
     {
@@ -2306,7 +2306,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 201
     },
     {
@@ -2359,7 +2359,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 88
     },
     {
@@ -2386,7 +2386,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 546
     },
     {
@@ -2523,7 +2523,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 63
     },
     {
@@ -2660,7 +2660,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 336
     },
     {
@@ -2760,7 +2760,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 399
     },
     {
@@ -2930,7 +2930,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1191
     },
     {
@@ -3035,7 +3035,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1036
     },
     {
@@ -3153,7 +3153,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1471
     },
     {
@@ -3264,7 +3264,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 620
     },
     {
@@ -3364,7 +3364,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 452
     },
     {
@@ -3501,7 +3501,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1386
     },
     {
@@ -3659,7 +3659,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1138
     },
     {
@@ -3796,7 +3796,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1503
     },
     {
@@ -3854,7 +3854,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/cookie.py",
+      "source": "Browser/keywords/cookie.py",
       "lineno": 180
     },
     {
@@ -3906,7 +3906,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/cookie.py",
+      "source": "Browser/keywords/cookie.py",
       "lineno": 28
     },
     {
@@ -3938,7 +3938,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/device_descriptors.py",
+      "source": "Browser/keywords/device_descriptors.py",
       "lineno": 39
     },
     {
@@ -3956,7 +3956,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/device_descriptors.py",
+      "source": "Browser/keywords/device_descriptors.py",
       "lineno": 24
     },
     {
@@ -4080,7 +4080,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1522
     },
     {
@@ -4112,7 +4112,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 902
     },
     {
@@ -4196,7 +4196,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1058
     },
     {
@@ -4489,7 +4489,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 963
     },
     {
@@ -4600,7 +4600,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 670
     },
     {
@@ -4739,7 +4739,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1436
     },
     {
@@ -4778,7 +4778,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 929
     },
     {
@@ -4929,7 +4929,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1210
     },
     {
@@ -5092,7 +5092,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1587
     },
     {
@@ -5190,7 +5190,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 147
     },
     {
@@ -5314,7 +5314,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 277
     },
     {
@@ -5464,7 +5464,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1330
     },
     {
@@ -5620,7 +5620,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1274
     },
     {
@@ -5738,7 +5738,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 499
     },
     {
@@ -5864,7 +5864,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 558
     },
     {
@@ -6053,7 +6053,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 1120
     },
     {
@@ -6111,7 +6111,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 761
     },
     {
@@ -6222,7 +6222,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 816
     },
     {
@@ -6333,7 +6333,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 859
     },
     {
@@ -6444,7 +6444,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 225
     },
     {
@@ -6542,7 +6542,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 189
     },
     {
@@ -6640,7 +6640,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 117
     },
     {
@@ -6764,7 +6764,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/getters.py",
+      "source": "Browser/keywords/getters.py",
       "lineno": 710
     },
     {
@@ -6777,7 +6777,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 61
     },
     {
@@ -6790,7 +6790,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 51
     },
     {
@@ -6856,7 +6856,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 71
     },
     {
@@ -6909,7 +6909,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 610
     },
     {
@@ -6948,7 +6948,7 @@
       "tags": [
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 848
     },
     {
@@ -7048,7 +7048,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/evaluation.py",
+      "source": "Browser/keywords/evaluation.py",
       "lineno": 82
     },
     {
@@ -7153,7 +7153,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 495
     },
     {
@@ -7249,7 +7249,7 @@
       "tags": [
         "HTTP"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/network.py",
+      "source": "Browser/keywords/network.py",
       "lineno": 59
     },
     {
@@ -7315,7 +7315,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1313
     },
     {
@@ -7355,7 +7355,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1284
     },
     {
@@ -7830,7 +7830,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 494
     },
     {
@@ -7870,7 +7870,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 124
     },
     {
@@ -8007,7 +8007,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 42
     },
     {
@@ -8060,7 +8060,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 103
     },
     {
@@ -8126,7 +8126,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 81
     },
     {
@@ -8256,7 +8256,7 @@
         "Coverage",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/coverage.py",
+      "source": "Browser/keywords/coverage.py",
       "lineno": 119
     },
     {
@@ -8387,7 +8387,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1003
     },
     {
@@ -8440,7 +8440,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1244
     },
     {
@@ -8506,7 +8506,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1201
     },
     {
@@ -8546,7 +8546,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1264
     },
     {
@@ -8969,7 +8969,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 423
     },
     {
@@ -9705,7 +9705,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 581
     },
     {
@@ -9763,7 +9763,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 964
     },
     {
@@ -10764,7 +10764,7 @@
       "doc": "<p>Open a new <a href=\"https://playwright.dev/docs/api/class-browsertype#browser-type-launch-persistent-context\">persistent context</a>.</p>\n<p><a href=\"#New%20Persistent%20Context\" class=\"name\">New Persistent Context</a> does basically executes <a href=\"#New%20Browser\" class=\"name\">New Browser</a>, <a href=\"#New%20Context\" class=\"name\">New Context</a> and <a href=\"#New%20Page\" class=\"name\">New Page</a> in one step with setting a profile at the same time.</p>\n<p>This keyword returns a tuple of browser id, context id and page details. (New in Browser 15.0.0)</p>\n<table border=\"1\">\n<tr>\n<th>Argument</th>\n<th>Description</th>\n</tr>\n<tr>\n<td><code>userDataDir</code></td>\n<td>Path to a User Data Directory, which stores browser session data like cookies and local storage. More details for Chromium and Firefox. Note that Chromium's user data directory is the parent directory of the \"Profile Path\" seen at <a href=\"chrome://version\">chrome://version</a>. Pass an empty string to use a temporary directory instead.</td>\n</tr>\n<tr>\n<td><code>browser</code></td>\n<td>Browser type to use. Default is Chromium.</td>\n</tr>\n<tr>\n<td><code>headless</code></td>\n<td>Whether to run browser in headless mode. Defaults to <code>True</code>.</td>\n</tr>\n<tr>\n<td>other arguments</td>\n<td>Please see <a href=\"#New%20Browser\" class=\"name\">New Browser</a>, <a href=\"#New%20Context\" class=\"name\">New Context</a> and <a href=\"#New%20Page\" class=\"name\">New Page</a> for more information about the other arguments.</td>\n</tr>\n</table>\n<p>If you want to use extensions you need to download the extension as a .zip, enable loading the extension, and load the extensions using chromium arguments like below. Extensions only work with chromium and with a headful browser.</p>\n<pre>\n${launch_args}=  Set Variable  [\"--disable-extensions-except=./ublock/uBlock0.chromium\", \"--load-extension=./ublock/uBlock0.chromium\"]\n${browserId}  ${contextId}  ${pageDetails}=  <a href=\"#New%20Persistent%20Context\" class=\"name\">New Persistent Context</a>  browser=chromium  headless=False  url=https://robocon,io  args=${launch_args}\n</pre>\n<p>Check <a href=\"#New%20Browser\" class=\"name\">New Browser</a>, <a href=\"#New%20Context\" class=\"name\">New Context</a> and <a href=\"#New%20Page\" class=\"name\">New Page</a> for the specific argument docs.</p>\n<p><a href=\"https://forum.robotframework.org/t//4309\">Comment &gt;&gt;</a></p>",
       "shortdoc": "Open a new [https://playwright.dev/docs/api/class-browsertype#browser-type-launch-persistent-context | persistent context].",
       "tags": [],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 699
     },
     {
@@ -10851,7 +10851,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 75
     },
     {
@@ -10878,7 +10878,7 @@
         "Clock",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/clock.py",
+      "source": "Browser/keywords/clock.py",
       "lineno": 69
     },
     {
@@ -10944,7 +10944,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 258
     },
     {
@@ -10983,7 +10983,7 @@
       "tags": [
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/promises.py",
+      "source": "Browser/keywords/promises.py",
       "lineno": 39
     },
     {
@@ -11015,7 +11015,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/promises.py",
+      "source": "Browser/keywords/promises.py",
       "lineno": 268
     },
     {
@@ -11086,7 +11086,7 @@
         "BrowserControl",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/promises.py",
+      "source": "Browser/keywords/promises.py",
       "lineno": 140
     },
     {
@@ -11125,7 +11125,7 @@
       "tags": [
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 465
     },
     {
@@ -11195,7 +11195,7 @@
       "tags": [
         "Config"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/runonfailure.py",
+      "source": "Browser/keywords/runonfailure.py",
       "lineno": 29
     },
     {
@@ -11248,7 +11248,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 583
     },
     {
@@ -11275,7 +11275,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/locator_handler.py",
+      "source": "Browser/keywords/locator_handler.py",
       "lineno": 89
     },
     {
@@ -11288,7 +11288,7 @@
         "Clock",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/clock.py",
+      "source": "Browser/keywords/clock.py",
       "lineno": 57
     },
     {
@@ -11510,7 +11510,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/pdf.py",
+      "source": "Browser/keywords/pdf.py",
       "lineno": 42
     },
     {
@@ -11528,7 +11528,7 @@
         "BrowserControl",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1656
     },
     {
@@ -11607,7 +11607,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 607
     },
     {
@@ -11686,7 +11686,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 567
     },
     {
@@ -11713,7 +11713,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 647
     },
     {
@@ -11773,7 +11773,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 714
     },
     {
@@ -11813,7 +11813,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 227
     },
     {
@@ -11950,7 +11950,7 @@
         "Getter",
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 146
     },
     {
@@ -12003,7 +12003,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 206
     },
     {
@@ -12069,7 +12069,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/webapp_state.py",
+      "source": "Browser/keywords/webapp_state.py",
       "lineno": 185
     },
     {
@@ -12166,7 +12166,7 @@
       "tags": [
         "Config"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/assertion_formatter.py",
+      "source": "Browser/keywords/assertion_formatter.py",
       "lineno": 98
     },
     {
@@ -12211,7 +12211,7 @@
         "Config",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 367
     },
     {
@@ -12243,7 +12243,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 364
     },
     {
@@ -12309,7 +12309,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 552
     },
     {
@@ -12354,7 +12354,7 @@
         "Config",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 463
     },
     {
@@ -12381,7 +12381,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 539
     },
     {
@@ -12426,7 +12426,7 @@
         "Config",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 399
     },
     {
@@ -12484,7 +12484,7 @@
         "Config",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 430
     },
     {
@@ -12524,7 +12524,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/strict_mode.py",
+      "source": "Browser/keywords/strict_mode.py",
       "lineno": 20
     },
     {
@@ -12564,7 +12564,7 @@
         "Clock",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/clock.py",
+      "source": "Browser/keywords/clock.py",
       "lineno": 23
     },
     {
@@ -12604,7 +12604,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 513
     },
     {
@@ -12694,7 +12694,7 @@
         "Config",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 482
     },
     {
@@ -12813,7 +12813,7 @@
         "Experimental",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/coverage.py",
+      "source": "Browser/keywords/coverage.py",
       "lineno": 28
     },
     {
@@ -12831,7 +12831,7 @@
         "Coverage",
         "Getter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/coverage.py",
+      "source": "Browser/keywords/coverage.py",
       "lineno": 90
     },
     {
@@ -12863,7 +12863,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1286
     },
     {
@@ -12921,7 +12921,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1319
     },
     {
@@ -13024,7 +13024,7 @@
         "BrowserControl",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/playwright_state.py",
+      "source": "Browser/keywords/playwright_state.py",
       "lineno": 1372
     },
     {
@@ -13394,7 +13394,7 @@
       "tags": [
         "PageContent"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/browser_control.py",
+      "source": "Browser/keywords/browser_control.py",
       "lineno": 136
     },
     {
@@ -13525,7 +13525,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 409
     },
     {
@@ -13591,7 +13591,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 136
     },
     {
@@ -13657,7 +13657,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 50
     },
     {
@@ -13697,7 +13697,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 691
     },
     {
@@ -13763,7 +13763,7 @@
         "PageContent",
         "Setter"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 1361
     },
     {
@@ -13789,7 +13789,7 @@
       "tags": [
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/promises.py",
+      "source": "Browser/keywords/promises.py",
       "lineno": 227
     },
     {
@@ -13881,7 +13881,7 @@
         "PageContent",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 877
     },
     {
@@ -14019,7 +14019,7 @@
         "PageContent",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/interaction.py",
+      "source": "Browser/keywords/interaction.py",
       "lineno": 927
     },
     {
@@ -14031,7 +14031,7 @@
       "tags": [
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/promises.py",
+      "source": "Browser/keywords/promises.py",
       "lineno": 253
     },
     {
@@ -14128,7 +14128,7 @@
         "PageContent",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/waiter.py",
+      "source": "Browser/keywords/waiter.py",
       "lineno": 238
     },
     {
@@ -14220,7 +14220,7 @@
         "PageContent",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/waiter.py",
+      "source": "Browser/keywords/waiter.py",
       "lineno": 39
     },
     {
@@ -14338,7 +14338,7 @@
         "PageContent",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/waiter.py",
+      "source": "Browser/keywords/waiter.py",
       "lineno": 162
     },
     {
@@ -14391,7 +14391,7 @@
         "PageContent",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/waiter.py",
+      "source": "Browser/keywords/waiter.py",
       "lineno": 307
     },
     {
@@ -14470,7 +14470,7 @@
         "HTTP",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/network.py",
+      "source": "Browser/keywords/network.py",
       "lineno": 279
     },
     {
@@ -14541,7 +14541,7 @@
         "HTTP",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/network.py",
+      "source": "Browser/keywords/network.py",
       "lineno": 143
     },
     {
@@ -14625,7 +14625,7 @@
         "HTTP",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/network.py",
+      "source": "Browser/keywords/network.py",
       "lineno": 169
     },
     {
@@ -14665,7 +14665,7 @@
         "HTTP",
         "Wait"
       ],
-      "source": "/private/tmp/claude-502/-Users-rener-Source-MarketSquare-robotframework-browser-org-claude/e01558fe-4fef-42f9-8fe9-902190d7af6e/scratchpad/genv/lib/python3.12/site-packages/Browser/keywords/network.py",
+      "source": "Browser/keywords/network.py",
       "lineno": 255,
       "deprecated": true
     }

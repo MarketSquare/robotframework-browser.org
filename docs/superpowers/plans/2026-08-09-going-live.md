@@ -183,16 +183,33 @@ or the stubs link to pages that do not exist yet.
 
 ## Phase 7 — Cutover
 
-1. Final review on the surge preview
-2. Switch the Pages source to GitHub Actions
-3. Verify `robotframework-browser.org` serves the new site over HTTPS, and that
-   the certificate is still valid for the custom domain
-4. Check the old site's most-linked URLs — decide redirects or accept 404s
-5. Merge the library dedup PR
-6. Announce
+**Confirmed:** the source today is *Deploy from a branch — `master` / (root)*.
+No `gh-pages` branch, no existing Actions deployment, so the cutover is one
+setting and the rollback is the same setting put back.
 
-**Rollback:** switch the Pages source back to `legacy-site`. Worth rehearsing
-before step 2 rather than during it.
+1. Final review on the surge preview
+2. Switch the Pages source to **GitHub Actions**
+3. Set the repository variable `PAGES_LIVE` to `true`
+4. Run the `Deploy` workflow from the Actions tab (it has `workflow_dispatch`),
+   rather than waiting for a push — this is what closes the gap in step 2
+5. Verify `robotframework-browser.org` serves the new site over HTTPS, and that
+   the certificate is still valid for the custom domain
+6. Check the old site's most-linked URLs — decide redirects or accept 404s
+7. Merge the library dedup PR
+8. Announce
+
+**The gap in step 2.** Changing the source away from a branch retires that
+deployment, and the first Actions deployment is minutes away. Steps 2–4 should
+be run back to back; the site is briefly the old one or a 404, not broken.
+
+**The custom domain.** Switching the source can clear the domain setting.
+`public/CNAME` is in the artifact precisely so the first Actions deploy restores
+it. HTTPS may take a few minutes to re-provision afterwards — that is expected,
+not a failure. Step 5 is the one that must actually be looked at.
+
+**Rollback:** set the source back to *Deploy from a branch* → `legacy-site` /
+(root), and unset `PAGES_LIVE`. `legacy-site` is a byte-for-byte copy of what
+`master` served, so this returns the exact site that is up today.
 
 ---
 
