@@ -1,11 +1,11 @@
 ---
 title: Assertions
-description: Every getter can assert, every assertion retries, and each return type allows different operators. The complete AssertionEngine reference.
+description: Almost every getter can assert, every assertion retries, and each return type allows different operators. The complete AssertionEngine reference.
 section: concepts
 order: 3
 ---
 
-Every keyword that gets something can also check it. There is no separate
+Almost every keyword that gets something can also check it. There is no separate
 assertion library, and — this is the part that matters — **the check retries**.
 
 ```robot-repl
@@ -42,7 +42,7 @@ check, because they are one operation.
 head: [Setting, Governs, Default]
 rows:
   - ['`timeout`', 'How long Playwright waits for the **element** to exist', '10s']
-  - ['`retry_assertions_for`', 'How long the **value** is re-read while the assertion fails', '1s']
+  - ['`retry_assertions_for`', 'How long the **value** is re-read while the assertion fails — never past `timeout`', '1s']
 ---
 ::
 
@@ -53,7 +53,9 @@ Library    Browser    timeout=15s    retry_assertions_for=5s
 
 Element never appears → `timeout`. Element is there but the text is still
 `Loading…` → `retry_assertions_for`. Raising the wrong one is the most common
-reason a fix does not help.
+reason a fix does not help — and note that `timeout` bounds the whole keyword,
+so `retry_assertions_for=30s` against the default `timeout=10s` still gives you
+ten seconds of retrying.
 
 ## The operators
 
@@ -106,7 +108,8 @@ dot, not any character.
 ### `matches` — regular expressions
 
 `matches` runs `re.search` over the value. It is spelled `matches` and nothing
-else — unlike the other operators it has no symbolic alias. In particular it is
+else — it has no symbolic alias, as `validate`, `then` and `not contains` also
+do not. In particular it is
 **not** `$`: that character is the operator's internal value, Robot Framework
 rejects it as input, and `$=` is a different operator entirely (*ends with*).
 
@@ -148,11 +151,13 @@ bound to `value`:
 Get Text             h1       validate    value.startswith("Welcome")
 Get Element Count    .row     validate    value % 2 == 0
 Get Text             .price   validate    float(value.strip("€")) < 100
-Get Page State       validate    2020 >= value['year']
+Get BoundingBox      #card    ALL         validate    value['width'] > 40
 ```
 
-Getters returning a dictionary — `Get Page State`, `Get Browser Catalog` — are
-usually asserted this way, indexing into `value` directly.
+Getters that return a dictionary — `Get BoundingBox    ALL`, `Get Viewport Size`
+— are usually asserted this way, indexing into `value` directly. So is
+`Get Browser Catalog`, which returns a list of dictionaries and accepts every
+operator.
 
 ### `then` — derive instead of check
 
@@ -173,13 +178,19 @@ for something you have to compute.
 Not every operator works everywhere. The engine picks a rule set from the type
 the keyword returns, and using the wrong one is an error, not a failed assertion.
 
+Not every getter asserts, either. `Get Element`, `Get Elements`, `Get Cookie`,
+`Get Cookies`, `Get Device`, `Get Devices` and a few others take no assertion
+arguments at all — they only return.
+
 ::doc-table
 ---
 head: [Return type, Allowed, Example keyword]
 rows:
-  - ['String, number', 'All of them', '`Get Text`, `Get Element Count`']
-  - ['**List**', '`==` `!=` `contains` `validate` `then`', '`Get Classes`, `Get Elements`']
-  - ['**Dictionary**', '`==` `!=` `contains` `validate` `then`', '`Get Page State`, `Get BoundingBox`']
+  - ['**String**', 'All of them', '`Get Text`, `Get Url`, `Get Property`']
+  - ['**Number**', '`==` `!=` `>` `>=` `<` `<=` `validate` `then`', '`Get Element Count`']
+  - ['**List**', '`==` `!=` `contains` `validate` `then`', '`Get Classes`, `Get Select Options`']
+  - ['**Dictionary** (numeric)', 'The list set, plus `>` `>=` `<` `<=` per key', '`Get BoundingBox`, `Get Viewport Size`']
+  - ['**Dictionary** (strict)', '`==` `!=` `contains` `validate` `then`', '`Get Style    ALL`']
   - ['**Boolean**', '`==` `!=` only', '`Get Checkbox State`']
   - ['**Element states**', 'Set operators, including `not contains`', '`Get Element States`']
 ---
@@ -201,9 +212,11 @@ operators. Use `validate` instead:
 Get Classes    .btn    validate    "disabled" not in value
 ```
 
-**Booleans accept Robot's truthiness.** `Get Checkbox State` compares against
-`is_truthy`, so `True`, `true`, `yes` and `checked` all mean the same, and the
-empty string, `no` and `false` mean the other.
+**Booleans use AssertionEngine's own truthiness**, which is not quite Robot's.
+Everything is true except `FALSE`, `NO`, `OFF`, `0`, `UNCHECKED`, `NONE` and the
+empty string, case-insensitively. So `checked`, `yes` and `true` are True;
+`unchecked`, `no` and `false` are False. (`unchecked` is the one that differs
+from Robot Framework's own `is_truthy`.)
 
 ## Types must match
 
@@ -220,7 +233,11 @@ Get Element Count    .row      ==    ${3}     # passes
 ```
 
 Keywords returning numbers *do* convert the expected value for you. Keywords
-returning strings do not, and `Get Text` is the one everybody trips over. When a
+returning strings do not, and `Get Text` is the one everybody trips over.
+
+Numbers also refuse the text operators outright — `Get Element Count    .row
+*=    2` raises `ValueError: Operator 'contains' is not allowed.` rather than
+failing the assertion. When a
 failure shows two values that look identical, print the types — see
 [messages](#custom-messages) below.
 
@@ -242,9 +259,11 @@ cannot compare a number with a string in Python, and so not here either.
 ## Formatters
 
 A formatter normalises the value *before* it is compared, so a test does not fail
-on whitespace nobody can see. This is the fix for the rendered-HTML problem:
-markup that says `Hello   World` across two source lines becomes the string
-`"Hello \n World"`.
+on whitespace nobody can see. Ordinary source indentation is not the problem —
+`Get Text` reads rendered text, so the browser has already collapsed that. What
+survives rendering is what bites: non-breaking spaces (`&nbsp;&nbsp;two
+spaces&nbsp;&nbsp;`), `<pre>` blocks, and text assembled from several inline
+elements.
 
 ::doc-table
 ---
@@ -294,8 +313,9 @@ Set Assertion Formatters
 ```
 
 The keyword returns the formatters that were set before, so a test can put them
-back. Note that a formatter written as a lambda is not included in that returned
-value — only the named rules survive the round trip.
+back — normalised to a canonical order rather than the order you supplied. A
+formatter written as a lambda is not included at all; only the named rules
+survive the round trip.
 
 ## Custom messages
 
@@ -325,7 +345,7 @@ sides look the same and it still fails, printing the types shows why:
 ```robot-repl
 Get Text    #price    ==    ${99}
 ...    message=Got {value} ({value_type}), expected {expected} ({expected_type})
-# Got 99 (<class 'str'>), expected 99 (<class 'int'>)
+# Got '99' (str), expected 99 (int)
 ```
 
 ## Common mistakes
@@ -346,6 +366,8 @@ rows:
 ## In short
 
 - Assert inside the getter, not after it — the retry is the whole point.
+- Match the operator to the return type: numbers refuse `contains` and `matches`,
+  lists refuse `not contains`, booleans take only `==` and `!=`.
 - `retry_assertions_for` is for values, `timeout` is for elements.
 - Match the type. `Get Text` returns a string.
 - Lists and dictionaries only take `==` `!=` `contains` `validate` `then`, and
