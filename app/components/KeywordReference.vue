@@ -501,10 +501,29 @@ useHead({
   user-select: none;
 }
 
+/*
+ * The state arrow, at a size you can actually read. It was 0.7em of a 0.68rem
+ * heading — about 7px — which conveyed neither "expandable" nor which way it
+ * pointed. It also turns to face down when the section is open, so the shape
+ * carries the state rather than only the colour.
+ */
 .acc-head::after {
   content: '▸';
   color: var(--faint);
-  font-size: 0.7em;
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.12s;
+}
+
+.acc-radio:checked + .acc-head::after {
+  transform: rotate(90deg);
+  color: var(--green);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acc-head::after {
+    transition: none;
+  }
 }
 
 .acc-head:hover {
@@ -725,11 +744,13 @@ useHead({
     top: var(--header-h, 6.2rem);
     z-index: 14;
     margin: 0;
-    padding: var(--sp-2) var(--gutter);
+    /* 44px minimum: this is the main control on a phone. */
+    min-height: 2.75rem;
+    padding: var(--sp-3) var(--gutter);
     border-bottom: 1px solid var(--line);
     background: var(--chrome);
     font-family: var(--font-display);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--dim);
@@ -744,6 +765,18 @@ useHead({
     content: '▾';
     margin-left: auto;
     color: var(--faint);
+    font-size: 1.1rem;
+    line-height: 1;
+  }
+
+  .bars i {
+    width: 1.1rem;
+    height: 2px;
+  }
+
+  /* Close is a touch target too. */
+  .rail-close {
+    min-height: 2.75rem;
   }
 
   .bars {

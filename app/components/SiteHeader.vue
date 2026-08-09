@@ -188,8 +188,10 @@ onMounted(() => {
   border-bottom-color: var(--red);
 }
 
+/* 0.6em of 0.85rem was around 8px — legible as a smudge, not as an arrow. */
 .caret {
-  font-size: 0.6em;
+  font-size: 0.9em;
+  line-height: 1;
   color: var(--faint);
 }
 

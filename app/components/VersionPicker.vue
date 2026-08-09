@@ -5,10 +5,15 @@
  *
  * Every version we hold data for is rendered here, in this design, at
  * /keywords/<version> — switching version keeps you on this site and in this
- * layout, which is the whole point of rebuilding the reference. Releases older
- * than the ones we document link to the Libdoc page published at the time, on
- * GitHub, in a new tab: that is a different site with a different look, so
- * replacing the page under someone silently would read as a broken link.
+ * layout, which is the whole point of rebuilding the reference. Older releases
+ * are not offered: they are on GitHub for anyone who needs them, and a menu
+ * that lists them invites a reader to go somewhere worse.
+ *
+ * `prefetch="false"` matters more than it looks. Every one of these routes
+ * carries that version's full keyword index in its payload, so with Nuxt's
+ * default prefetch-on-visible, opening this menu fired 26 requests and pulled
+ * roughly a megabyte before the reader had chosen anything — which is what
+ * made the page feel slow.
  *
  * **These are real anchors inside a <details>, not a <select> with a handler.**
  * The first version of this used `window.open` on change, which works until it
@@ -51,23 +56,20 @@ const href = (v: string) => (v === LATEST_VERSION ? '/keywords' : `/keywords/${v
         an <a> is invalid, and assistive technology cannot offer a choice
         between two targets that are the same element.
       -->
-      <ul class="list">
+      <div class="panel-scroll">
+        <ul class="list">
         <li v-for="v in versions" :key="v" :class="{ on: v === props.current }">
-          <NuxtLink class="doc" :to="href(v)">
+          <NuxtLink class="doc" :to="href(v)" :prefetch="false">
             <span class="v">{{ v }}</span>
-            <span v-if="v === LATEST_VERSION" class="tag">latest</span>
+            <!-- One tag, not two: on the common case both applied and the row
+                 grew to three lines in a narrow panel. -->
             <span v-if="v === props.current" class="tag reading">reading</span>
+            <span v-else-if="v === LATEST_VERSION" class="tag">latest</span>
           </NuxtLink>
-          <NuxtLink class="notes" :to="`/releases/${v}`">Notes</NuxtLink>
+          <NuxtLink class="notes" :to="`/releases/${v}`" :prefetch="false">Notes</NuxtLink>
         </li>
-      </ul>
-
-      <p class="panel-note">
-        Releases before {{ versions.at(-1) }} are not rendered here.
-        <a :href="ARCHIVE.libdoc('19.12.0')" target="_blank" rel="noopener">
-          Their original documentation is on GitHub<span class="ext" aria-hidden="true"> ↗</span>
-        </a>
-      </p>
+        </ul>
+      </div>
     </div>
   </details>
 </template>
@@ -113,27 +115,41 @@ summary:hover {
 
 .caret {
   color: var(--faint);
-  font-size: 0.7em;
+  /* Was 0.7em, which rendered as a speck at this size. */
+  font-size: 1em;
+  line-height: 1;
 }
 
 [open] .caret {
   transform: rotate(180deg);
 }
 
+/*
+ * The panel carries the bevel and clips; the list inside it scrolls.
+ *
+ * One element cannot do both. A scrollbar is drawn in the padding box, which
+ * corner-shape does not clip, so it cut across the bevelled corners — exactly
+ * the fault the code blocks had.
+ */
 .panel {
   position: absolute;
   z-index: 10;
   top: calc(100% + 4px);
   left: 0;
-  min-width: 19rem;
-  max-height: 22rem;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  width: max-content;
+  max-width: min(17rem, 80vw);
   background: var(--panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: var(--sp-3);
+  overflow: hidden;
+}
+
+.panel-scroll {
+  max-height: 18rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sp-2);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
@@ -217,13 +233,6 @@ summary:hover {
   white-space: nowrap;
 }
 
-.all {
-  font-size: 0.78rem;
-  padding-top: var(--sp-2);
-  border-top: 1px solid var(--line);
-  border-bottom: 0;
-}
-
 @supports (corner-shape: bevel) {
   summary,
   .panel {
@@ -231,11 +240,32 @@ summary:hover {
   }
 }
 
-@media (max-width: 40rem) {
+/*
+ * On a phone this lives inside the keyword rail, which is itself a scroll box:
+ * an absolutely positioned panel was clipped by it and only half appeared. In
+ * the flow it simply pushes the list down, and the rail scrolls as usual.
+ */
+@media (max-width: 900px) {
+  /* Its own row in the bar, so the list is full width and easy to hit. */
+  .picker {
+    flex: 1 1 100%;
+  }
+
   .panel {
-    /* A fixed-width dropdown would run off a phone screen. */
-    min-width: 0;
-    width: min(88vw, 22rem);
+    position: static;
+    width: auto;
+    max-width: none;
+    box-shadow: none;
+    margin-top: var(--sp-2);
+  }
+
+  .panel-scroll {
+    max-height: 40dvh;
+  }
+
+  summary {
+    /* A comfortable touch target. */
+    min-height: 2.75rem;
   }
 }
 </style>
