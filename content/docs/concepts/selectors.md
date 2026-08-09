@@ -174,6 +174,31 @@ Click    /html/body/div[3]/div/div[2]/button
 break on the next layout change, and the failure will look like a bug in the
 software rather than in the test.
 
+### Also available: the test-id aliases
+
+`data-test-id=` has two siblings that do exactly the same job against a
+different attribute. Which one you use is decided by what your developers
+already put in the markup, not by preference:
+
+::doc-table
+---
+head:
+  - Prefix
+  - Matches
+nowrap: [0]
+rows:
+  - - "`data-testid=`"
+    - "`data-testid` — Playwright's own default, and the most common in the wild"
+  - - "`data-test-id=`"
+    - "`data-test-id`"
+  - - "`data-test=`"
+    - "`data-test`"
+---
+::
+
+All three behave identically. Pick the one your application emits and stay with
+it.
+
 ## How a strategy is chosen
 
 You can always be explicit with a `strategy=value` prefix. Spaces around the
@@ -220,6 +245,136 @@ Get Text    role=listitem[name="Basket"] >> css=.price
 ```
 
 That means you rarely need one clever selector. You need two obvious ones.
+
+## Filter selectors
+
+Some prefixes do not find elements at all. They take what the previous step
+found and **narrow it**, which is why they only make sense as a step in a
+chain — `nth=` on its own has nothing to count.
+
+It is worth holding the two kinds apart in your head:
+
+::doc-table
+---
+head:
+  - Kind
+  - Does
+  - Examples
+nowrap: [0]
+rows:
+  - - Strategy
+    - Finds elements in the page
+    - "`css=`, `xpath=`, `text=`, `role=`, `id=`"
+  - - Filter
+    - Narrows what the step before it found
+    - "`nth=`, `visible=`"
+---
+::
+
+### `nth=` — pick one out of many
+
+Zero-based, and `-1` is the last one:
+
+```robot-repl
+Click    css=.result >> nth=0     # the first result
+Click    css=.result >> nth=2     # the third
+Click    css=.result >> nth=-1    # the last
+```
+
+This is the honest escape hatch from [strict mode](#strict-mode): when a
+selector legitimately matches several elements and you want a specific one,
+say so. It is still positional, so prefer narrowing by something meaningful
+first — `css=.result >> text=Helsinki` beats `nth=3` whenever it is available.
+
+### `visible=` — keep only what can be seen
+
+```robot-repl
+Click    css=button.save >> visible=true
+Get Element Count    css=.row >> visible=false    ==    2
+```
+
+Useful when a page keeps hidden copies of things in the DOM — a mobile menu
+next to a desktop one, a template, a collapsed panel.
+
+::doc-note{kind="warning"}
+**The order of filters changes the answer.** These two are not the same
+selector:
+
+```robot-repl
+# Third input among the visible ones
+Click    //input >> visible=true >> nth=2
+
+# Third input in the DOM, then check it happens to be visible
+Click    //input >> nth=2 >> visible=true
+```
+
+Each step operates on the result of the one before it. Reading a chain left to
+right tells you exactly what it does, and reading it in any other order tells
+you something false.
+::
+
+## Filtering inside a CSS selector
+
+Playwright adds pseudo-classes to CSS that stay inside one step, rather than
+becoming another link in the chain. These are strategies-with-conditions, not
+filters, because they still describe *which* element you want:
+
+::doc-table
+---
+head:
+  - Pseudo-class
+  - Matches
+nowrap: [0]
+rows:
+  - - "`:has(sel)`"
+    - An element that contains something matching `sel`
+  - - "`:has-text(\"x\")`"
+    - An element containing that text anywhere inside it, case-insensitive
+  - - "`:text(\"x\")`"
+    - The *smallest* element containing that text
+  - - "`:text-is(\"x\")`"
+    - The smallest element whose text is exactly that
+  - - "`:text-matches(\"re\")`"
+    - Text matching a regular expression
+  - - "`:visible`"
+    - Only elements that are visible
+  - - "`:is(a, b)`"
+    - Several conditions on one element
+  - - "`:nth-match(sel, n)`"
+    - The n-th match, one-based, across the whole query
+---
+::
+
+```robot-repl
+# The row that contains the name, then the button inside that row
+Click    css=tr:has-text("Ada Lovelace") >> role=button[name="Edit"]
+
+# A card that contains an image, rather than a card whose text mentions one
+Get Text    css=.card:has(img) >> css=.title
+```
+
+`:has-text()` is the one you will reach for most. Note the difference from
+`:text()`: `tr:has-text("Ada")` is the whole row, while `tr :text("Ada")` is the
+cell.
+
+## Layout selectors
+
+Playwright can also select by where an element sits relative to another:
+`:right-of()`, `:left-of()`, `:above()`, `:below()` and `:near()`.
+
+```robot-repl
+Fill Text    css=input:right-of(:text("Postcode"))    00100
+```
+
+::doc-note{kind="warning"}
+These match on rendered geometry, so they break when the layout changes — the
+same objection as selecting by document position with XPath, and for the same
+reason. A form field is nearly always reachable through its `<label>`, which is
+what `role=textbox[name="Postcode"]` uses and what a screen reader uses too.
+
+Reach for a layout selector when the markup genuinely offers nothing else, and
+treat it as a note that the page has an accessibility problem worth reporting.
+::
 
 ## Crossing into iframes with `>>>`
 
@@ -286,3 +441,5 @@ valid across a re-render that would invalidate a stored node.
 - `css=` is acceptable; `id=` is less stable than it looks.
 - `xpath=` last, and never by document position.
 - Two obvious selectors chained with `>>` beat one clever one.
+- `nth=` and `visible=` are filters, not strategies: they narrow the step
+  before them, and their order in a chain changes the answer.
