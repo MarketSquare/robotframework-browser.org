@@ -20,7 +20,21 @@
  */
 import data from '~/../content/contributors.json'
 
-const props = withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
+const props = withDefaults(
+  defineProps<{
+    compact?: boolean
+    /**
+     * How many faces to show in the compact wall. 0 means all.
+     *
+     * All 206 is 926 KB and 207 requests — worth it on /community, where the
+     * wall is the point, and not on a page where it is a band at the foot.
+     * Lazy loading does not save it either: Chrome widens its threshold on a
+     * slow connection, so every one of them loads anyway.
+     */
+    limit?: number
+  }>(),
+  { compact: false, limit: 0 },
+)
 
 interface Person {
   login: string
@@ -31,6 +45,9 @@ interface Person {
 }
 
 const { people, total } = data as unknown as { people: Person[]; total: number }
+
+const shown = computed(() => (props.limit > 0 ? people.slice(0, props.limit) : people))
+const rest = computed(() => total - shown.value.length)
 
 /**
  * The filters, in the order the page introduces the ways of contributing —
@@ -61,10 +78,14 @@ const inputId = (way: string) => `way-${way}`
     because unlike the full wall there is no visible name to read.
   -->
   <ul v-if="props.compact" class="wall is-compact">
-    <li v-for="p in people" :key="p.login">
+    <li v-for="p in shown" :key="p.login">
       <a class="person" :href="p.profile" :title="p.name">
         <img class="face" :src="p.avatar" :alt="p.name" width="40" height="40" loading="lazy" decoding="async">
       </a>
+    </li>
+    <!-- Says plainly that this is a sample, and where the rest are. -->
+    <li v-if="rest > 0" class="rest">
+      <a href="/community#hall">+{{ rest }}</a>
     </li>
   </ul>
 
@@ -157,7 +178,8 @@ const inputId = (way: string) => `way-${way}`
 .count {
   font-family: var(--font-mono);
   font-size: 0.7rem;
-  color: var(--faint);
+  /* --faint on the filter chip measured below AA at this size. */
+  color: var(--dim);
   letter-spacing: 0;
 }
 
@@ -223,6 +245,25 @@ const inputId = (way: string) => `way-${way}`
 
 .wall.is-compact .person {
   padding: 0;
+}
+
+.rest a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px dashed var(--line-strong);
+  border-bottom: 1px dashed var(--line-strong);
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  color: var(--dim);
+}
+
+.rest a:hover {
+  border-color: var(--red);
+  color: var(--ink);
 }
 
 .wall.is-compact .face {

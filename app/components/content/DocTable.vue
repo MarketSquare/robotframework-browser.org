@@ -46,15 +46,23 @@ function cellText(cell: unknown, row: number, col: number): string {
     <table class="doc-table">
       <thead>
         <tr>
-          <th v-for="(h, j) in props.head" :key="j" :class="{ tight: tight(j) }">{{ h }}</th>
+          <!-- scope, or every cell in a table this size reads as unassociated. -->
+          <th v-for="(h, j) in props.head" :key="j" scope="col" :class="{ tight: tight(j) }">{{ h }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(row, i) in props.rows" :key="i">
           <!-- Cells come from YAML, so Markdown in them is inert until we render it. -->
-          <td
+          <!--
+            A cell under an empty heading has no header to be associated with,
+            so the whole table reads as unlabelled. Those columns are the row's
+            subject anyway — a rank, a property — so they become row headers.
+          -->
+          <component
+            :is="props.head[j] === '' ? 'th' : 'td'"
             v-for="(cell, j) in row"
             :key="j"
+            :scope="props.head[j] === '' ? 'row' : undefined"
             :class="{ tight: tight(j) }"
             :data-label="props.head[j] || null"
             v-html="inlineMarkdown(cellText(cell, i, j))"
@@ -101,7 +109,13 @@ function cellText(cell: unknown, row: number, col: number): string {
   padding: 0 var(--sp-4) var(--sp-2) 0;
 }
 
-.doc-table td {
+/* Row headers are cells too, visually. */
+.doc-table tbody th {
+  font-weight: 400;
+  text-align: left;
+}
+
+.doc-table :is(td, tbody th) {
   overflow-wrap: break-word;
   padding: var(--sp-2) var(--sp-4) var(--sp-2) 0;
   border-bottom: 1px solid var(--line);

@@ -26,6 +26,10 @@
   font-size: var(--step--2);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--faint);
+  /*
+   * --dim, not --faint. At this size (11px, letter-spaced) --faint measured
+   * below 4.5:1 against the page — Lighthouse flagged every item in the row.
+   */
+  color: var(--dim);
 }
 </style>

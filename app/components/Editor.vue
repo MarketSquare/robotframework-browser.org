@@ -142,6 +142,7 @@ function gutter(n: number) {
       type="radio"
       :name="`${uid}-file`"
       :checked="i === 0"
+      :aria-label="f.name"
     >
 
     <div v-if="props.chrome" class="plate-bar">

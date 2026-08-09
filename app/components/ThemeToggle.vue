@@ -38,6 +38,11 @@ function cycle() {
   apply(ORDER[(ORDER.indexOf(theme.value) + 1) % ORDER.length]!)
 }
 
+/*
+ * Also the accessible name. A button labelled AUTO whose accessible name began
+ * "Colour theme: system" fails WCAG 2.5.3: speech users say what they see, and
+ * "AUTO" appeared nowhere in the name.
+ */
 const LABEL: Record<Theme, string> = {
   system: 'AUTO',
   light: 'LIGHT',
@@ -50,7 +55,7 @@ const LABEL: Record<Theme, string> = {
   <button
     type="button"
     class="toggle"
-    :aria-label="`Colour theme: ${theme}. Activate to change.`"
+    :aria-label="`${LABEL[theme]} colour theme. Activate to change.`"
     @click="cycle"
   >
     <span class="dot" aria-hidden="true" />

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
@@ -60,9 +60,22 @@ describe('the contributor data', () => {
     expect(orphans.map(p => `${p.login} (${p.contributions.join(', ')})`)).toEqual([])
   })
 
-  it('asks GitHub for a resized avatar rather than a full-resolution one', () => {
-    // 206 full-size avatars scaled down in CSS is a slow page for no visible gain.
-    for (const p of data.people) expect(p.avatar).toMatch(/[?&]s=\d+/)
+  it('vendors every avatar rather than hot-linking GitHub', () => {
+    /*
+     * They used to be <img src="https://avatars.githubusercontent.com/…">, so
+     * every visitor fetched 206 images from GitHub — over a megabyte of
+     * third-party requests, and a runtime dependency on GitHub for a site that
+     * is otherwise entirely static.
+     */
+    for (const p of data.people) {
+      expect(p.avatar, `${p.login} is not vendored`).toMatch(/^\/avatars\//)
+    }
+  })
+
+  it('has a file on disk for each of them', () => {
+    for (const p of data.people) {
+      expect(existsSync(join(ROOT, 'public', p.avatar)), `missing ${p.avatar}`).toBe(true)
+    }
   })
 
   it('has no duplicate logins', () => {

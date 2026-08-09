@@ -12,7 +12,7 @@
  * The output is committed, so a build never needs the library checked out
  * alongside — the same arrangement as the Libdoc JSON.
  */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 
 /** One entry as the bot stores it. */
@@ -53,17 +53,74 @@ const source = join(libraryRoot, '.all-contributorsrc')
 const raw = JSON.parse(readFileSync(source, 'utf8')) as { contributors: Raw[] }
 
 /*
- * `s=` asks GitHub for a resized avatar. Without it the URLs serve a
- * full-resolution image that we then scale down in CSS — 206 of those is a
- * slow page for no visible gain. 160 is twice the rendered size, for high-DPI
- * screens.
+ * Avatars are vendored, not hot-linked.
+ *
+ * They used to be <img src="https://avatars.githubusercontent.com/…">, which
+ * meant every visitor fetched 206 images from GitHub at page load: over a
+ * megabyte of third-party requests, and the landing page's Lighthouse
+ * performance score sat at 62. It also quietly made GitHub a runtime
+ * dependency of a static site, and told them who was reading it.
+ *
+ * One size, at 96px: the compact wall renders 40px and the full wall 56px, so
+ * this covers both at better than 1.7x. Downloaded once and committed, the
+ * same arrangement as the Libdoc JSON — a build never needs the network.
  */
-const avatar = (url: string) => `${url}${url.includes('?') ? '&' : '?'}s=160`
+const AVATAR_SIZE = 96
+const AVATARS = join(process.cwd(), 'public/avatars')
+
+/** GitHub serves JPEG or PNG; keep whatever arrives rather than re-encoding. */
+function extensionFor(type: string | null): string {
+  if (type?.includes('png')) return 'png'
+  if (type?.includes('gif')) return 'gif'
+  return 'jpg'
+}
+
+async function vendorAvatar(login: string, url: string): Promise<string | null> {
+  const existing = ['jpg', 'png', 'gif']
+    .map(ext => `${login}.${ext}`)
+    .find(name => existsSync(join(AVATARS, name)))
+  if (existing) return `/avatars/${existing}`
+
+  const src = `${url}${url.includes('?') ? '&' : '?'}s=${AVATAR_SIZE}`
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(src)
+      if (!res.ok) continue
+      const ext = extensionFor(res.headers.get('content-type'))
+      const name = `${login}.${ext}`
+      writeFileSync(join(AVATARS, name), Buffer.from(await res.arrayBuffer()))
+      return `/avatars/${name}`
+    }
+    catch {
+      /* retry once, then give up on this one */
+    }
+  }
+  return null
+}
+
+mkdirSync(AVATARS, { recursive: true })
+
+/* Eight at a time: polite to GitHub, and 206 serial requests is a long wait. */
+const downloaded = new Map<string, string>()
+const queue = [...raw.contributors]
+await Promise.all(
+  Array.from({ length: 8 }, async () => {
+    for (let c = queue.pop(); c; c = queue.pop()) {
+      const path = await vendorAvatar(c.login, c.avatar_url)
+      if (path) downloaded.set(c.login, path)
+    }
+  }),
+)
+
+const withoutAvatar = raw.contributors.filter(c => !downloaded.has(c.login))
+if (withoutAvatar.length > raw.contributors.length / 10) {
+  throw new Error(`${withoutAvatar.length} avatars failed to download; refusing to ship a wall of gaps`)
+}
 
 const people = raw.contributors.map(c => ({
   login: c.login,
   name: c.name,
-  avatar: avatar(c.avatar_url),
+  avatar: downloaded.get(c.login) ?? '',
   profile: c.profile,
   /* De-duplicated: `bug` and `ideas` both map to `report`. */
   ways: [...new Set(c.contributions.map(k => WAYS[k]).filter(Boolean))].sort(),
@@ -102,4 +159,6 @@ const counts = people.reduce<Record<string, number>>((acc, p) => {
 }, {})
 
 console.log(`${people.length} contributors → content/contributors.json`)
+console.log(`  avatars vendored to public/avatars (${downloaded.size} files)`)
+if (withoutAvatar.length) console.log(`  no avatar for: ${withoutAvatar.map(m => m.login).join(', ')}`)
 console.log(Object.entries(counts).map(([k, v]) => `  ${k}: ${v}`).join('\n'))

@@ -18,11 +18,18 @@
  * come from the library logo.
  */
 
-/* ---------- fonts ---------- */
+/* ---------- fonts ----------
+ *
+ * Served from /fonts rather than bundled, so they have stable URLs that the
+ * document can preload. Bundled they were discovered only after the CSS
+ * parsed, which put the whole chain — HTML, CSS, font, paint — in series and
+ * left the headline invisible for most of it: OCR-A is `font-display: block`,
+ * and every heading on the site is set in it.
+ */
 
 @font-face {
   font-family: 'OCR A';
-  src: url('~/assets/fonts/ocr-a.woff') format('woff');
+  src: url('/fonts/ocr-a.woff') format('woff');
   font-weight: 400;
   font-style: normal;
   /* block, not swap: a fallback flash on a display face is very visible */
@@ -31,7 +38,7 @@
 
 @font-face {
   font-family: 'IBM Plex Sans';
-  src: url('~/assets/fonts/plex-sans-400.woff2') format('woff2');
+  src: url('/fonts/plex-sans-400.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -39,7 +46,7 @@
 
 @font-face {
   font-family: 'IBM Plex Sans';
-  src: url('~/assets/fonts/plex-sans-600.woff2') format('woff2');
+  src: url('/fonts/plex-sans-600.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -47,7 +54,7 @@
 
 @font-face {
   font-family: 'IBM Plex Mono';
-  src: url('~/assets/fonts/plex-mono-400.woff2') format('woff2');
+  src: url('/fonts/plex-mono-400.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -66,7 +73,7 @@
   /* ink — very slightly cool, never warm */
   --ink: #14181a;
   --dim: #5a6468;
-  --faint: #8a9296;
+  --faint: #666f73; /* 5.14:1 on paper, 4.54:1 on chrome — AA at small sizes */
 
   /* brand: both accents come from the logo */
   --red: #d63a2e;
@@ -170,7 +177,7 @@
 
     --ink: #e2e1d7;
     --dim: #a3afb5;
-    --faint: #7c888e;
+    --faint: #8b979d; /* 5.36:1 on the dark paper */
 
     --red: #ff6b5e;
     --red-text: #ff6b5e;
@@ -198,7 +205,7 @@
 
   --ink: #e2e1d7;
   --dim: #a3afb5;
-  --faint: #7c888e;
+  --faint: #8b979d; /* 5.36:1 on the dark paper */
 
   --red: #ff6b5e;
   --red-text: #ff6b5e;

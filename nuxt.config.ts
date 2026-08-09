@@ -89,7 +89,17 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
-      link: [{ rel: 'icon', href: '/logo/browser.svg', type: 'image/svg+xml' }],
+      link: [
+        { rel: 'icon', href: '/logo/browser.svg', type: 'image/svg+xml' },
+        /*
+         * Only the two faces the first screen actually needs: the display face
+         * every heading uses, and the body regular. The 600 weight and the
+         * mono are left to be discovered — preloading everything competes with
+         * the fonts that decide when text appears.
+         */
+        { rel: 'preload', as: 'font', type: 'font/woff', href: '/fonts/ocr-a.woff', crossorigin: '' },
+        { rel: 'preload', as: 'font', type: 'font/woff2', href: '/fonts/plex-sans-400.woff2', crossorigin: '' },
+      ],
       script: [
         {
           // Applies a stored theme choice before first paint. Without this the

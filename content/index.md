@@ -163,7 +163,7 @@ Bug reports, ideas, documentation, running main against a real suite before it
 was ever released. Most of them never wrote a line of code for Browser.
 [See who did what](/community#hall).
 
-::contributor-wall{compact}
+::contributor-wall{compact :limit="60"}
 ::
 
 **Let's make the best Browser library.**

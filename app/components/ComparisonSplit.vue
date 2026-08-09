@@ -35,9 +35,10 @@ const uid = useId()
 
 <template>
   <div class="cmp-wrap">
-    <input :id="`${uid}-even`" class="cmp-radio" data-state="even" type="radio" :name="uid" checked>
-    <input :id="`${uid}-left`" class="cmp-radio" data-state="left" type="radio" :name="uid">
-    <input :id="`${uid}-right`" class="cmp-radio" data-state="right" type="radio" :name="uid">
+    <!-- Named, because a label that only carries a glyph gives the input none. -->
+    <input :id="`${uid}-even`" class="cmp-radio" data-state="even" type="radio" :name="uid" checked aria-label="Show both panes equally">
+    <input :id="`${uid}-left`" class="cmp-radio" data-state="left" type="radio" :name="uid" :aria-label="`Expand ${props.left.name}`">
+    <input :id="`${uid}-right`" class="cmp-radio" data-state="right" type="radio" :name="uid" :aria-label="`Expand ${props.right.name}`">
 
     <div class="cmp">
       <div class="cmp-pane" data-side="left">

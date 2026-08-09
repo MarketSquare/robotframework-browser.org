@@ -114,6 +114,18 @@ describe('text contrast', () => {
     expect(ratio(value(DARK, '--dim')!, value(DARK, '--paper')!)).toBeGreaterThan(4.5)
   })
 
+  it('--faint is readable text, not decoration', () => {
+    /*
+     * It was never asserted here, and it carries real text: counts in the
+     * rail, argument counts, sub-items, breadcrumbs. At #8a9296 it measured
+     * 3.17:1 on paper, which Lighthouse flagged on every page that used it.
+     * Chrome is the tightest background it sits on.
+     */
+    expect(ratio(value(LIGHT, '--faint')!, value(LIGHT, '--paper')!)).toBeGreaterThan(4.5)
+    expect(ratio(value(LIGHT, '--faint')!, value(LIGHT, '--chrome')!)).toBeGreaterThan(4.5)
+    expect(ratio(value(DARK, '--faint')!, value(DARK, '--paper')!)).toBeGreaterThan(4.5)
+  })
+
   it('meets AA for red used as small text', () => {
     expect(ratio(value(LIGHT, '--red-text')!, value(LIGHT, '--paper')!)).toBeGreaterThan(4.5)
     expect(ratio(value(DARK, '--red-text')!, value(DARK, '--paper')!)).toBeGreaterThan(4.5)

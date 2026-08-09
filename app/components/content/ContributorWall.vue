@@ -13,9 +13,9 @@
  * The body lives in `components/` instead, where the `.server` suffix does what
  * it says: it renders as an island, and the client receives markup only.
  */
-withDefaults(defineProps<{ compact?: boolean }>(), { compact: false })
+withDefaults(defineProps<{ compact?: boolean; limit?: number }>(), { compact: false, limit: 0 })
 </script>
 
 <template>
-  <ContributorWallBody :compact="compact" />
+  <ContributorWallBody :compact="compact" :limit="limit" />
 </template>
