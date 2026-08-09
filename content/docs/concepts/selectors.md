@@ -268,8 +268,8 @@ Get Text    text="some >> text"
 ## Filter selectors
 
 Some prefixes do not find elements at all. They take what the previous step
-found and **narrow it**, which is why they only make sense as a step in a
-chain — `nth=` on its own has nothing to count.
+found and **narrow it**, which is why they are only *useful* as a step in a
+chain. Used alone they apply to the whole document rather than being rejected.
 
 It is worth holding the two kinds apart in your head:
 
@@ -381,8 +381,12 @@ cell.
 Playwright can also select by where an element sits relative to another:
 `:right-of()`, `:left-of()`, `:above()`, `:below()` and `:near()`.
 
+They return **every** element in that direction, sorted by distance — not the
+nearest one — so under strict mode you need a `nth=0` to say you meant the
+closest.
+
 ```robot-repl
-Fill Text    css=input:right-of(:text("Postcode"))    00100
+Fill Text    css=input:right-of(:text("Postcode")) >> nth=0    00100
 ```
 
 ::doc-note{kind="warning"}
@@ -407,6 +411,11 @@ Click       iframe[name="editor"] >>> role=button[name="Bold"]
 No context switching, and no switching back afterwards — the frame boundary is
 just another step in the chain.
 
+Two rules it is easy to trip over. `>>>` must have **spaces around it**: written
+as `a>>>b` it is parsed as ordinary CSS and you get a timeout with no
+explanation. And the clause immediately before it must select the `<iframe>`
+element itself — under strict mode, exactly one of them.
+
 ## Shadow DOM
 
 Browser pierces open shadow roots automatically, so a normal chain reaches into
@@ -423,40 +432,37 @@ from any other page.
 Closed shadow roots cannot be pierced by anything, by design — if you hit one,
 that is a conversation with the developers rather than a selector problem.
 
-Piercing is what the `css` and `text` engines do: every descendant combinator,
-including the implicit one at the start of a selector, crosses any number of
-open shadow roots. Elements are searched in the light DOM first, then inside
+Piercing is what most engines do — `css`, `text`, `role` and the attribute
+engines all cross open shadow roots. `xpath` does not. Every descendant
+combinator, including the implicit one at the start of a selector, crosses any
+number of open roots. Elements are searched in the light DOM first, then inside
 open shadow roots, in document order. Neither engine enters an iframe — that
 needs [`>>>`](#crossing-into-iframes-with-).
 
 ### Turning piercing off
 
-Two engines behave like the plain DOM APIs and stop at the shadow boundary:
-
-::doc-table
----
-head: [Engine, Behaves like]
-nowrap: [0]
-rows:
-  - ['`css:light=`', '`document.querySelector` — the CSS spec, no piercing']
-  - ['`text:light=`', 'The text engine, no piercing']
----
-::
+One engine stops at the shadow boundary: `css:light=`, which behaves like
+`document.querySelector` and follows the CSS spec exactly.
 
 ```robot-repl
-# Matches the button inside the component's shadow root
+# Matches .label inside the component's shadow root
 Get Text    css=my-widget .label
 
 # Matches only if .label is in the light DOM
 Get Text    css:light=my-widget .label
 ```
 
-The attribute engines have the same pair: `id=` pierces, `id:light=` does not,
-and the same for `data-testid`, `data-test-id` and `data-test`.
+::callout{type="warning"}
+The other `:light` engines are gone. `text:light=`, `id:light=`, `xpath:light=`,
+`data-testid:light=`, `data-test-id:light=` and `data-test:light=` were removed
+from the bundled Playwright and now raise `"…" selector is not supported` the
+moment they match an element. Write `css:light=[id="foo"]` instead of
+`id:light=foo`.
+::
 
-Reach for `:light` when you specifically need to assert that something is *not*
-inside a shadow root. The rest of the time the piercing default is what you
-want.
+Reach for `css:light=` when you specifically need to assert that something is
+*not* inside a shadow root. The rest of the time the piercing default is what
+you want.
 
 ## Strict mode
 
@@ -496,7 +502,8 @@ ${row} =    Get Element    css=tr.selected
 Click       ${row} >> css=button.delete    # relative to the row
 ```
 
-You cannot pierce a frame after a reference, and there is no `element=` prefix —
+A reference works like any other first clause, `>>>` included: if it points at
+an iframe, `${frame} >>> h1` crosses into it. And there is no `element=` prefix —
 the value is already an ordinary selector, so it needs no strategy in front of it.
 
 ## In short
