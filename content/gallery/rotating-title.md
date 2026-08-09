@@ -15,6 +15,5 @@ titles:
 ---
 :::
 
-Shown here at three seconds so the effect is visible; the landing page holds
-each headline for ten. Only the characters that differ from the previous
+Shown here at three seconds; the landing page holds each headline for five. Only the characters that differ from the previous
 headline scramble — which is why "Browser automation" sits still.

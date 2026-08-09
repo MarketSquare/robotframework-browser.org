@@ -40,7 +40,7 @@ const props = withDefaults(
     /** Milliseconds each headline is held. */
     every?: number
   }>(),
-  { titles: () => [], every: 10_000 },
+  { titles: () => [], every: 5_000 },
 )
 
 const titles = computed(() => props.titles.map(t => String(t).trim()).filter(Boolean))
