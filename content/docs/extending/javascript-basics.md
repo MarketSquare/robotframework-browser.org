@@ -60,7 +60,7 @@ function add(a, b) {
   return a + b
 }                                  // can be called before it is defined
 
-const add = (a, b) => a + b        // must be defined before use
+const sum = (a, b) => a + b        // must be defined before use
 const double = a => a + a          // one expression: no braces, no return
 ```
 
@@ -103,14 +103,27 @@ async function getTitle(page) {
 }
 ```
 
-An `async` function returns a promise. `await` waits for one. Forgetting `await`
-gives you a `Promise` object where you expected a value — if a JS extension
-returns something that looks like `{}`, this is usually why.
+An `async` function returns a promise. `await` waits for one.
+
+Browser awaits whatever your keyword returns, so a promise returned *directly*
+resolves fine. A promise tucked **inside** the returned value does not — it is
+serialised as `{}`. If one field of your result comes back empty, a missing
+`await` is usually why.
 
 ## Evaluate JavaScript
 
 You can run page-side JavaScript from Robot Framework directly, which is often
 enough without writing an extension at all.
+
+Three things about its shape, because they are what people get wrong first:
+
+- The **first argument is a selector**, and it cannot be omitted — pass
+  `${None}` when you do not want one.
+- With a selector, the function receives `(element, arg)`; with `all_elements=True`
+  it receives `(elements, arg)` — that flag is what makes it an array. With no
+  selector it receives just `(arg)`.
+- The return value must be JSON-serialisable. Returning nothing gives you an
+  empty string, and a DOM node comes back as the useless string `ref: <Node>`.
 
 ```robot
 *** Test Cases ***
@@ -128,12 +141,13 @@ ${elements} =    Get Elements    a
 ${texts} =    Create List
 FOR    ${element}    IN    @{elements}
     ${text} =    Get Text    ${element}
-    IF    $text    Append To List    ${texts}    ${text}
+    IF    $text    Append To List    ${texts}    ${text}    # needs Library Collections
 END
 ```
 
 Both are correct. The first is one round trip to the browser; the second is one
-per element. On a page with a hundred links, that difference is visible.
+per element, plus one for `Get Elements`. On a page with a hundred links, that
+difference is visible.
 
 Returning an object works too, and arrives in Robot Framework as a dictionary:
 
@@ -148,7 +162,11 @@ ${links} =    Evaluate JavaScript    a
 ```
 
 ::doc-note
-Practise in your browser's devtools console before writing an extension. Open
-F12, paste the expression, and see what comes back — that is the same
-environment `Evaluate JavaScript` runs in.
+Practise in your browser's devtools console before writing an extension: both
+run in the page. One difference — the string you pass to `Evaluate JavaScript`
+is compiled in Node first, so wrap what you paste in an arrow function,
+`() => document.querySelectorAll('a').length`, rather than pasting a bare
+expression. A bare one can be evaluated by Node and its *result* sent to the
+page, which produces errors that make no sense, like
+`ReferenceError: object is not defined`.
 ::

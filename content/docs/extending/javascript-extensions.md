@@ -9,7 +9,8 @@ A JavaScript module adds keywords that run on the Node side, with the Playwright
 `page` object in hand. It is the lighter of the two extension points: no Python,
 no class, just exported functions.
 
-The module must be CommonJS, which is what Node uses.
+The module must be CommonJS: Browser loads it with `require()`, so an ESM module
+using `export`/`import` will not load.
 
 ## A module
 
@@ -40,7 +41,9 @@ async function mouseWheel(x, y, logger, page) {
 
 Three conventions carry the whole API:
 
-- **Exported functions become keywords.** `getLinks` is `Get Links`.
+- **Exported names become keywords** — the *export key*, not the function's own
+  name. `exports.getLinks = getLinks` gives `Get Links`; the
+  `exports.myMouseWheel = mouseWheel` below gives `My Mouse Wheel`.
 - **Five argument names are filled in for you**, by name — see below.
 - **`fn.rfdoc` becomes the keyword documentation**, so your keyword shows up in
   Libdoc and in editor tooltips like any other.
@@ -69,9 +72,15 @@ Robot Framework, because that name is spoken for. `self` is not usable either.
 
 One further name is special without being filled in. A parameter called `args`
 makes the keyword variadic — it receives Robot Framework's `*args`, so it
-carries values *to* your function rather than from the library.
+carries values *to* your function rather than from the library. It cannot have a
+default, and anything you declare after it becomes a named-only argument on the
+Robot side, so it reads best last.
 
-Load it at import:
+Whatever you return is JSON-serialised on the way back, so it must be
+serialisable — `undefined` arrives in Robot Framework as `${None}`.
+
+`jsextension` takes a single path, a comma-separated list, or a real list of
+paths. Load it at import:
 
 ```robot
 *** Settings ***
@@ -91,7 +100,7 @@ selector is accepted:
 
 ```javascript
 async function registerMySelector(playwright) {
-  playwright.selectors.register('myselector', () => ({
+  await playwright.selectors.register('myselector', () => ({
     query(root, selector) {
       return root.querySelector(`a[data-title="${selector}"]`);
     },
@@ -104,9 +113,29 @@ exports.__esModule = true;
 exports.registerMySelector = registerMySelector;
 ```
 
-```robot-repl
-Click    myselector=Some Title
+```robot
+*** Test Cases ***
+Use A Custom Engine
+    New Browser           chromium
+    Register My Selector      # a browser must already be open
+    New Page              ${URL}
+    Click                 myselector=Some Title
 ```
+
+::doc-note
+---
+kind: warning
+---
+Two things this example depends on.
+
+**A browser must already be open.** Every JavaScript-extension keyword resolves
+the active browser before it runs, even one whose only argument is `playwright`,
+so calling this first fails with `Browser has been closed.`
+
+**Register once per run.** `selectors.register` rejects a name that is already
+registered, and because the registration is awaited that rejection fails the
+keyword — unawaited, it takes the whole Node process down instead.
+::
 
 ## Debugging
 
@@ -154,7 +183,8 @@ Set it for the debug session rather than globally. For RobotCode, in
 kind: warning
 ---
 With `--inspect-brk` you have to attach quickly: the Playwright process start
-has a fixed timeout of about **five seconds**. Miss it and the run fails before
+has a timeout of about **15 seconds** — macOS retries once, so roughly 30. Miss
+it and the run fails before
 you are attached.
 ::
 
