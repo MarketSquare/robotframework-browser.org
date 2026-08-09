@@ -5,7 +5,21 @@ description: A browser automation library for Robot Framework, powered by Playwr
 
 ::::page-hero{logo="/logo/browser.svg"}
 #title
-Browser automation that doesn't flake.
+:::rotating-title
+---
+titles:
+  - Browser automation that doesn't flake.
+  - Browser automation that doesn't suck.
+  - Browser automation faster than sound.
+  - Browser automation ready for the future.
+  - Browser automation that sees shadow DOM.
+  - Browser automation that waits for you.
+  - Browser automation your team can read.
+  - Browser automation with zero sleeps.
+  - Browser automation built to outlast CSS.
+  - Browser automation that says what broke.
+---
+:::
 
 #default
 Robot Framework deserves a browser automation solution designed for the 2020s.
