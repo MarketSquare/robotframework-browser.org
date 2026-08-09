@@ -41,10 +41,35 @@ async function mouseWheel(x, y, logger, page) {
 Three conventions carry the whole API:
 
 - **Exported functions become keywords.** `getLinks` is `Get Links`.
-- **`logger` and `page` are appended** to your declared arguments. Declare your
-  own first, then take these two last.
+- **Five argument names are filled in for you**, by name — see below.
 - **`fn.rfdoc` becomes the keyword documentation**, so your keyword shows up in
   Libdoc and in editor tooltips like any other.
+
+### The five names Browser fills in
+
+Name a parameter one of these and the library passes the object in. Everything
+else in your signature becomes an ordinary keyword argument.
+
+| Name | You get |
+|---|---|
+| `page` | The active [Page](https://playwright.dev/docs/api/class-page) |
+| `context` | The active [BrowserContext](https://playwright.dev/docs/api/class-browsercontext) |
+| `browser` | The active [Browser](https://playwright.dev/docs/api/class-browser) |
+| `logger` | A function that writes to the Robot Framework log |
+| `playwright` | The [`playwright` module](https://playwright.dev/docs/api/class-playwright) itself |
+
+**They are matched by name, not by position.** Browser reads your parameter
+names and fills in the ones it recognises, so `mouseWheel(x, y, logger, page)`
+and `mouseWheel(logger, x, page, y)` behave identically — and the Robot side
+sees the same keyword either way, taking `x` and `y`. Put them wherever reads
+best.
+
+These names are reserved: a keyword cannot take an argument called `page` from
+Robot Framework, because that name is spoken for. `self` is not usable either.
+
+One further name is special without being filled in. A parameter called `args`
+makes the keyword variadic — it receives Robot Framework's `*args`, so it
+carries values *to* your function rather than from the library.
 
 Load it at import:
 

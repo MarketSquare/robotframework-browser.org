@@ -100,6 +100,31 @@ the `self` restriction. Going the other way, the site documents `fn.rfdoc` as th
 keyword-documentation mechanism (`javascript-extensions.md:47`) and the library
 never mentions `rfdoc` at all.
 
+**Resolved from the code — both pages were wrong, and the library has a real
+bug here.**
+
+`node/playwright-wrapper/playwright-state.ts:162-170` builds the injection map,
+and it holds **five** entries: `page`, `context`, `browser`, `logger`,
+`playwright`. `Browser/browser.py:1102` lists the same five as reserved, sending
+each as the literal string `"RESERVED"` for Node to swap out.
+
+`args` is **not** injected. `browser.py:1107` turns a JavaScript parameter named
+`args` into `*args` on the generated Robot keyword, so it carries values *from*
+Robot Framework *to* the function — the opposite direction. The library's prose
+says as much (“the rest of values from Robot Framework keyword call”) while
+listing it under “reserved arguments that are not accessible from Robot
+Framework side”, which contradicts itself. **The library PR should move `args`
+out of that list and describe it as what it is.**
+
+The arguments are also resolved **by name, not by position**:
+`getArgumentNamesFromJavascriptKeyword(keyword).map(argName => apiArguments.get(argName) || namedArguments[argName])`
+reads the declared parameter names and fills in the ones it recognises, wherever
+they sit. The site's “appended … declare your own first, then take these two
+last” described a positional convention that does not exist.
+
+The site page is corrected: five names in a table, matched by name, with `args`
+called out separately. That is the version the library should link to.
+
 **Blocking:** the stub proposed below for this section keeps the reserved-argument
 list in the library precisely so this does not become a regression, and the site page
 should gain the missing four regardless.
