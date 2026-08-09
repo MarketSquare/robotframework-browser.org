@@ -483,9 +483,21 @@ Get Element States    ${button}    contains    enabled
 Click    ${button}
 ```
 
-What you get back is a Playwright *locator*, not a snapshot of the DOM node. It
-captures *how to find* the element, and re-resolves when used — so it stays
-valid across a re-render that would invalidate a stored node.
+What you get back is a **selector string** — the selector Playwright resolved for
+that element — not a snapshot of the DOM node. `Get Elements` returns a list of
+them.
+
+That distinction matters in both directions. It re-resolves on every use, so it
+survives a re-render that would invalidate a stored node. But it is only a
+selector, so it goes in the *first* clause of a chain and nothing more:
+
+```robot-repl
+${row} =    Get Element    css=tr.selected
+Click       ${row} >> css=button.delete    # relative to the row
+```
+
+You cannot pierce a frame after a reference, and there is no `element=` prefix —
+the value is already an ordinary selector, so it needs no strategy in front of it.
 
 ## In short
 
