@@ -1,16 +1,34 @@
 <script setup lang="ts">
 /** A table authored in Markdown frontmatter, so wide tables stay readable in source. */
-defineProps<{ head: string[]; rows: string[][] }>()
+const props = defineProps<{ head: string[]; rows: string[][] }>()
+
+/*
+ * Cells are YAML, and an unquoted scalar containing ": " is a *mapping* to a
+ * YAML parser, not a string — so a cell reading
+ *
+ *     - Detected by `@media (pointer: coarse)`
+ *
+ * arrives here as an object and the page 500s with "src.replace is not a
+ * function", naming neither the file nor the cell. Checking here turns that
+ * into a message that says what to do.
+ */
+function cellText(cell: unknown, row: number, col: number): string {
+  if (typeof cell === 'string') return cell
+  throw new TypeError(
+    `doc-table cell [${row}][${col}] is ${typeof cell}, not a string: ${JSON.stringify(cell)}. `
+    + 'A YAML scalar containing ": " parses as a mapping — wrap the cell in double quotes.',
+  )
+}
 </script>
 
 <template>
   <div class="scroll-x">
     <table class="doc-table">
-      <thead><tr><th v-for="h in head" :key="h">{{ h }}</th></tr></thead>
+      <thead><tr><th v-for="h in props.head" :key="h">{{ h }}</th></tr></thead>
       <tbody>
-        <tr v-for="(row, i) in rows" :key="i">
+        <tr v-for="(row, i) in props.rows" :key="i">
           <!-- Cells come from YAML, so Markdown in them is inert until we render it. -->
-          <td v-for="(cell, j) in row" :key="j" v-html="inlineMarkdown(cell)" />
+          <td v-for="(cell, j) in row" :key="j" v-html="inlineMarkdown(cellText(cell, i, j))" />
         </tr>
       </tbody>
     </table>

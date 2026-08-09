@@ -19,6 +19,7 @@ const path = computed(() => `/docs/${(route.params.slug as string[]).filter(Bool
 const SECTIONS: { id: string; name: string }[] = [
   { id: 'start', name: 'Getting started' },
   { id: 'concepts', name: 'Core concepts' },
+  { id: 'mobile', name: 'Mobile web' },
   { id: 'extending', name: 'Extending Browser' },
   { id: 'operations', name: 'Running it' },
 ]
