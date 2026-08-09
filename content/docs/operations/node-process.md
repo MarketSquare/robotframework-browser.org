@@ -20,9 +20,10 @@ setting for a normal suite.
 
 ## What the startup costs
 
-Starting the Node process is the slowest part of importing Browser: a process
-launch plus a gRPC handshake, once per Robot Framework execution. On a single
-suite that is paid once and disappears into the noise.
+Starting the Node process is the slowest single step in a run: a process
+launch plus a gRPC health handshake, once per Robot Framework execution. It is
+paid at the first Browser keyword rather than at import — the library starts the
+process lazily — and on a single suite it disappears into the noise.
 
 Under [Pabot](https://github.com/mkorpela/pabot) it stops being noise. Pabot runs
 each suite in its own Robot Framework process, so **each one starts its own Node
@@ -40,10 +41,12 @@ You can start the Node side yourself, once, and point every run at it. Start it
 from the directory where the Browser package is installed:
 
 ```bash
-PLAYWRIGHT_BROWSERS_PATH=0 node Browser/wrapper/index.js 12345
+PLAYWRIGHT_BROWSERS_PATH=0 node Browser/wrapper/index.js 127.0.0.1 12345
 ```
 
-The trailing number is the port. Then tell the runs where to find it:
+The two arguments are the host and the port, in that order — both are
+required, and with only one the script exits with `No port defined`. Then tell
+the runs where to find it:
 
 ```bash
 ROBOT_FRAMEWORK_BROWSER_NODE_PORT=12345 pabot --processes 12 tests/
@@ -58,7 +61,12 @@ Library    Browser    playwright_process_port=12345
 ```
 
 There is a matching `playwright_process_host` for the case where the Node process
-runs on another machine. The environment variable is the blunt instrument — it
+runs on another machine. If both are set the **import parameter wins**: the
+port from `playwright_process_port` is checked first and the variable is only a
+fallback. There is no environment variable for the host — that is
+`playwright_process_host` only.
+
+The environment variable is the blunt instrument — it
 applies to everything in that shell — and the import parameter is the precise one.
 
 ### What you give up
@@ -67,6 +75,11 @@ The shared process is genuinely faster to start. It also means:
 
 - **One failure domain.** If the shared process dies, every run pointed at it
   fails, not just the one that killed it.
+- **Teardown is shared too.** When a run finishes it tells the process to close
+  *all* browsers and browser servers, not only its own — so under Pabot the
+  first suite to finish can pull the browsers out from under the others.
+  `auto_closing_level=KEEP` suppresses that, at the cost of leaving everything
+  running for you to clean up.
 - **You own its lifecycle.** Nothing starts it for you and nothing cleans it up.
   In CI that means a start step, a wait, and a teardown that runs even when the
   suite fails.

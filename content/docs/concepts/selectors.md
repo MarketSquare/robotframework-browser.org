@@ -452,7 +452,7 @@ Get Text    css=my-widget .label
 Get Text    css:light=my-widget .label
 ```
 
-::callout{type="warning"}
+::doc-note{kind="warning"}
 The other `:light` engines are gone. `text:light=`, `id:light=`, `xpath:light=`,
 `data-testid:light=`, `data-test-id:light=` and `data-test:light=` were removed
 from the bundled Playwright and now raise `"…" selector is not supported` the

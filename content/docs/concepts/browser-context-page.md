@@ -10,26 +10,19 @@ Browser works in three layers. Almost every question about isolation, speed, or
 layer you are on.
 
 ```text
-┌── Browser ── chromium ───────────────────────────────────────┐
-│   one OS process · seconds to start · the engine             │
-│                                                              │
-│   ┌── Context 1 ──────────────┐  ┌── Context 2 ───────────┐  │
-│   │  cookies · localStorage   │  │  cookies · localStorage│  │
-│   │  permissions · viewport   │  │  permissions · viewport│  │
-│   │  ~ a fresh incognito win  │  │  ~ a fresh incognito   │  │
-│   │                           │  │                        │  │
-│   │   ┌ Page ┐   ┌ Page ┐     │  │   ┌ Page ┐             │  │
-│   │   │ tab  │   │ tab  │     │  │   │ tab  │             │  │
-│   │   └──────┘   └──────┘     │  │   └──────┘             │  │
-│   └───────────────────────────┘  └────────────────────────┘  │
-│         signed in as alice            signed in as bob       │
-└──────────────────────────────────────────────────────────────┘
-              ▲                              ▲
-              └── these two share nothing ───┘
+Browser · chromium
+│
+├── Context 1 · alice
+│   ├── Page · tab
+│   └── Page · tab
+│
+└── Context 2 · bob
+    └── Page · tab
 ```
 
-Two users, one browser process. That picture is the whole reason the layers are
-worth learning.
+One browser process, two signed-in users, three tabs. The two contexts share
+nothing — separate cookies, separate storage, separate permissions — which is
+the whole reason the layers are worth learning.
 
 ::doc-table
 ---
@@ -61,7 +54,8 @@ Playwright brings its own binaries, so there is no geckodriver, no chromedriver,
 and no driver version to keep in step with a browser version. The same three
 engines run on Windows, Linux and macOS.
 
-A browser starts headless unless you say otherwise:
+`New Browser` starts headless unless you say otherwise — `Open Browser`, being a
+debugging tool, starts headful:
 
 ```robot-repl
 New Browser    chromium    headless=False
@@ -73,9 +67,12 @@ arguments.
 
 ### Browsers are reused
 
-`New Browser` with the same arguments does not start a second process — it
-switches to the existing one. That is what makes it safe to call in a suite
-setup that runs many times. To force a genuinely new process:
+`New Browser` with the same arguments as an earlier `New Browser` call does not
+start a second process — it switches to that one. That is what makes it safe to
+call in a suite setup that runs many times. A browser that `New Page` or
+`New Context` created implicitly is not a reuse candidate, so an explicit
+`New Browser` after them does start a second process. To force a new one
+deliberately:
 
 ```robot-repl
 New Browser    chromium    reuse_existing=False
@@ -88,16 +85,17 @@ cookies, its own storage, its own permissions. Two contexts share nothing. The
 closest everyday equivalent is a fresh incognito window.
 
 This is the layer worth understanding, because it is where Browser is
-structurally faster than the older tools. In Selenium, an isolated session means
-a new browser process. Here it is one call inside a process that is already warm:
+structurally faster than the older tools. With tools that give you one session per browser process, an isolated session
+costs a process start. Here it is one call inside a process that is already
+warm:
 
 ```robot-repl
 New Context    # a clean slate, in milliseconds
 ```
 
-So "log in as a different user" costs nothing, and neither does "start this test
-from a known-clean state". You do not clear cookies; you throw the context away
-and open another.
+So "log in as a different user" costs a few milliseconds of context creation
+rather than a browser start, and so does "start this test from a known-clean
+state". You do not clear cookies; you throw the context away and open another.
 
 The context is also where the interesting configuration lives:
 
@@ -110,8 +108,8 @@ New Context    acceptDownloads=True
 New Context    colorScheme=dark
 ```
 
-Downloads need `acceptDownloads=True` — without it the download is discarded,
-and that catches people out.
+Downloads are accepted by default. Pass `acceptDownloads=False` if you want the
+browser to refuse them.
 
 Tracing and video recording are context-level too, which is why a trace covers
 exactly one session:
@@ -143,8 +141,16 @@ Starting A Browser With A Page
 ```
 
 A popup, a target-blank link or a second tab is another page in the same
-context — so it shares the login, and you do not switch back and forth to reach
-it.
+context, so it shares the login. It does **not** become the active page on its
+own — reach it with `Switch Page    NEW`, which returns the id of the page you
+came from:
+
+```robot-repl
+Click          text=Open report
+${previous} =    Switch Page    NEW
+Get Title      *=    Report
+Switch Page    ${previous}
+```
 
 ## You rarely open all three
 
@@ -164,17 +170,22 @@ Every browser, context and page has an id, and `Get Browser Catalog` returns the
 whole tree:
 
 ```text
-Browser 1 ─ chromium ─ id=browser=94c1...
-├── Context 1.1 ─ id=context=7f2a...
-│   ├── Page 1.1.1 ─ https://example.com/login
-│   └── Page 1.1.2 ─ https://example.com/cart
-└── Context 1.2 ─ id=context=b3d9...
-    └── Page 1.2.1 ─ https://example.com/admin
+Browser  chromium  browser=94c1…            activeBrowser: true
+├── Context  context=7f2a…                  activeContext: true
+│   ├── Page  page=3dce…  /login            activePage: true
+│   └── Page  page=8b17…  /cart
+└── Context  context=b3d9…
+    └── Page  page=1f60…  /admin
 
-Browser 2 ─ firefox ─ id=browser=1ae8...
-└── Context 2.1 ─ id=context=5c04...
-    └── Page 2.1.1 ─ about:blank
+Browser  firefox  browser=1ae8…
+└── Context  context=5c04…
+    └── Page  page=42aa…  about:blank
 ```
+
+Drawn as a tree here for readability; the keyword returns a list of
+dictionaries, one per browser, each carrying its contexts and their pages. The
+`active*` flags are the part worth reading — they tell you which browser,
+context and page the next keyword will act on.
 
 This is the fastest way to answer "what does the library think is running" when
 a suite has drifted from what you expected. `Get Browser Ids`, `Get Context Ids`
@@ -185,8 +196,11 @@ and `Switch Browser`, `Switch Context` and `Switch Page` move that pointer.
 
 ## When things close
 
-By default, whatever a test opened is closed when the test ends. That is
-`auto_closing_level`, and it has four settings:
+By default, the **contexts and pages** a test opened are closed when the test
+ends. Browsers are not: no auto-closing level closes a browser per test or per
+suite, so a browser lives until execution ends or you call `Close Browser`.
+
+That setting is `auto_closing_level`, and it has four values:
 
 ::doc-table
 ---
@@ -218,7 +232,8 @@ rows:
   - ['A second user session', 'A new **context**']
   - ['A popup or a second tab in the same session', 'A new **page**']
   - ['A clean slate between tests', 'A new **context** — not a new browser']
-  - ['A different engine, a GUI, or a proxy', 'A new **browser**']
+  - ['A different engine, or a GUI', 'A new **browser**']
+  - ['A proxy', 'Either — `proxy` is an argument on **both** `New Browser` and `New Context`']
   - ['A profile that survives the run', '`New Persistent Context`']
   - ['A mobile device profile', 'A new **context** from `Get Device`']
 ---

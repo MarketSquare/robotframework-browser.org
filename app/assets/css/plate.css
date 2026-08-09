@@ -469,3 +469,22 @@
 .term-fail {
   color: var(--term-red);
 }
+
+/*
+ * ASCII diagrams.
+ *
+ * Tightened from the 1.75 that suits code, so the │ runs in a tree read as
+ * lines rather than as dotted columns. Not tighter than this: at line-height 1
+ * the glyph cell is taller than the line box in IBM Plex Mono and consecutive
+ * rows overlap. `.plate-body .line` carries a matching min-height, which is
+ * what actually sets the row pitch — line-height alone changes nothing.
+ *
+ * Scoped to `text` blocks, so real code keeps its spacing.
+ */
+.editor.language-text .plate-body pre {
+  line-height: 1.35;
+}
+
+.editor.language-text .plate-body .line {
+  min-height: 1.35em;
+}
