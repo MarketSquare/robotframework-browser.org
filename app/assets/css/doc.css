@@ -105,9 +105,20 @@
   font-size: var(--step-0);
 }
 
-/* Libdoc emits wide tables; they scroll in their own box, never the page. */
+/*
+ * Libdoc emits wide tables; they scroll in their own box, never the page.
+ *
+ * `display: block` was doing that job and cost more than it was worth. A
+ * block-level <table> is not a table to the layout engine, so its columns can
+ * no longer widen the box — on a phone they simply overflowed it, leaving the
+ * last column past the edge with nothing to scroll to. It is not a table to a
+ * screen reader either, which loses the row and column relationships that make
+ * a comparison readable at all.
+ *
+ * `overflow-x` on a real table still gives Libdoc's wide tables their own
+ * scroll box, and our own <DocTable> restacks itself below 40rem instead.
+ */
 .doc table {
-  display: block;
   overflow-x: auto;
   max-width: 100%;
   border-collapse: collapse;

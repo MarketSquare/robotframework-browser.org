@@ -20,9 +20,10 @@ keeps working when the page is redesigned but the feature is unchanged.**
 ::doc-table
 ---
 head:
-  - Rank
+  - ""
   - Strategy
   - Reach for it when
+nowrap: [0, 1]
 rows:
   - - "1"
     - role=

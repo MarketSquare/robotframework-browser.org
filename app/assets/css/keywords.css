@@ -35,6 +35,22 @@
 }
 
 /*
+ * Libdoc's own tables keep the block-level scroll box.
+ *
+ * This is the hack removed from .doc table, kept where it earns its place: we
+ * do not control this markup, some of these tables are genuinely wide, and
+ * there is no wrapper element to put the scrolling on. A block-level table
+ * loses its semantics, which is a real cost — but the alternative here is a
+ * table that pushes the whole page sideways on a phone.
+ */
+.kw table,
+.intro-section table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/*
  * Long unbreakable tokens.
  *
  * This content is generated from the library's docstrings, so it contains

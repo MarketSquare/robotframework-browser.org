@@ -1,6 +1,26 @@
 <script setup lang="ts">
 /** A table authored in Markdown frontmatter, so wide tables stay readable in source. */
-const props = defineProps<{ head: string[]; rows: string[][] }>()
+const props = withDefaults(
+  defineProps<{
+    head: string[]
+    rows: string[][]
+    /**
+     * Column indexes holding a single term — a rank, a selector prefix, a
+     * keyword. They shrink to their content and never wrap, leaving the rest
+     * of the row to the prose.
+     *
+     * Explicit rather than inferred. Treating an empty heading as "this is an
+     * index column" seemed reasonable and was wrong: several tables use an
+     * empty heading above a column of prose labels, and making those nowrap
+     * pushed the table past the screen.
+     */
+    nowrap?: number[]
+  }>(),
+  { nowrap: () => [] },
+)
+
+/** Shrink-to-content columns; everything else shares what is left. */
+const tight = (col: number) => props.nowrap.includes(col)
 
 /*
  * Cells are YAML, and an unquoted scalar containing ": " is a *mapping* to a
@@ -24,11 +44,21 @@ function cellText(cell: unknown, row: number, col: number): string {
 <template>
   <div class="scroll-x">
     <table class="doc-table">
-      <thead><tr><th v-for="h in props.head" :key="h">{{ h }}</th></tr></thead>
+      <thead>
+        <tr>
+          <th v-for="(h, j) in props.head" :key="j" :class="{ tight: tight(j) }">{{ h }}</th>
+        </tr>
+      </thead>
       <tbody>
         <tr v-for="(row, i) in props.rows" :key="i">
           <!-- Cells come from YAML, so Markdown in them is inert until we render it. -->
-          <td v-for="(cell, j) in row" :key="j" v-html="inlineMarkdown(cellText(cell, i, j))" />
+          <td
+            v-for="(cell, j) in row"
+            :key="j"
+            :class="{ tight: tight(j) }"
+            :data-label="props.head[j] || null"
+            v-html="inlineMarkdown(cellText(cell, i, j))"
+          />
         </tr>
       </tbody>
     </table>
@@ -37,10 +67,26 @@ function cellText(cell: unknown, row: number, col: number): string {
 
 <style scoped>
 .doc-table {
+  /*
+   * No min-width. `min-width: 30rem` forced every table to 480px, so tables
+   * that would have fitted a phone scrolled sideways regardless — which is
+   * what this started as. Below 40rem the layout changes shape entirely; see
+   * the media query at the end of this block.
+   */
   width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
-  min-width: 30rem;
+}
+
+/*
+ * A single-term column takes exactly the width of its longest term and no
+ * more, leaving the rest of the row to the prose. Without this the browser
+ * shares the width evenly and wraps `data-test-id=` across two lines while
+ * the description column has room to spare.
+ */
+.doc-table :is(th, td).tight {
+  width: 1%;
+  white-space: nowrap;
 }
 
 .doc-table th {
@@ -56,17 +102,78 @@ function cellText(cell: unknown, row: number, col: number): string {
 }
 
 .doc-table td {
+  overflow-wrap: break-word;
   padding: var(--sp-2) var(--sp-4) var(--sp-2) 0;
   border-bottom: 1px solid var(--line);
   vertical-align: baseline;
 }
 
+/* Long tokens are the reason a table cannot fit; let them break. */
 .doc-table :deep(code) {
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 0.88em;
   background: var(--chrome);
   border: 1px solid var(--line);
   border-radius: 3px;
   padding: 0.05em 0.3em;
+}
+
+/*
+ * Below 40rem a table stops being a table.
+ *
+ * A three-column comparison cannot fit a phone: the columns' min-content adds
+ * up to more than the screen, so the last column ended up past the edge of a
+ * wrapper that had nothing to scroll — 200px of unreachable content, measured
+ * at 390px. Every alternative that keeps the grid either scrolls sideways,
+ * which hides half of a comparison, or squashes prose into 100px columns.
+ *
+ * So each row becomes a block and each cell carries its column heading as a
+ * label. Nothing is hidden, nothing scrolls, and a row reads as what it is: a
+ * property, and what each tool does about it.
+ */
+@media (max-width: 40rem) {
+  .doc-table,
+  .doc-table tbody,
+  .doc-table tr,
+  .doc-table td {
+    display: block;
+    width: auto;
+  }
+
+  .doc-table thead {
+    display: none;
+  }
+
+  .doc-table tr {
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .doc-table td {
+    border: 0;
+    padding: 0 0 var(--sp-2);
+  }
+
+  /* A cell whose column has no heading — a rank — needs no label. */
+  .doc-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--step--2);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* The first cell is the row's subject, so it leads. */
+  .doc-table td:first-child {
+    font-family: var(--font-display);
+  }
+
+  .doc-table td.tight {
+    width: auto;
+    white-space: normal;
+  }
 }
 </style>
