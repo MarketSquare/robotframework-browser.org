@@ -14,12 +14,14 @@
  */
 const { version } = useKeywordIndex()
 
-/** Kept in step with content/compare/*.json rather than hard-coded twice. */
+/** Kept in step with content/why/*.md rather than hard-coded twice. */
 const { data: tools } = await useAsyncData('nav-compare', async () => {
   // Server, plus the client in dev — see app/utils/content-guard.md
   if (import.meta.server || import.meta.dev) {
-    const all = await queryCollection('compare').all()
-    return all.map(t => ({ to: `/why/${t.slug}`, label: `vs ${t.tool}` }))
+    const all = await queryCollection('why').select('slug', 'tool', 'order').all()
+    return all
+      .sort((a, b) => a.order - b.order)
+      .map(t => ({ to: `/why/${t.slug}`, label: `vs ${t.tool}` }))
   }
   return [] as { to: string; label: string }[]
 })

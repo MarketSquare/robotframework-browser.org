@@ -27,18 +27,23 @@ export default defineContentConfig({
       }),
     }),
 
-    compare: defineCollection({
-      type: 'data',
-      source: 'compare/**.json',
+    /**
+     * The comparison pages. Prose now rather than data: each one argues a case
+     * and embeds its code example, so it is Markdown like every other page.
+     */
+    why: defineCollection({
+      type: 'page',
+      source: 'why/*.md',
       schema: z.object({
+        title: z.string(),
+        /** Display name, used in navigation. */
         tool: z.string(),
+        /** Route under /why, e.g. `vs-cypress`. */
         slug: z.string(),
         tagline: z.string(),
+        order: z.number().default(99),
+        /** Versions the page was checked against. */
         comparedAgainst: z.string(),
-        scenario: z.string(),
-        left: z.object({ file: z.string(), name: z.string(), lang: z.string() }),
-        right: z.object({ file: z.string(), name: z.string(), lang: z.string() }),
-        notes: z.array(z.string()),
       }),
     }),
 

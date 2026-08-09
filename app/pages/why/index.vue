@@ -11,9 +11,12 @@ import type { EditorFile } from '~/components/Editor.vue'
  */
 const { data: tools } = await useAsyncData('why-tools', async () => {
   // Server, plus the client in dev — see app/utils/content-guard.md
-  if (import.meta.server || import.meta.dev) return await queryCollection('compare').all()
+  if (import.meta.server || import.meta.dev) return await queryCollection('why').all()
   return []
 })
+
+/** Page order is a property of the set, so it lives in each page's frontmatter. */
+const sortedTools = computed(() => [...(tools.value ?? [])].sort((a, b) => a.order - b.order))
 
 interface Concept {
   id: string
@@ -152,13 +155,13 @@ useHead({
         <p class="label">Comparison</p>
         <h2>Let the code speak.</h2>
         <p class="lede">
-          The same scenario written with Browser and with the other tool, side by side — the real
-          files from this repository, highlighted. Facts underneath, no scores and no winner
-          declared. You are deciding, not us.
+          Three tools, three honest pages. Each one shows the same scenario written both ways —
+          the real files from this repository — and then makes its case: where Browser is
+          genuinely better, and where the other tool is the one we would pick.
         </p>
 
         <ul class="tools">
-          <li v-for="tool in tools" :key="tool.slug">
+          <li v-for="tool in sortedTools" :key="tool.slug">
             <NuxtLink :to="`/why/${tool.slug}`">
               <span class="name">Browser vs {{ tool.tool }}</span>
               <span class="tag">{{ tool.tagline }}</span>

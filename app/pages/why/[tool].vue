@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import type { EditorFile } from '~/components/Editor.vue'
-
+/**
+ * A comparison page.
+ *
+ * These began as JSON — a scenario, two file paths and a list of notes — which
+ * was right while each page was a code diff with captions. They are arguments
+ * now, so they are Markdown like the rest of the site, and the code diff is one
+ * component inside the prose rather than the page itself.
+ */
 const route = useRoute()
 const slug = computed(() => String(route.params.tool))
 
-const { data: doc } = await useAsyncData(`compare-${slug.value}`, async () => {
+const { data: doc } = await useAsyncData(`why-${slug.value}`, async () => {
   // Server, plus the client in dev — see app/utils/content-guard.md
   if (import.meta.server || import.meta.dev) {
-    return await queryCollection('compare').where('slug', '=', slug.value).first()
+    return await queryCollection('why').where('slug', '=', slug.value).first()
   }
   return null
 })
@@ -16,61 +22,40 @@ if (!doc.value) {
   throw createError({ statusCode: 404, statusMessage: 'No such comparison', fatal: true })
 }
 
-/** Both panes come from real files on disk; nothing is pasted. */
-const left = computed<EditorFile>(() => ({
-  name: doc.value!.left.name,
-  lang: doc.value!.left.lang as EditorFile['lang'],
-  code: exampleSource(doc.value!.left.file),
-}))
-
-const right = computed<EditorFile>(() => ({
-  name: doc.value!.right.name,
-  lang: doc.value!.right.lang as EditorFile['lang'],
-  code: exampleSource(doc.value!.right.file),
-}))
-
-/** Stated rather than asserted — the reader can count the gutter. */
-const lineNote = computed(() => {
-  const a = exampleLineCount(doc.value!.left.file)
-  const b = exampleLineCount(doc.value!.right.file)
-  return `${a} lines vs ${b}`
-})
+/** On-this-page, from the rendered headings. */
+const toc = computed(() => doc.value?.body?.toc?.links ?? [])
 
 useHead(() => ({
-  title: `Browser vs ${doc.value?.tool} — Robot Framework Browser`,
-  meta: [{ name: 'description', content: `${doc.value?.scenario} Written with Robot Framework Browser and with ${doc.value?.tool}.` }],
+  title: `${doc.value?.title} — Robot Framework Browser`,
+  meta: [{ name: 'description', content: doc.value?.tagline ?? '' }],
 }))
 </script>
 
 <template>
   <div v-if="doc">
     <SiteHeader />
+
     <main class="main">
-      <nav class="crumb">
-        <NuxtLink to="/why">Why Browser</NuxtLink><span>/</span><NuxtLink to="/why#compare">Comparison</NuxtLink><span>/</span><span>{{ doc.tool }}</span>
+      <nav class="crumb" aria-label="Breadcrumb">
+        <NuxtLink to="/why">Why Browser</NuxtLink><span>/</span><span>{{ doc.tool }}</span>
       </nav>
 
-      <h1>Browser vs {{ doc.tool }}</h1>
-      <p class="lede">{{ doc.tagline }}</p>
+      <header class="head">
+        <h1>{{ doc.title }}</h1>
+        <p class="lede">{{ doc.tagline }}</p>
+        <p class="versions">Compared against {{ doc.comparedAgainst }}</p>
+      </header>
 
-      <p class="scenario">
-        <span class="label">Scenario</span>
-        {{ doc.scenario }}
-      </p>
+      <div class="cols">
+        <ContentRenderer :value="doc" class="doc" />
 
-      <ComparisonSplit :left="left" :right="right" :notes="[lineNote]" />
-
-      <section class="differences">
-        <h2 class="label">What actually differs</h2>
-        <ul>
-          <li v-for="note in doc.notes" :key="note">{{ note }}</li>
-        </ul>
-        <p class="fine">
-          Compared against {{ doc.comparedAgainst }}. Both files live in
-          <code>examples/{{ doc.left.file.split('/').slice(0, -1).join('/') }}/</code>
-          and are read from disk at build time, so what you see here is what runs.
-        </p>
-      </section>
+        <aside v-if="toc.length" class="toc">
+          <p class="toc-label">On this page</p>
+          <a v-for="link in toc" :key="link.id" :href="`#${link.id}`" :class="`d${link.depth}`">
+            {{ link.text }}
+          </a>
+        </aside>
+      </div>
     </main>
   </div>
 </template>
@@ -81,26 +66,35 @@ useHead(() => ({
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
-  max-width: 74rem;
 }
 
 .crumb {
   display: flex;
   gap: var(--sp-2);
   font-family: var(--font-display);
-  font-size: var(--step--2);
-  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--faint);
 }
 
 .crumb a {
-  color: var(--dim);
+  color: var(--faint);
   border-bottom: 0;
 }
 
+.crumb a:hover {
+  color: var(--ink);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
 h1 {
-  font-size: var(--step-3);
+  font-size: var(--step-4);
 }
 
 .lede {
@@ -109,55 +103,72 @@ h1 {
   max-width: var(--measure);
 }
 
-/* Painted, not bordered — see the note on .pillar in pages/index.vue. */
-.scenario {
+.versions {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--faint);
+}
+
+/*
+ * The comparison component is deliberately allowed to run wider than the prose
+ * — two code panes side by side inside a reading measure would be two columns
+ * of nothing.
+ */
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 14rem;
+  gap: var(--sp-8);
+  align-items: start;
+  margin-top: var(--sp-4);
+}
+
+.doc {
+  min-width: 0;
+}
+
+.toc {
+  position: sticky;
+  top: 5rem;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
-  padding: var(--sp-3) var(--sp-4);
-  background:
-    linear-gradient(var(--red), var(--red)) top left / 2px 100% no-repeat,
-    var(--chrome);
-  border-radius: var(--radius-sm);
-  max-width: var(--measure);
-  margin-bottom: var(--sp-2);
+  gap: 2px;
+  max-height: calc(100vh - 7rem);
+  overflow-y: auto;
 }
 
-.differences {
-  margin-top: var(--sp-8);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
+.toc-label {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 var(--sp-2);
 }
 
-.differences h2 {
-  margin: 0;
-  padding-bottom: var(--sp-2);
-  border-bottom: 1px solid var(--line);
-}
-
-.differences ul {
-  margin: 0;
-  padding-left: var(--sp-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  max-width: var(--measure);
-}
-
-.differences li {
-  line-height: 1.7;
-}
-
-.fine {
+.toc a {
   color: var(--dim);
-  font-size: 0.85rem;
-  max-width: var(--measure);
+  font-size: 0.8rem;
+  border-bottom: 0;
+  padding: 2px 0;
+  line-height: 1.4;
 }
 
-@supports (corner-shape: bevel) {
-  .scenario {
-    corner-shape: bevel;
+.toc a:hover {
+  color: var(--ink);
+}
+
+.toc a.d3 {
+  padding-left: var(--sp-3);
+  color: var(--faint);
+}
+
+@media (max-width: 1100px) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .toc {
+    display: none;
   }
 }
 </style>
