@@ -61,10 +61,40 @@ const nav = computed<NavItem[]>(() => [
 ])
 
 const uid = useId()
+
+/*
+ * Publish the header's height as --header-h.
+ *
+ * Anything that wants to sit directly under a sticky header needs to know how
+ * tall it is, and it is not a constant: this one wraps to two rows on a narrow
+ * phone (98px at 390px wide) and is 61px above that. The keyword rail's mobile
+ * panel used a hardcoded offset and got it wrong at both — too big a gap under
+ * the header, and its sticky close button pinned itself behind the header
+ * rather than at the top of the panel.
+ *
+ * A measured value rather than a breakpoint guess, kept current through a
+ * ResizeObserver. The CSS carries a fallback, so this is an improvement on a
+ * working state rather than a requirement.
+ */
+const header = useTemplateRef<HTMLElement>('header')
+
+onMounted(() => {
+  if (!header.value) return
+  const publish = () => {
+    document.documentElement.style.setProperty(
+      '--header-h',
+      `${Math.round(header.value!.getBoundingClientRect().height)}px`,
+    )
+  }
+  publish()
+  const observer = new ResizeObserver(publish)
+  observer.observe(header.value)
+  onBeforeUnmount(() => observer.disconnect())
+})
 </script>
 
 <template>
-  <header class="site">
+  <header ref="header" class="site">
     <NuxtLink to="/" class="brand">
       <img src="/logo/browser.svg" alt="" width="30" height="22">
       <span>BROWSER</span>

@@ -124,10 +124,15 @@ useHead({
       </a>
 
       <nav id="kw-nav" class="rail" aria-label="Keywords">
-        <a class="rail-close" href="#kw-top" aria-label="Close the keyword list">
-          <span aria-hidden="true">×</span> Close
-        </a>
         <div class="rail-top">
+          <!--
+            Inside the sticky block, not above it: two separately-sticky things
+            both pinned to top: 0 simply overlap, and the close button lost —
+            it was in the right place and behind the search field.
+          -->
+          <a class="rail-close" href="#kw-top" aria-label="Close the keyword list">
+            <span aria-hidden="true">×</span> Close
+          </a>
           <div class="field">
             <label class="sr" for="kw-filter">Filter keywords</label>
             <input id="kw-filter" v-model="query" type="search" placeholder="Search…" autocomplete="off">
@@ -540,19 +545,26 @@ useHead({
   }
 
   /*
-   * Full height under the header rather than over it: the header is sticky at
-   * z-index 20 and opaque, so a panel below it in the stack is covered exactly
-   * where it should be, whatever height the header happens to wrap to — 98px
-   * at 390px wide, 61px above that. Padding keeps the *scrollable* content
-   * clear of it.
+   * Starts *below* the header, not behind it.
+   *
+   * Spanning the whole viewport and padding the content down looks the same
+   * until you scroll: the panel's own top edge is then hidden under the
+   * header, so `position: sticky; top: 0` pins the close button up there with
+   * it and it disappears. Offsetting the box instead gives the close button a
+   * visible edge to stick to.
+   *
+   * --header-h is measured and published by SiteHeader; the fallback covers
+   * the two-row phone layout, which is the taller case.
    */
   .rail {
     position: fixed;
-    inset: 0;
+    top: var(--header-h, 6.2rem);
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 15;
     max-height: none;
-    height: 100dvh;
-    padding-top: 6.5rem;
+    padding-top: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     background: var(--paper);
@@ -568,14 +580,13 @@ useHead({
     opacity: 1;
   }
 
+  /* Sticks with the filter block it lives in; needs no offset of its own. */
   .rail-close {
     display: inline-flex;
     align-items: center;
     gap: var(--sp-2);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    margin: 0 0 var(--sp-3);
+    align-self: start;
+    margin: 0;
     padding: var(--sp-2) var(--sp-3);
     background: var(--panel);
     border: 1px solid var(--line-strong);
