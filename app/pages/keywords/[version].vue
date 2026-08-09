@@ -10,11 +10,6 @@
 const route = useRoute()
 const version = computed(() => String(route.params.version))
 
-/* The current release lives at /keywords; keep one canonical URL for it. */
-if (version.value === LATEST_VERSION) {
-  await navigateTo('/keywords', { redirectCode: 301 })
-}
-
 const { data } = await useAsyncData(`keywords-${version.value}`, async () => {
   /*
    * Server, plus the client in dev — see app/utils/content-guard.md.
@@ -38,6 +33,18 @@ const { data } = await useAsyncData(`keywords-${version.value}`, async () => {
 if (!data.value) {
   throw createError({ statusCode: 404, statusMessage: 'No documentation for that version', fatal: true })
 }
+
+/*
+ * The current release is reachable both here and at /keywords, so say which
+ * one is canonical rather than redirecting. A redirect would need a server,
+ * and this site does not have one: /keywords/<latest> was a 404 with an empty
+ * page for anyone who bookmarked or linked it.
+ */
+useHead(() => ({
+  link: version.value === LATEST_VERSION
+    ? [{ rel: 'canonical', href: 'https://robotframework-browser.org/keywords' }]
+    : [],
+}))
 </script>
 
 <template>

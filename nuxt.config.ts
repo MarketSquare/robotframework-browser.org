@@ -24,17 +24,18 @@ const releaseRoutes = readdirSync('content/releases')
   .map(f => `/releases/${f.replace(/\.md$/, '')}`)
 
 /*
- * The keyword reference for every version we hold data for. Same crawler
- * limitation as above — `/keywords/20.2.0` reads as a file with a `.0`
- * extension — and the current release is excluded because it lives at
- * /keywords and the version route redirects there.
+ * The keyword reference for every version we hold data for, the current
+ * release included.
+ *
+ * Same crawler limitation as above — `/keywords/20.2.0` reads as a file with a
+ * `.0` extension. The current release is in the list rather than redirecting
+ * to /keywords: a redirect needs a server, and on a static host
+ * /keywords/20.3.0 was simply a 404 with an empty page. It renders the same
+ * content as /keywords and points a canonical link there.
  */
-const LATEST = readFileSync('content/libdoc/LATEST', 'utf8').trim()
 const keywordRoutes = readdirSync('app/generated/index')
   .filter(f => f.endsWith('.json'))
-  .map(f => f.replace(/\.json$/, ''))
-  .filter(v => v !== LATEST)
-  .map(v => `/keywords/${v}`)
+  .map(f => `/keywords/${f.replace(/\.json$/, '')}`)
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-08',

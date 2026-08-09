@@ -74,7 +74,7 @@ useHead(() => ({
         </dl>
 
         <BtnRow>
-          <Btn :to="isLatest ? '/keywords' : `/keywords?version=${doc.version}`" primary>
+          <Btn :to="isLatest ? '/keywords' : `/keywords/${doc.version}`" primary>
             Keyword reference for {{ doc.version }}
           </Btn>
           <Btn :to="`https://github.com/MarketSquare/robotframework-browser/releases/tag/v${doc.version}`">

@@ -109,7 +109,24 @@ useHead({
     <SiteHeader />
 
     <div class="layout">
-      <nav class="rail" aria-label="Keywords">
+      <!--
+        The rail becomes a second menu on a phone, opened by :target rather
+        than by a checkbox or a click handler.
+        
+        That choice is what makes "tap a keyword and the panel closes behind
+        you" free: every rail link is an in-page anchor, so following one moves
+        the hash off #kw-nav, the panel stops matching :target, and the browser
+        jumps to the keyword. No JavaScript, and nothing to keep in sync.
+      -->
+      <a class="rail-open" href="#kw-nav" aria-label="Open the keyword list">
+        <span class="bars" aria-hidden="true"><i /><i /><i /></span>
+        Keywords
+      </a>
+
+      <nav id="kw-nav" class="rail" aria-label="Keywords">
+        <a class="rail-close" href="#kw-top" aria-label="Close the keyword list">
+          <span aria-hidden="true">×</span> Close
+        </a>
         <div class="rail-top">
           <div class="field">
             <label class="sr" for="kw-filter">Filter keywords</label>
@@ -183,6 +200,9 @@ useHead({
       </nav>
 
       <main class="main">
+        <!-- Where the close button returns to; also the panel's un-target. -->
+        <span id="kw-top" class="anchor-top" />
+
         <header class="lib">
           <h1>{{ index.length }} keywords</h1>
           <p class="lede">
@@ -472,16 +492,113 @@ useHead({
   }
 }
 
+/* Desktop: the rail is always there, and the mobile controls are not. */
+.rail-open,
+.rail-close {
+  display: none;
+}
+
+.anchor-top {
+  /* A target, not a box. */
+  display: block;
+  height: 0;
+  scroll-margin-top: 5rem;
+}
+
 @media (max-width: 900px) {
   .layout {
     grid-template-columns: 1fr;
   }
 
+  .rail-open {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    align-self: start;
+    margin: var(--sp-4) var(--gutter) 0;
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .bars i {
+    width: 0.85rem;
+    height: 1.5px;
+    background: currentcolor;
+    display: block;
+  }
+
+  /*
+   * Full height under the header rather than over it: the header is sticky at
+   * z-index 20 and opaque, so a panel below it in the stack is covered exactly
+   * where it should be, whatever height the header happens to wrap to — 98px
+   * at 390px wide, 61px above that. Padding keeps the *scrollable* content
+   * clear of it.
+   */
   .rail {
-    position: static;
-    max-height: 22rem;
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    max-height: none;
+    height: 100dvh;
+    padding-top: 6.5rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--paper);
     border-right: 0;
-    border-bottom: 1px solid var(--line);
+    /* Out of the way, and out of the tab order, until opened. */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.12s, visibility 0.12s;
+  }
+
+  .rail:target {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .rail-close {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: 0 0 var(--sp-3);
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--dim);
+    align-self: start;
+  }
+
+  @supports (corner-shape: bevel) {
+    .rail-open,
+    .rail-close {
+      corner-shape: bevel;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rail {
+      transition: none;
+    }
   }
 }
 </style>
