@@ -39,6 +39,24 @@ describe('the version manifest', () => {
     expect(versions.browserMajor).toBe(LATEST.split('.')[0])
   })
 
+  it('has the two documents that make a version a version', () => {
+    /*
+     * The release workflow bumps LATEST, generates the Libdoc and imports the
+     * release note as three separate steps against three separate sources.
+     * Any one of them failing leaves a site that builds perfectly and serves a
+     * keyword reference for a version with no notes, or a version picker whose
+     * newest entry 404s. This is the assertion that turns that into a red
+     * build, and it is the reason the workflow can open a PR unattended.
+     */
+    expect(existsSync(join(ROOT, `content/libdoc/Browser-${LATEST}.json`)), 'libdoc').toBe(true)
+    expect(existsSync(join(ROOT, `content/releases/${LATEST}.md`)), 'release note').toBe(true)
+
+    const spec = JSON.parse(read(`content/libdoc/Browser-${LATEST}.json`)) as { version: string }
+    // A file can be named for one version and describe another; libdoc's own
+    // field is the one that decides what the keyword pages actually say.
+    expect(spec.version, 'the Libdoc describes a different version').toBe(LATEST)
+  })
+
   it('keeps the tested Playwright separate from the image one', () => {
     /*
      * They are allowed to differ, and did at the time of writing: 20.3.0 was

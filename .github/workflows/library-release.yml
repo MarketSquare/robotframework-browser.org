@@ -1,0 +1,275 @@
+name: Library release
+
+# Watches MarketSquare/robotframework-browser for a new release and opens a
+# pull request here that updates the keyword reference, the release notes, the
+# contributor wall and every version number on the site.
+#
+# THE SITE POLLS; THE LIBRARY PUSHES NOTHING.
+#
+# The alternative was a repository_dispatch from the library, which is instant.
+# It needs a token that can write here, stored there — for a MarketSquare
+# repository that means org approval, it belongs to one person's account, and
+# when it is revoked or expires it fails silently: releases simply stop
+# reaching the site until somebody notices a stale version number.
+#
+# Polling needs no credential at all. The automatic GITHUB_TOKEN is scoped to
+# this repository, cannot expire, and involves nobody outside it. The price is
+# up to an hour of latency and a scheduled job that almost always finds
+# nothing and stops within seconds.
+#
+# Nothing here deploys. It opens a PR with a preview attached; a human merges.
+
+on:
+  schedule:
+    # Not on the hour: scheduled runs cluster there and GitHub delays them.
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to import (default: the library’s latest release)'
+        required: false
+      force:
+        description: 'Rebuild even if this version is already on the site'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# One import at a time; two runs would race on the same branch.
+concurrency:
+  group: library-release
+  cancel-in-progress: false
+
+env:
+  LIBRARY: MarketSquare/robotframework-browser
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.decide.outputs.version }}
+      tag: ${{ steps.decide.outputs.tag }}
+      previous: ${{ steps.decide.outputs.previous }}
+      needed: ${{ steps.decide.outputs.needed }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Is there anything to do?
+        id: decide
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REQUESTED: ${{ inputs.version }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          set -euo pipefail
+
+          CURRENT="$(cat content/libdoc/LATEST)"
+
+          # The library tags releases `v20.3.0`; everything on this site — the
+          # LATEST file, the Libdoc filename, the release note, the URL — uses
+          # the bare number. Strip it once, here, and carry both.
+          if [ -n "$REQUESTED" ]; then
+            TAG="$REQUESTED"
+          else
+            TAG="$(gh release view --repo "$LIBRARY" --json tagName -q .tagName)"
+          fi
+          [ "${TAG#v}" = "$TAG" ] && TAG="v$TAG"
+          VERSION="${TAG#v}"
+
+          echo "current on the site: $CURRENT"
+          echo "latest release:      $VERSION (tag $TAG)"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "previous=$CURRENT" >> "$GITHUB_OUTPUT"
+
+          if [ "$VERSION" = "$CURRENT" ] && [ "$FORCE" != "true" ]; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo "Up to date."
+            exit 0
+          fi
+
+          # An open PR for this version means the previous run already did the
+          # work and it is waiting on a human. Doing it again would force-push
+          # over a branch somebody may be reviewing.
+          OPEN="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open \
+                    --head "library-release/$VERSION" --json number -q 'length')"
+          if [ "$OPEN" != "0" ] && [ "$FORCE" != "true" ]; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo "A pull request for $VERSION is already open."
+            exit 0
+          fi
+
+          echo "needed=true" >> "$GITHUB_OUTPUT"
+
+  import:
+    needs: check
+    if: needs.check.outputs.needed == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      TAG: ${{ needs.check.outputs.tag }}
+      PREVIOUS: ${{ needs.check.outputs.previous }}
+    steps:
+      - uses: actions/checkout@v5
+
+      # The release note, the contributor list and the version pins are read
+      # from the library's own tree at the tag — not from its main branch,
+      # which has already moved on.
+      - name: Check out the library at ${{ needs.check.outputs.version }}
+        uses: actions/checkout@v5
+        with:
+          repository: MarketSquare/robotframework-browser
+          ref: ${{ needs.check.outputs.tag }}
+          path: library
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: astral-sh/setup-uv@v5
+
+      - run: pnpm install --frozen-lockfile
+
+      # Four sources, four steps. Each is independently wrong in its own way,
+      # which is what the validation below is for.
+      - name: Keyword documentation
+        run: ./scripts/fetch-libdoc.sh "$VERSION" --latest
+
+      - name: Release notes
+        run: node scripts/build-releases.ts ./library
+
+      - name: Contributors and their avatars
+        run: node scripts/build-contributors.ts ./library
+
+      - name: Version numbers
+        run: node scripts/build-versions.ts ./library
+
+      - name: Check the import is coherent
+        run: |
+          set -euo pipefail
+
+          # These three are cheap and specific, and they fail with a sentence a
+          # maintainer can act on rather than a stack trace from the build.
+          test "$(cat content/libdoc/LATEST)" = "$VERSION" \
+            || { echo "::error::LATEST is not $VERSION"; exit 1; }
+          test -f "content/libdoc/Browser-$VERSION.json" \
+            || { echo "::error::no keyword documentation for $VERSION"; exit 1; }
+          test -f "content/releases/$VERSION.md" \
+            || { echo "::error::the library has no docs/releasenotes/Browser-$VERSION.md at this tag"; exit 1; }
+
+      # The whole suite and a real build. This is where a missing avatar, an
+      # unresolved %%token%% or a release note that will not parse is caught.
+      - run: pnpm verify
+
+      - name: What changed in the keyword API
+        run: |
+          node scripts/keyword-diff.ts "$PREVIOUS" "$VERSION" > /tmp/keyword-diff.md
+          cat /tmp/keyword-diff.md
+
+      - name: Commit to a branch
+        id: branch
+        run: |
+          set -euo pipefail
+          BRANCH="library-release/$VERSION"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+          git checkout -B "$BRANCH"
+          git add content public/avatars app/generated/versions.json
+
+          # A forced re-run of a version already on the site changes nothing
+          # but libdoc's `generated` timestamp — and `git commit` exits 1 with
+          # nothing staged, which would fail the job for having no work to do.
+          if git diff --cached --quiet; then
+            echo "::notice::Nothing changed; not opening a pull request."
+            echo "branch=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git commit -m "content: Browser $VERSION" \
+                     -m "Generated by .github/workflows/library-release.yml."
+
+          # Force, because a forced re-run is meant to replace its own branch.
+          git push --force origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+      - name: Open the pull request
+        id: pr
+        if: steps.branch.outputs.branch != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo "Browser **$VERSION** is out. This updates the keyword reference, the"
+            echo "release notes, the contributor wall and every version number on the site."
+            echo
+            echo "### Keyword API"
+            echo
+            cat /tmp/keyword-diff.md
+            echo
+            echo "### Before merging"
+            echo
+            echo "- [ ] The preview renders (link in the comment below)"
+            echo "- [ ] \`/keywords\` shows $VERSION and the version picker lists it"
+            echo "- [ ] \`/releases/$VERSION\` reads correctly"
+            echo "- [ ] Nothing in the keyword diff above is a surprise"
+            echo
+            echo "---"
+            echo
+            echo "[Release notes](https://github.com/$LIBRARY/releases/tag/$TAG) ·"
+            echo "opened by \`library-release.yml\`."
+          } > /tmp/body.md
+
+          NUMBER="$(gh pr list --repo "$GITHUB_REPOSITORY" --state open \
+                      --head "${{ steps.branch.outputs.branch }}" --json number -q '.[0].number')"
+
+          if [ -n "$NUMBER" ]; then
+            gh pr edit "$NUMBER" --body-file /tmp/body.md
+          else
+            NUMBER="$(gh pr create --repo "$GITHUB_REPOSITORY" \
+                        --base main --head "${{ steps.branch.outputs.branch }}" \
+                        --title "content: Browser $VERSION" \
+                        --body-file /tmp/body.md \
+                        | grep -oE '[0-9]+$')"
+          fi
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+
+      # Published here rather than by pr-preview.yml, which never runs on this
+      # PR: a push made with GITHUB_TOKEN does not trigger workflows. The
+      # domain follows the same rfbrowser-pr-<n> pattern so the teardown
+      # workflow removes it when the PR closes.
+      - name: Publish the preview
+        id: preview
+        if: steps.branch.outputs.branch != ''
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+          SURGE_LOGIN: ${{ secrets.SURGE_LOGIN }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          if [ -z "$SURGE_TOKEN" ]; then
+            echo "::warning::SURGE_TOKEN is not set — the PR has no preview."
+            exit 0
+          fi
+          DOMAIN="rfbrowser-pr-${NUMBER}.surge.sh"
+          cp .output/public/404.html .output/public/200.html 2>/dev/null || true
+          npx --yes surge ./.output/public "$DOMAIN" --token "$SURGE_TOKEN"
+          echo "url=https://${DOMAIN}" >> "$GITHUB_OUTPUT"
+
+      - name: Comment the preview
+        if: steps.preview.outputs.url != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          URL: ${{ steps.preview.outputs.url }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+        run: |
+          gh pr comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "$(
+            printf '<!-- pr-preview -->\n### Preview\n\n%s\n\n| | |\n|---|---|\n| Keywords | %s/keywords |\n| Release note | %s/releases/%s |\n' \
+              "$URL" "$URL" "$URL" "$VERSION"
+          )"

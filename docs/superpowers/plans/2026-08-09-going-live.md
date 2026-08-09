@@ -148,6 +148,52 @@ thing a reader actually needs and no generic tool produces it.
 **Done when:** a real release opens a PR here with a working preview, and a
 deliberately broken payload fails the validation step rather than merging.
 
+### Built — and what the build turned up
+
+`.github/workflows/library-release.yml`, plus two new pieces it needs.
+
+**`scripts/fetch-libdoc.sh`.** There was no procedure for step 2: the twelve
+committed Libdoc files were made by hand. Libdoc only imports the library, so
+this needs no `rfbrowser init`, no Node and no browsers — an ephemeral `uv`
+environment and a few seconds.
+
+**Robot Framework is floored at 7.4, and the floor is load-bearing.** The type
+documentation comes from the RF doing the introspecting, not from the library.
+Generating Browser 20.3.0 with RF 7.3.2 produces a *valid* file that is missing
+the `Secret` and `Mapping` type pages — no error, no warning, two fewer
+documents on the site. RF 7.4.1 reproduces the committed file exactly. That is
+also why the diff reports documented types appearing and disappearing.
+
+**The Libdoc files were machine-dependent.** Libdoc records each keyword's
+`source` as an absolute path into whatever environment generated it; the
+committed files held 1804 of them, pointing at the machine this site was built
+on. Regenerating a version elsewhere therefore produced a 150-line diff that
+meant nothing — precisely the noise that makes a generated PR unreviewable.
+Normalised to `Browser/keywords/<file>.py`, which is all the renderer ever used
+(`basename(source)`). A test now fails if an absolute path comes back.
+
+With that done, a full re-import of a version already on the site changes
+exactly one line: libdoc's `generated` timestamp. The workflow detects that case
+and declines to open a PR rather than failing on an empty commit.
+
+**The tags are `v20.3.0`, not `20.3.0`** — while `LATEST`, the Libdoc filename,
+the release note and the URL all use the bare number. The workflow strips the
+prefix once and carries both.
+
+**A test now asserts what the workflow cannot check for itself:** that
+`content/libdoc/Browser-<LATEST>.json` and `content/releases/<LATEST>.md` both
+exist and that the Libdoc's own `version` field matches. The three imports come
+from three different sources; any one silently failing leaves a site that builds
+perfectly and serves a keyword reference for a version with no release note.
+This assertion is why the workflow can open a PR unattended.
+
+**Not `peter-evans/create-pull-request`** — `gh` and the automatic
+`GITHUB_TOKEN` do the job with no third-party action in the trusted path. The
+consequence is that a push made with `GITHUB_TOKEN` triggers no workflows, so
+`pr-preview.yml` will never run on the bot's PR; this workflow publishes the
+preview itself, to the same `rfbrowser-pr-<n>` domain so the teardown workflow
+still cleans it up.
+
 ---
 
 ## Phase 5 — Maintainer documentation
