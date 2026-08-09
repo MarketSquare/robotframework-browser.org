@@ -27,6 +27,35 @@ second domain, no special case for a login flow that redirects through an
 identity provider. Multiple tabs are multiple pages. Multiple browsers in one
 test are multiple browsers.
 
+The case that decides it for a lot of applications is **two users at once**.
+Chat, a shared document, a seller and a bidder, an approval queue, a support
+agent and the customer they are helping — one test, two logged-in sessions,
+each seeing what the other does:
+
+```robot
+*** Test Cases ***
+The Buyer Sees The Seller's Price Change
+    New Browser    chromium
+    ${seller} =    New Context
+    ${buyer} =     New Context
+
+    Switch Context    ${seller}
+    New Page    ${SHOP}/admin
+    Log In As    seller@example.com
+    Fill Text    id=price    99.00
+    Click    text=Publish
+
+    Switch Context    ${buyer}
+    New Page    ${SHOP}/item/42
+    Get Text    css=.price    ==    99.00
+```
+
+Two contexts are two isolated profiles — separate cookies, separate storage,
+separate logins — in one browser, created in milliseconds. Cypress has one
+browser session per test and no way to run two of them side by side, so this
+scenario is not something you write awkwardly there. It is something you do not
+write.
+
 ::doc-table
 ---
 head:
@@ -49,6 +78,9 @@ rows:
   - - Two browsers at once
     - "`New Browser` twice"
     - Not supported
+  - - Two logged-in users interacting
+    - Two contexts, switched between
+    - Not supported
 ---
 ::
 
@@ -69,8 +101,31 @@ through the UI and verifies the result in the database is an ordinary
 requirement, not an exotic one.
 
 Robot Framework has libraries for all of that, and they compose in the same
-test, in the same syntax, in the same report. If a library does not exist for
-your particular thing, you write one — a Python class, published on PyPI, done.
+test, in the same syntax, in the same report.
+
+If a library does not exist for your particular thing, you write one, and the
+bar is far lower than people expect. No class, no packaging, no publishing: a
+Python file next to your tests, with a function in it, is a library. Every
+function becomes a keyword.
+
+```python [my_stuff.py]
+def the_invoice_total_in_the_database(order_id):
+    ...
+    return total
+```
+
+```robot
+*** Settings ***
+Library     my_stuff.py
+
+*** Test Cases ***
+Example
+    ${total} =    The Invoice Total In The Database    ${order_id}
+```
+
+That is the entire mechanism. Publish it to PyPI later if other teams want it —
+or never, because most of these are three functions that only make sense in one
+company.
 
 Cypress tests web pages, which is what it is for. When your test needs to check
 the database, you write a task in Node and call it through `cy.task` — at which
@@ -101,10 +156,18 @@ Cypress the runner is MIT; the dashboard, the parallelisation and the flake
 analytics are the product. That is a legitimate business model. It is worth
 knowing which parts of your workflow you own and which you rent.
 
-**Made for end-to-end testing.** Robot Framework has run acceptance tests since
-2008, for people who mean *acceptance* in the contractual sense: suite setups
-and teardowns, tags, per-environment variables, listeners, a machine-readable
-`output.xml`, and libraries for every other system the same test touches.
+**Made for end-to-end testing.** Robot Framework has been running acceptance
+tests since 2005, when it was built at Nokia; it was open-sourced in 2008. Two
+decades of people meaning *acceptance* in the contractual sense.
+
+And end-to-end means end to end. A real one crosses systems — the web shop, the
+payment provider's API, the warehouse database, the confirmation email — and
+often crosses users and pages as well. Cypress describes itself as an
+end-to-end testing tool, and within one browser session on one origin it is a
+very good one. But an end that stops at the edge of the browser tab is not the
+end of anything: the moment a scenario needs a second user, a second origin or
+a system that is not a web page, the tool is not able to express it. Robot
+Framework treats all of those as ordinary.
 
 ## 4. The test reads like the thing it tests
 
@@ -136,6 +199,14 @@ they cover, nobody outside the team reads the results, and the system under test
 is a web application and nothing else. The Cypress runner is genuinely good to
 develop against, and picking the tool your team already speaks is a real
 argument.
+
+::doc-note{kind="aside"}
+**PS.** Even then, have a look at [Playwright Test](/why/vs-playwright) before
+you commit. It is also JavaScript, also lives next to your components, and it
+is free of the architectural constraints described above — no `cy.origin()`, no
+one-session-per-test, three real engines. If the answer to "which JavaScript
+runner?" is being decided today, it deserves to be in the comparison.
+::
 
 Outside those conditions — more than one technology, more than one audience for
 the report, testers who are not JavaScript developers — the constraints start to

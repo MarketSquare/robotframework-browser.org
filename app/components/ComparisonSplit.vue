@@ -18,7 +18,15 @@ import type { EditorFile } from './Editor.vue'
 const props = defineProps<{
   left: EditorFile
   right: EditorFile
-  /** Structural observations shown beneath. Facts only — no scoring. */
+  /**
+   * A short measurement, e.g. "12 lines vs 9". Set in the display face as a
+   * chip, which is what that face is for.
+   */
+  metric?: string
+  /**
+   * Structural observations shown beneath. Facts only — no scoring. Inline
+   * Markdown is rendered, so `code` in a note looks like code.
+   */
   notes?: string[]
 }>()
 
@@ -51,9 +59,13 @@ const uid = useId()
       </div>
     </div>
 
-    <ul v-if="props.notes?.length" class="cmp-notes">
-      <li v-for="note in props.notes" :key="note">{{ note }}</li>
-    </ul>
+    <div v-if="props.metric || props.notes?.length" class="cmp-below">
+      <p v-if="props.metric" class="cmp-metric">{{ props.metric }}</p>
+      <ul v-if="props.notes?.length" class="cmp-notes">
+        <!-- Notes come from frontmatter, so their Markdown is inert until rendered. -->
+        <li v-for="note in props.notes" :key="note" v-html="inlineMarkdown(note)" />
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -138,19 +150,52 @@ const uid = useId()
   outline-offset: 2px;
 }
 
-.cmp-notes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2) var(--sp-8);
-  margin: var(--sp-4) 0 0;
-  padding: var(--sp-3) 0 0;
-  list-style: none;
+.cmp-below {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
   border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/*
+ * The measurement is a label, so it keeps the display face. The notes are
+ * sentences, so they do not: OCR-A, uppercased and letter-spaced, is for two
+ * or three words at a time and becomes hard work at sentence length.
+ */
+.cmp-metric {
   font-family: var(--font-display);
   font-size: var(--step--2);
   letter-spacing: 0.12em;
   color: var(--faint);
   text-transform: uppercase;
+  margin: 0;
+}
+
+.cmp-notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: 0 0 0 var(--sp-4);
+  list-style: disc;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--dim);
+}
+
+.cmp-notes li::marker {
+  color: var(--faint);
+}
+
+.cmp-notes :deep(code) {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--chrome);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.05em 0.3em;
 }
 
 /*

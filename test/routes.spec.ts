@@ -51,8 +51,13 @@ describe.skipIf(!built)('prerendered output', () => {
     for (const tool of ['vs-cypress', 'vs-playwright', 'vs-seleniumlibrary']) {
       const html = page(`why/${tool}`)
       expect(html, tool).toContain('cmp-wrap')
-      // Two editors, one per pane.
-      expect((html.match(/plate editor/g) ?? []).length, tool).toBe(2)
+      /*
+       * Two *panes*, not two editors on the page: these pages are prose now
+       * and carry their own code samples besides the comparison.
+       */
+      // `data-side` rather than the class: the class also appears in the CSS.
+      expect((html.match(/data-side="/g) ?? []).length, tool).toBe(2)
+      expect((html.match(/plate editor/g) ?? []).length, tool).toBeGreaterThanOrEqual(2)
       expect(new Set(html.match(/color:#[0-9A-F]{6}/g) ?? []).size, tool).toBeGreaterThan(3)
     }
   })

@@ -41,9 +41,8 @@ const lineNote = computed(
   () => `${exampleLineCount(props.left)} lines vs ${exampleLineCount(props.right)}`,
 )
 
-const allNotes = computed(() => [lineNote.value, ...(props.notes ?? [])])
 </script>
 
 <template>
-  <ComparisonSplit :left="leftFile" :right="rightFile" :notes="allNotes" />
+  <ComparisonSplit :left="leftFile" :right="rightFile" :metric="lineNote" :notes="props.notes" />
 </template>
