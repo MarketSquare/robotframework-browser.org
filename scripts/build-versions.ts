@@ -13,6 +13,15 @@
  *   playwrightDocker  the library's Dockerfile FROM line, which lags the above
  *                     whenever a Browser release does not rebuild the image
  *
+ * Needs the library checked out alongside, so it is NOT part of `pnpm
+ * generate` — a build must work from a clean clone with no second repository
+ * and no network. `app/generated/versions.json` is committed; this script
+ * rewrites it, and `pnpm refresh` is when that happens.
+ *
+ * test/versions.spec.ts asserts the committed file matches
+ * content/libdoc/LATEST, so a stale manifest fails the build rather than
+ * shipping wrong version numbers.
+ *
  * Usage: pnpm versions [path-to-library-checkout]
  */
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs'

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -41,11 +41,14 @@ describe('browser.svg', () => {
     expect(closes).toBe(opens)
   })
 
-  it('is smaller than the source it was derived from', () => {
-    const source = readFileSync(
-      join(process.cwd(), '../robotframework-browser/browser_lib_logo.svg'),
-      'utf8',
-    )
-    expect(svg.length).toBeLessThan(source.length)
+  /*
+   * Needs the library checked out alongside, so it is skipped where that is
+   * not true — CI, and anyone's first clone. It failed the build there before,
+   * which is exactly the dependency a build must not have.
+   */
+  const SOURCE = join(process.cwd(), '../robotframework-browser/browser_lib_logo.svg')
+
+  it.skipIf(!existsSync(SOURCE))('is smaller than the source it was derived from', () => {
+    expect(svg.length).toBeLessThan(readFileSync(SOURCE, 'utf8').length)
   })
 })

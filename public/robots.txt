@@ -1,0 +1,5 @@
+# The whole site is meant to be indexed. Nothing here is private.
+User-agent: *
+Allow: /
+
+Sitemap: https://robotframework-browser.org/sitemap.xml

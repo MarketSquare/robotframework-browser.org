@@ -99,17 +99,25 @@ green — while the live domain is still on `legacy-site`.
 
 Two workflows, mirroring the reference repos.
 
-**In `robotframework-browser` (the library):**
+**Decided: the site polls; the library pushes nothing.**
 
-`trigger-site-update.yml` — on `release: published`, send a
-`repository_dispatch` of type `library-release` to this repo, with
-`{ version, tag }`. Needs a PAT secret (`SITE_DISPATCH_TOKEN`) with
-`contents:write` on the site repo.
+A fine-grained PAT in the library repo was the alternative. It is instant and
+event-driven, and it was rejected because it needs org approval for a
+MarketSquare repository, is tied to one person's account, and fails silently —
+releases would simply stop reaching the site until somebody noticed a stale
+version number.
 
-**Here:**
+Polling needs no credential at all: the automatic `GITHUB_TOKEN` is
+repo-scoped, cannot expire, and involves nobody outside this repository. The
+cost is up to an hour of latency and a scheduled job that usually finds nothing.
 
-`library-release.yml` — on `repository_dispatch: [library-release]`, and
-`workflow_dispatch` so it can be run by hand:
+**Here, and nowhere else:**
+
+`library-release.yml` — on `schedule` (hourly) and `workflow_dispatch`:
+
+0. Ask the GitHub API for the library's latest release. Compare with
+   `content/libdoc/LATEST`. Stop here if they match — which is what happens on
+   almost every run. Also stop if a PR for that version is already open.
 
 1. Check out this repo and the library at the release tag
 2. `pip install robotframework-browser==<version>` in a venv, `libdoc --format json` → `content/libdoc/Browser-<version>.json`, update `LATEST`
