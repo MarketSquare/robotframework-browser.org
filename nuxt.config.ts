@@ -32,10 +32,14 @@ const releaseRoutes = readdirSync('content/releases')
  * to /keywords: a redirect needs a server, and on a static host
  * /keywords/20.3.0 was simply a 404 with an empty page. It renders the same
  * content as /keywords and points a canonical link there.
+ *
+ * The list comes from the committed manifest, not from `app/generated/index`.
+ * That directory is built by `pnpm libdoc` and rightly gitignored — 8 MB of
+ * rendered keyword bodies — but this config is loaded by `nuxt prepare` during
+ * `pnpm install`, before any script has run. Reading it there made a clean
+ * clone fail to install.
  */
-const keywordRoutes = readdirSync('app/generated/index')
-  .filter(f => f.endsWith('.json'))
-  .map(f => `/keywords/${f.replace(/\.json$/, '')}`)
+const keywordRoutes = (VERSIONS.documented as unknown as string[]).map(v => `/keywords/${v}`)
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-08',
