@@ -1,7 +1,7 @@
 ---
 title: Finding elements
 description: Which selector strategy to reach for, why the order matters, and how to chain across iframes and shadow DOM.
-order: 3
+order: 2
 section: concepts
 ---
 

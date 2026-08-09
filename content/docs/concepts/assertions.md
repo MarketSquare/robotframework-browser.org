@@ -2,7 +2,7 @@
 title: Assertions
 description: Almost every getter can assert, every assertion retries, and each return type allows different operators. The complete AssertionEngine reference.
 section: concepts
-order: 4
+order: 3
 ---
 
 Almost every keyword that gets something can also check it. There is no separate

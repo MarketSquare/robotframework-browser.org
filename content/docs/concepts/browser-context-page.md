@@ -2,7 +2,7 @@
 title: Browser, context and page
 description: The three layers Playwright is built on — and why a new context is the cheapest clean slate you will ever get.
 section: concepts
-order: 2
+order: 1
 ---
 
 Browser works in three layers. Almost every question about isolation, speed, or

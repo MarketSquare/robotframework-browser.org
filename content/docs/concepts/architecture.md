@@ -2,7 +2,7 @@
 title: How Browser works
 description: Python, a Node process and Playwright — what runs where, and which installation to choose.
 section: concepts
-order: 1
+order: 4
 ---
 
 Browser is a Python library that drives [Playwright](https://playwright.dev/)
@@ -25,7 +25,7 @@ per browser and no driver version to keep in step with a browser update.
 ---
 head: [Method, Node.js needed, Choose it when]
 rows:
-  - ['`robotframework-browser-batteries`', 'No', 'Recommended. Simplest — but you still install browser binaries unless you already have a Chromium-based browser.']
+  - ['`robotframework-browser-batteries`', 'No', 'Fewest moving parts — but you still install browser binaries unless you already have a Chromium-based browser.']
   - ['`robotframework-browser` + `rfbrowser init`', 'Yes', 'Your OS or CPU is not covered, or you need extra Node dependencies.']
 ---
 ::

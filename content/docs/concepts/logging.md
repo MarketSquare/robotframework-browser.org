@@ -86,8 +86,8 @@ variable `ROBOT_FRAMEWORK_BROWSER_TRACING=True`. And
 `auto_delete_passed_tracing=True` at import keeps only the traces of failed
 tests, which is what makes this affordable in CI:
 
-```robot-repl
-New Context    tracing=True
+```bash
+ROBOT_FRAMEWORK_BROWSER_TRACING=True robot tests/
 ```
 
 Open the result either way:

@@ -13,9 +13,13 @@ You need **Python 3.10 or newer** and **Node.js with npm on your PATH** —
 `rfbrowser init` runs `npm ci` and `npx playwright install` underneath, and fails
 with a clear message if npm is missing.
 
-If you would rather not install Node.js at all, there is a second route: the
-`robotframework-browser-batteries` package ships its own Node runtime. See
-[how Browser works](/docs/concepts/architecture).
+Do this in a virtual environment — `uv`, `venv` or `pyenv`, whichever your team
+uses. **Never install into the system Python:** the install writes into
+`site-packages`, so it needs root there and is painful to unpick afterwards.
+
+There is a second route that needs no Node.js at all, and it is the simpler one
+if you have no particular reason to want Node on the machine — see
+[how Browser works](/docs/concepts/architecture) once you are running.
 
 ## Install
 
@@ -52,6 +56,10 @@ needs a few hundred megabytes. You only do it once per environment.
 
 The assertion is part of the keyword — `Get Title` both reads and checks.
 
+The browser runs **headless** by default, so this prints a result without
+anything appearing on screen. Add `New Browser    chromium    headless=False`
+above `New Page` when you want to watch it.
+
 ```robot [first.robot]
 *** Settings ***
 Library    Browser
@@ -76,7 +84,7 @@ sessions:
     steps:
       - command: robot first.robot
         output:
-          - "Search The Robot Framework Site                                | PASS |"
+          - "Open The Keyword Reference                                   | PASS |"
           - "1 test, 1 passed, 0 failed"
 ---
 :::
@@ -92,7 +100,7 @@ doing that work:
 
 - **Action keywords** like `Click` wait for the element to be actionable —
   attached, visible, stable and able to receive the click — before acting.
-- **Assertions** like `Get Title    *=    Robot Framework` re-read the value
+- **Assertions** like `Get Title    *=    Robot Framework Browser` re-read the value
   until it matches or the retry window expires.
 
 So a keyword with an assertion operator is itself the wait. A getter *without*
