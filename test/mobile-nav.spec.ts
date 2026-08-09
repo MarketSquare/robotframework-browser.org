@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
@@ -36,5 +36,27 @@ describe('the small-screen menu panel', () => {
 
   it('still opens the panel from the checkbox alone, so it works without JavaScript', () => {
     expect(small).toMatch(/\.menu-toggle:checked\s*~\s*\.nav\s*\{[^}]*display:\s*flex/)
+  })
+})
+
+describe('the styleguide is published but unlisted', () => {
+  /*
+   * /styleguide exists and is meant to stay reachable — CONTRIBUTING.md links
+   * it, and it is the only accurate reference for the MDC components because
+   * it renders each one beside its own source. It is documentation of the
+   * site, though, aimed at whoever is editing it. A reader who came here to
+   * learn Browser has no use for it, so it is not in the navigation and not in
+   * the sitemap.
+   */
+  it('is not a navigation entry', () => {
+    expect(src).not.toMatch(/to:\s*'\/styleguide'/)
+  })
+
+  it('still exists as a page', () => {
+    expect(existsSync(`${process.cwd()}/app/pages/styleguide.vue`)).toBe(true)
+  })
+
+  it('is linked from the maintainer guide', () => {
+    expect(readFileSync(`${process.cwd()}/CONTRIBUTING.md`, 'utf8')).toContain('/styleguide')
   })
 })

@@ -53,9 +53,14 @@ Two commands and you are running.
 Nesting is expressed with **more colons on the outer component**, not with
 indentation. That trips up everyone once.
 
-**`/styleguide` is the reference.** It renders every component in every state
-next to its own source, so it is always accurate. Read it before inventing
-markup.
+**[`/styleguide`](https://robotframework-browser.org/styleguide) is the
+reference** — locally, <http://localhost:3000/styleguide>. It renders every
+component in every state next to its own source, so it cannot drift out of date.
+Read it before inventing markup.
+
+It is deliberately not in the site navigation and not in the sitemap: it
+documents the site to the people editing it, and a reader who came to learn
+Browser has no use for it. This link is how you get there.
 
 ### Version numbers are never typed by hand
 

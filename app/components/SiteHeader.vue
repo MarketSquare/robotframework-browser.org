@@ -55,7 +55,12 @@ const nav = computed<NavItem[]>(() => [
   { to: '/keywords', label: 'Keywords' },
   { to: '/releases', label: 'Releases' },
   { to: '/community', label: 'Community' },
-  { to: '/styleguide', label: 'Styleguide' },
+  /*
+   * /styleguide is not listed here on purpose. It is published — it is how a
+   * contributor sees every component in every state next to its source, and
+   * CONTRIBUTING.md links it — but it documents the site to the people editing
+   * it, and a reader looking for Browser has no use for it.
+   */
 ])
 
 const uid = useId()

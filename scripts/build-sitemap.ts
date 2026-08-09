@@ -41,9 +41,18 @@ function pages(dir = DIST, found: string[] = []): string[] {
 const LATEST = readFileSync(join(ROOT, 'content/libdoc/LATEST'), 'utf8').trim()
 const canonicalDuplicate = (url: string) => url === `/keywords/${LATEST}`
 
+/**
+ * /styleguide stays reachable — CONTRIBUTING.md links it, and it is the only
+ * accurate reference for the MDC components because it renders each one beside
+ * its own source. But it documents the site to whoever is editing it, which is
+ * not what someone searching for Browser is looking for. Unlisted in the
+ * navigation for the same reason.
+ */
+const internal = (url: string) => url === '/styleguide'
+
 const urls = pages()
   .map(file => `/${relative(DIST, file).replace(/index\.html$/, '')}`.replace(/\/$/, '') || '/')
-  .filter(url => !canonicalDuplicate(url))
+  .filter(url => !canonicalDuplicate(url) && !internal(url))
   .sort()
 
 /*
