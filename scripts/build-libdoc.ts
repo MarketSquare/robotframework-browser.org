@@ -96,27 +96,46 @@ for (const file of specFiles) {
       `${result.types.length} types, ${result.groups.length} groups`,
   )
 
-  if (result.version === latest) {
-    latestResult = result
+  /*
+   * Everything the reference page needs for this version, in one file.
+   *
+   * This is large — every rendered documentation body — and is read on the
+   * server only. It must never be imported from an ordinary component, or it
+   * lands in the client bundle AND again in the Nuxt payload. See
+   * app/components/KeywordPanels.server.vue, which reaches these through a
+   * glob so that only the version being rendered is ever loaded.
+   */
+  write(join(GEN, `full/${result.version}.json`), {
+    version: result.version,
+    libraryName: result.libraryName,
+    intro: result.intro,
+    introSections: result.introSections,
+    keywords: result.keywords,
+    types: result.types,
+    groups: result.groups,
+  })
 
-    /*
-     * Everything the single reference page needs, in one file.
-     *
-     * This is large — all 151 rendered documentation bodies — and is read on
-     * the server only. It must never be imported from an ordinary component,
-     * or it lands in the client bundle AND again in the Nuxt payload. See
-     * app/components/KeywordPanels.server.vue.
-     */
-    write(join(GEN, 'libdoc-full.json'), {
-      version: result.version,
-      libraryName: result.libraryName,
-      intro: result.intro,
-      introSections: result.introSections,
-      keywords: result.keywords,
-      types: result.types,
-      groups: result.groups,
-    })
-  }
+  /*
+   * The small half: index, groups and type names. This is what the rail and
+   * the search filter run against, and the only part that reaches the client.
+   * One file per version so a page loads its own and no other.
+   */
+  write(join(GEN, `index/${result.version}.json`), {
+    version: result.version,
+    libraryName: result.libraryName,
+    index: result.index,
+    groups: result.groups,
+    introSections: result.introSections,
+    types: result.types.map(t => ({
+      name: t.name,
+      slug: t.slug,
+      anchor: t.anchor,
+      kind: t.kind,
+      usedByCount: t.usedBy.length,
+    })),
+  })
+
+  if (result.version === latest) latestResult = result
 }
 
 if (!latestResult) {
@@ -131,8 +150,9 @@ write(join(OUT, 'versions.json'), {
     .reverse(),
 })
 
-// Imported at build time for route generation and the rail. Index and groups
-// only — never the keyword bodies, which would defeat the split.
+// The latest, imported directly for route generation, the header badge and
+// the default reference page. Index and groups only — never the keyword
+// bodies, which would defeat the split.
 write(join(GEN, 'libdoc.json'), {
   version: latestResult.version,
   libraryName: latestResult.libraryName,

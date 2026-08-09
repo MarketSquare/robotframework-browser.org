@@ -17,7 +17,30 @@
  * Filtering is done by the page around it, against the small index, by
  * toggling classes on these panels.
  */
-import full from '~/generated/libdoc-full.json'
+/*
+ * One file per version, reached through a glob rather than a static import.
+ *
+ * `import.meta.glob` gives Vite a map of loaders; only the one whose version
+ * is asked for is ever executed, so rendering 19.12.4 does not pull the other
+ * eleven into memory. Eager is safe here *because this is a server component*
+ * — none of it can reach a browser.
+ */
+const FULL = import.meta.glob('~/generated/full/*.json', { eager: true, import: 'default' }) as Record<string, unknown>
+
+const props = defineProps<{ version?: string }>()
+
+function forVersion(version: string) {
+  const hit = Object.entries(FULL).find(([path]) => path.endsWith(`/${version}.json`))
+  if (!hit) {
+    throw new Error(
+      `No rendered documentation for ${version}. `
+      + `Have: ${Object.keys(FULL).map(p => p.split('/').pop()).join(', ')}`,
+    )
+  }
+  return hit[1]
+}
+
+const full = forVersion(props.version ?? LATEST_VERSION)
 
 interface Arg {
   name: string

@@ -23,6 +23,19 @@ const releaseRoutes = readdirSync('content/releases')
   .filter(f => f.endsWith('.md'))
   .map(f => `/releases/${f.replace(/\.md$/, '')}`)
 
+/*
+ * The keyword reference for every version we hold data for. Same crawler
+ * limitation as above — `/keywords/20.2.0` reads as a file with a `.0`
+ * extension — and the current release is excluded because it lives at
+ * /keywords and the version route redirects there.
+ */
+const LATEST = readFileSync('content/libdoc/LATEST', 'utf8').trim()
+const keywordRoutes = readdirSync('app/generated/index')
+  .filter(f => f.endsWith('.json'))
+  .map(f => f.replace(/\.json$/, ''))
+  .filter(v => v !== LATEST)
+  .map(v => `/keywords/${v}`)
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-08',
   /*
@@ -56,7 +69,7 @@ export default defineNuxtConfig({
   nitro: {
     // 151 keyword + 81 type routes are discovered by crawling /keywords.
     preset: 'github-pages',
-    prerender: { crawlLinks: true, routes: ['/', ...releaseRoutes], failOnError: true },
+    prerender: { crawlLinks: true, routes: ['/', ...releaseRoutes, ...keywordRoutes], failOnError: true },
   },
 
   /*

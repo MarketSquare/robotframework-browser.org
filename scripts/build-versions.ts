@@ -60,8 +60,23 @@ function dockerBase(): { image: string; playwright: string } {
 
 const docker = dockerBase()
 
+/*
+ * Every version with a keyword reference on this site. Small enough for the
+ * client — it is a list of strings — where the indexes themselves are not.
+ */
+const documented = readdirSync(join(ROOT, 'app/generated/index'))
+  .filter(f => f.endsWith('.json'))
+  .map(f => f.replace(/\.json$/, ''))
+  .sort((a, b) => {
+    const x = a.split('.').map(Number)
+    const y = b.split('.').map(Number)
+    for (let i = 0; i < 3; i++) if ((x[i] ?? 0) !== (y[i] ?? 0)) return (y[i] ?? 0) - (x[i] ?? 0)
+    return 0
+  })
+
 const versions = {
   browser,
+  documented,
   browserMinor,
   browserMajor: browser.split('.')[0]!,
   playwright: playwrightFromNotes(),
@@ -76,4 +91,6 @@ writeFileSync(
 )
 
 console.log('versions →  app/generated/versions.json')
-for (const [k, v] of Object.entries(versions)) console.log(`  ${k.padEnd(22)} ${v}`)
+for (const [k, v] of Object.entries(versions)) {
+  console.log(`  ${k.padEnd(22)} ${Array.isArray(v) ? `${v.length} versions` : v}`)
+}

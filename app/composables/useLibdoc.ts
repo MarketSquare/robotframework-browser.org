@@ -46,13 +46,36 @@ export interface IntroSection {
   level: number
 }
 
-export function useKeywordIndex() {
+export interface KeywordIndex {
+  index: IndexEntry[]
+  groups: GroupEntry[]
+  types: TypeEntry[]
+  introSections: IntroSection[]
+  version: string
+}
+
+/** The current release. Imported directly, because every page needs it. */
+export function useKeywordIndex(): KeywordIndex {
   return {
     index: libdoc.index as IndexEntry[],
     groups: libdoc.groups as GroupEntry[],
     types: libdoc.types as TypeEntry[],
     introSections: libdoc.introSections as IntroSection[],
     version: LATEST_VERSION,
+  }
+}
+
+
+export async function loadKeywordIndex(version: string): Promise<KeywordIndex> {
+  const entry = Object.entries(INDEXES).find(([path]) => path.endsWith(`/${version}.json`))
+  if (!entry) throw new Error(`No keyword index for ${version}`)
+  const data = (await entry[1]()) as KeywordIndex
+  return {
+    index: data.index as IndexEntry[],
+    groups: data.groups as GroupEntry[],
+    types: data.types as TypeEntry[],
+    introSections: data.introSections as IntroSection[],
+    version: data.version,
   }
 }
 

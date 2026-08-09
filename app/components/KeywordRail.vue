@@ -9,16 +9,22 @@
  * Filtering is client-side over the 36 KB index. It degrades to the full list
  * without JavaScript, which is the correct fallback for a navigation aid.
  */
-const props = defineProps<{ current?: string }>()
+const props = defineProps<{
+  current?: string
+  /** Defaults to the current release; a version page passes its own. */
+  data?: KeywordIndex
+}>()
 
-const { index, groups } = useKeywordIndex()
+const source = computed(() => props.data ?? useKeywordIndex())
+const index = computed(() => source.value.index)
+const groups = computed(() => source.value.groups)
 
 const query = ref('')
 
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase()
-  if (!q) return index
-  return index.filter(
+  if (!q) return index.value
+  return index.value.filter(
     k => k.name.toLowerCase().includes(q) || k.shortdoc.toLowerCase().includes(q),
   )
 })
