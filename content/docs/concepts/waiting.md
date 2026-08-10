@@ -46,38 +46,57 @@ them for one test without widening them for the suite.
 ## When that is not enough
 
 The built-in waiting covers the element you are about to touch and the value you
-are about to check. It does not cover everything: a spinner that has to
-*disappear*, a button that has to become enabled, a list that has to reach a
-certain length before you act on it.
+are about to check. What it does not cover is everything else the page might be
+doing: a spinner that has to *disappear*, an animation that has to finish, a
+framework that has to declare itself ready.
 
-### `Wait For Condition`
+Two keywords do that job, and they are siblings. The difference is which side of
+the wire the condition lives on.
 
-This is the one to reach for, and it is the most useful waiting keyword in the
-library. It takes any Browser getter, runs it with an assertion, and keeps
-retrying until it passes or the timeout expires.
+::doc-table
+---
+head: [Keyword, Evaluates, Reach for it when]
+rows:
+  - ['`Wait For Condition`', 'A Browser **getter**, in Robot Framework', 'The thing you are waiting for is something a Browser keyword can already read']
+  - ['`Wait For Function`', '**JavaScript**, inside the page', 'The thing you are waiting for is only visible to the page itself']
+---
+::
 
-The trick is that you do not have to learn a new syntax. Write the assertion
-first, as an ordinary getter:
+If you can already write a `Get …` assertion for it, use the first. If you would
+have to open devtools to see it, use the second.
+
+## `Wait For Condition`
+
+The rule is simple enough that you do not have to learn anything new. Write the
+assertion as an ordinary getter first, get it passing, and then take the `Get`
+off the front:
 
 ```robot-repl
-Get Text    id=status_bar    contains    Done
-```
-
-Then drop the word `Get` and hand the rest to `Wait For Condition`:
-
-```robot-repl
+Get Text              id=status_bar    contains    Done
 Wait For Condition    Text    id=status_bar    contains    Done
 ```
 
-That is the whole rule. The first argument is a getter's name without `Get`, and
-everything after it is that getter's own arguments.
+Everything after the condition name is that getter's own arguments, so anything
+you already know how to assert, you already know how to wait for.
 
 ```robot-repl
-Wait For Condition    Title           should start with    Robot
-Wait For Condition    Url             should end with      robotframework.org
-Wait For Condition    Element Count   .row    ==    ${12}
-Wait For Condition    Style           body    display    ==    block
+# The upload finished
+Wait For Condition    Text            .progress     ==    100%
+
+# The table filled in
+Wait For Condition    Element Count   tbody tr       ==    ${25}
+
+# The single-page app actually navigated
+Wait For Condition    Url             should end with    /checkout
+
+# A CSS class arrived
+Wait For Condition    Classes         .modal    contains    is-open
 ```
+
+Most getters that take an assertion can be used, but not all — the id getters,
+the storage getters, `Console Log`, `Page Errors` and `Aria Snapshot` are not
+among them, and passing one fails with a conversion error rather than waiting.
+The keyword documentation lists the exact set.
 
 ::doc-note
 `timeout` here governs how long the **assertion** is retried, not how long an
@@ -85,106 +104,149 @@ element is looked for. It temporarily *sets* `retry_assertions_for` to that
 value — so a short one shortens the retry window just as a long one lengthens it
 — and additionally raises the browser `timeout` if that would otherwise be the
 shorter of the two. Both are restored afterwards.
-
-```robot-repl
-Wait For Condition    Text    id=status_bar    contains    Done    timeout=30s
-```
 ::
 
-Twenty-three getters can be used this way. It is *most* of the assertion
-getters, not all of them — `Console Log`, `Page Errors`, `Aria Snapshot`, the id
-getters and the two storage getters are not among them, and passing one fails
-with a conversion error rather than waiting. The full list:
-`Attribute`, `Attribute Names`, `BoundingBox`, `Browser Catalog`,
-`Checkbox State`, `Classes`, `Client Size`, `Download State`, `Element Count`,
-`Element States`, `Page Source`, `Property`, `Scroll Position`, `Scroll Size`,
-`Select Options`, `Selected Options`, `Style`, `Table Cell Index`,
-`Table Row Index`, `Text`, `Title`, `Url` and `Viewport Size`.
+### The pairing that does most of the work
 
-### `Wait For Condition` with `Element States`
+`Get Element States` returns the *set* of states an element is in right now, and
+that is what makes it the most useful condition of the lot: one keyword covers
+every "wait until this element is…" case, including the ones no dedicated
+keyword exists for.
 
-This pairing is the workhorse, and it deserves its own section.
+The states come in opposites, which is the part worth internalising:
 
-`Get Element States` returns the *set* of states an element is currently in, so
-combining it with `Wait For Condition` lets you wait for any combination of
-them — including combinations no dedicated keyword exists for.
+::doc-table
+---
+head: [If you are waiting for, Wait for the state]
+rows:
+  - ['The element to exist / be gone', '`attached` / `detached`']
+  - ['It to be shown / not shown', '`visible` / `hidden`']
+  - ['A control to become usable / unusable', '`enabled` / `disabled`']
+  - ['A field to accept typing / not', '`editable` / `readonly`']
+  - ['A box to be ticked / cleared', '`checked` / `unchecked`']
+  - ['An option to be picked / dropped', '`selected` / `deselected`']
+  - ['The cursor to land / leave', '`focused` / `defocused`']
+---
+::
+
+So the four cases you will actually hit:
 
 ```robot-repl
-# Wait until the overlay is gone from the DOM entirely
+# The overlay is gone from the DOM entirely — not merely invisible
 Wait For Condition    Element States    id=cdk-overlay-0    ==    detached
 
-# Wait until the heading is visible, editable and enabled — all three
-Wait For Condition    Element States    //h1    contains    visible    editable    enabled
-
-# Wait until the submit button stops being disabled
+# The submit button became usable after validation
 Wait For Condition    Element States    button#submit    contains    enabled
 
-# Wait until a field is no longer focused
-Wait For Condition    Element States    input#search    contains    defocused
+# The field is ready to type into: there, shown, and not read-only
+Wait For Condition    Element States    input#search    contains    visible    editable
+
+# Focus moved away, so the blur handler has run
+Wait For Condition    Element States    input#amount    contains    defocused
 ```
 
-The states, all fifteen of them:
-
-::doc-table
----
-head: [State, True when the element]
-nowrap: [0]
-rows:
-  - ['`attached`', 'Is present in the DOM']
-  - ['`detached`', 'Is not present in the DOM']
-  - ['`visible`', 'Has a non-empty bounding box and no `visibility: hidden`']
-  - ['`hidden`', 'Is attached but has an empty bounding box or `visibility: hidden`. A detached element reports `detached` alone, never `hidden`']
-  - ['`enabled`', 'Is not disabled']
-  - ['`disabled`', 'Is disabled — `button`, `fieldset`, `input`, `optgroup`, `option`, `select`, `textarea`']
-  - ['`editable`', 'Is not read-only']
-  - ['`readonly`', 'Is read-only — `input` and `textarea`']
-  - ['`selected`', 'Is selected — `option`']
-  - ['`deselected`', 'Is not selected']
-  - ['`focused`', 'Is the `activeElement`']
-  - ['`defocused`', 'Is not the `activeElement`']
-  - ['`checked`', 'Is checked — `input`']
-  - ['`unchecked`', 'Is not checked']
-  - ['`stable`', '**Not reported here.** `Get Element States` never returns it — only `Wait For Elements State` accepts it']
----
-::
-
-Because it is a set, `contains` means "all of these are true" and you can list
-as many as you need. `==` means the state set is *exactly* what you listed,
-which is why `== detached` is the right way to wait for something to disappear.
+`contains` means *all of these are true*, so you can list as many as you need.
+`==` means the set is *exactly* that, which is why `== detached` is the honest
+way to wait for something to disappear: an element that is gone reports
+`detached` and nothing else.
 
 ::doc-note{kind="warning"}
-There is also a `Wait For Elements State` keyword, which waits for **one** state
-of one element. It still works, and the library's own documentation recommends
-`Wait For Condition` with `Element States` instead when it gives you trouble.
-Prefer the pairing above: it handles several states at once and it fails with a
-message that tells you which states the element actually had.
+`stable` is the exception. It is a valid state for `Wait For Elements State`, but
+`Get Element States` never reports it — so `Wait For Condition … contains stable`
+polls until the timeout and fails, always. Wait for `visible` instead, or use
+`Wait For Elements State    selector    stable`.
 ::
 
-### The other waiting keywords
+## `Wait For Function`
+
+The other half of the pair. Where `Wait For Condition` asks a Browser getter,
+this one runs JavaScript **inside the page** and keeps running it until it
+returns something truthy.
+
+Reach for it when the thing you are waiting for is not in the DOM in any way a
+selector can express — it is in the application's own state:
+
+```robot-repl
+# The framework says it has finished booting
+Wait For Function    () => window.myApp.ready === true
+
+# The client-side store has data in it
+Wait For Function    () => window.__STORE__.getState().cart.items.length > 0
+
+# A third-party widget has attached itself
+Wait For Function    () => typeof window.Intercom === 'function'
+
+# Every image has actually decoded, not merely been requested
+Wait For Function    () => [...document.images].every(i => i.complete)
+```
+
+That last one is the flavour of problem this keyword exists for: nothing about
+"all images finished decoding" is expressible as a selector, and no getter
+returns it.
+
+### Waiting on one element
+
+Pass a `selector` and it is resolved and handed to your function as its **first
+argument**. The condition then becomes a question about that element, evaluated
+in the page where the real computed values live:
+
+```robot-repl
+# The progress bar reached full width — a computed style, not an attribute
+Wait For Function    element => element.style.width === '100%'    selector=#progress_bar
+
+# The CSS transition has finished, so the element has stopped moving
+Wait For Function    el => el.getBoundingClientRect().top === 0    selector=.sticky-header
+
+# A canvas has actually been drawn into
+Wait For Function    c => c.getContext('2d').getImageData(0,0,1,1).data[3] > 0    selector=canvas
+```
+
+These are the cases `Wait For Condition` cannot reach: computed geometry, canvas
+pixels, live style values mid-animation.
+
+### Polling
+
+By default it polls on `requestAnimationFrame` — once per frame, which is the
+right choice for anything visual, because it re-checks exactly when the browser
+repaints. Give `polling` a time instead when you are waiting on something slow
+and want to stop burning frames on it:
+
+```robot-repl
+Wait For Function    () => window.jobStatus === 'done'    polling=2s    timeout=2min
+```
+
+### Two things that catch people
+
+**Truthy is JavaScript's truthy.** `0`, `''`, `null` and `undefined` all read as
+"not yet", so `() => element.children.length` waits for a *non-empty* list
+without you writing the comparison — and `() => document.querySelector('.x')`
+waits for the element to exist, because a missing one is `null`.
+
+**Errors are treated as "not yet"**, not as failures. If your expression throws
+because the object does not exist on the first poll, that is suppressed and
+retried until the timeout — which is what makes
+`() => window.myApp.ready` safe to run before `myApp` exists.
+
+## Choosing between them
 
 ::doc-table
 ---
-head: [Keyword, For]
-nowrap: [0]
+head: [You are waiting for, Use]
 rows:
-  - ['`Wait For Elements State`', 'One state of one element. See the note above.']
-  - ['`Wait For Function`', 'A JavaScript expression to become truthy — the escape hatch when the condition is not something a getter can express']
-  - ['`Wait For Load State`', 'The page to reach `load`, `domcontentloaded` or `networkidle`. `commit` is accepted but returns immediately without waiting']
-  - ['`Wait For Response` / `Wait For Request`', 'A network response or request matching a glob or regular expression — usually promised, see below']
-  - ['`Wait For Navigation`', 'A navigation to complete, usually promised around the click that causes it']
+  - ['Text, a count, a class, an attribute, a URL', '`Wait For Condition`']
+  - ['An element to appear, vanish, or become usable', '`Wait For Condition` with `Element States`']
+  - ['A framework or widget to be ready', '`Wait For Function`']
+  - ['An animation or transition to finish', '`Wait For Function`']
+  - ['Application state that never reaches the DOM', '`Wait For Function`']
+  - ['The page to finish loading', '`Wait For Load State`']
+  - ['A request or response to happen', '`Wait For Response` / `Wait For Request` — and promise it, see below']
+  - ['A navigation caused by a click', '`Wait For Navigation` — promise it too']
 ---
 ::
 
-`Wait For Function` is the last resort, and it is genuinely useful for state
-that lives only in the page:
-
-```robot-repl
-Wait For Function    () => window.myApp.ready === true    timeout=10s
-```
-
-It also takes `selector=`, which is passed to your function as its first
-argument, and `polling=`, which defaults to `raf` — every animation frame —
-rather than to a time interval.
+Prefer the first wherever it fits. A condition written against a getter fails
+with a message naming what the value actually was; a JavaScript one fails with a
+timeout and leaves you to work out why.
 
 ## Promises
 
@@ -336,11 +398,18 @@ keyword and avoids the ordering question entirely.
 ## In short
 
 - A getter with an assertion operator is a wait. Without one, it reads once.
-- Reach for `Wait For Condition` before anything else: take the getter you would
-  have written, drop the `Get`.
-- `Wait For Condition` + `Element States` handles the awkward cases, including
-  waiting for several states at once and for an element to be gone.
-- `timeout` on `Wait For Condition` extends the *assertion* retry.
+- Two keywords cover the rest, and they are siblings: `Wait For Condition` asks a
+  Browser getter, `Wait For Function` asks the page. If you can write the
+  `Get …` assertion, use the first.
+- `Wait For Condition` needs no new syntax — write the getter assertion, then
+  drop the `Get`.
+- `Wait For Condition` + `Element States` is the one that handles most cases;
+  the states come in opposites, and `== detached` is how you wait for something
+  to be gone.
+- `Wait For Function` is for what only the page knows: readiness flags,
+  animations, computed geometry, application state that never reaches the DOM.
+  A throw counts as "not yet", so it is safe to poll for something that does not
+  exist yet.
 - Promises are start-now, collect-later. The order is always
   **`Promise To` → trigger → `Wait For`**.
 - Any Browser keyword can be promised, and promises really do run in parallel —
