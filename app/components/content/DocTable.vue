@@ -130,9 +130,12 @@ function cellText(cell: unknown, row: number, col: number): string {
   vertical-align: baseline;
 }
 
-/* Long tokens are the reason a table cannot fit; let them break. */
+/*
+ * Code in a cell keeps its spaces and stays on one line, like everywhere else
+ * (base.css). A cell is the tightest column on the page, so the span scrolls
+ * inside itself rather than widening the table.
+ */
 .doc-table :deep(code) {
-  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 0.88em;
   background: var(--chrome);

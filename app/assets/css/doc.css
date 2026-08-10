@@ -42,12 +42,11 @@
 }
 
 /*
- * Inline code is often one long unbreakable token — an image tag, an env var,
- * a URL — and at phone width one of those pushes the whole page sideways.
- * `anywhere` because there is nothing in them to break at.
+ * No `overflow-wrap` here on purpose: inline code must not be broken across
+ * lines, and it must keep its runs of spaces. Both come from `white-space: pre`
+ * in base.css, together with the inline-block that contains the overflow.
  */
 .doc code {
-  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 0.9em;
   background: var(--chrome);
@@ -119,6 +118,17 @@
  * scroll box, and our own <DocTable> restacks itself below 40rem instead.
  */
 .doc table {
+  /*
+   * `table-layout: fixed` is load-bearing since inline code stopped wrapping.
+   * An auto-laid table sizes itself to its widest cell, and a cell holding a
+   * `white-space: pre` keyword call has no width it can give back — so the
+   * table grew past `max-width` and took the page with it, 192px of sideways
+   * scroll at phone width. Fixed layout makes the columns share the width they
+   * are given; the cell's own overflow handles what does not fit, and the
+   * table stays a table for a screen reader, which `display: block` would not.
+   */
+  table-layout: fixed;
+  width: 100%;
   overflow-x: auto;
   max-width: 100%;
   border-collapse: collapse;

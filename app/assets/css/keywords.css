@@ -66,9 +66,13 @@
   overflow-wrap: break-word;
 }
 
-.intro-section :is(code, a),
-.kw :is(code, a) {
-  /* Anywhere, not break-word: these have no spaces to break at. */
+/*
+ * Links may break anywhere — they have nothing to break at. Code may not:
+ * see base.css, where `white-space: pre` keeps a keyword call whole and keeps
+ * its argument separators.
+ */
+.intro-section a,
+.kw a {
   overflow-wrap: anywhere;
 }
 

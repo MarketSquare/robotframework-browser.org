@@ -50,18 +50,56 @@ describe('long unbreakable words cannot push a page sideways', () => {
     )
   })
 
-  it('generated keyword documentation breaks its long tokens', () => {
+  it('generated keyword documentation breaks its long links', () => {
     /*
      * This content comes from docstrings, so it contains names nobody chose
      * for a phone: ROBOT_FRAMEWORK_BROWSER_NODE_DEBUG_OPTIONS, and links whose
      * text is a whole URL.
+     *
+     * Links, not code. Code stopped breaking when it started keeping its
+     * spaces — see below.
      */
     const kw = read('app/assets/css/keywords.css')
-    expect(kw).toMatch(/\.kw :is\(code, a\)[\s\S]{0,80}overflow-wrap:\s*anywhere/)
+    expect(kw).toMatch(/\.kw a\s*\{[\s\S]{0,80}overflow-wrap:\s*anywhere/)
   })
 
-  it('inline code in the docs breaks too', () => {
-    expect(read('app/assets/css/doc.css')).toMatch(/\.doc code\s*\{[^}]*overflow-wrap:\s*anywhere/)
+  it('inline code keeps its spaces and never breaks', () => {
+    /*
+     * `White-space: pre` on inline code is what makes a Robot Framework call
+     * readable: `Click    text=Sign in` needs its separator, and HTML's default
+     * collapses those four spaces to one -- printing an example that does not
+     * run. It also stops a keyword call being split across two lines.
+     *
+     * Both were requested, and both remove the escape hatch that kept a long
+     * token from widening the page. The box below is what replaces it.
+     */
+    const base = read('app/assets/css/base.css')
+    const rule = /:not\(pre\) > code \{[^}]*\}/.exec(base)?.[0] ?? ''
+    expect(rule, 'inline code must preserve runs of spaces').toMatch(/white-space:\s*pre/)
+    expect(rule, 'and must not wrap').not.toMatch(/overflow-wrap/)
+  })
+
+  it('inline code is boxed, so not wrapping cannot widen the page', () => {
+    /*
+     * Measured, at 375px: without this the keyword reference overflowed by
+     * 1124px. An inline-block that scrolls keeps a long span whole and inside
+     * its column.
+     */
+    const rule = /:not\(pre\) > code \{[^}]*\}/.exec(read('app/assets/css/base.css'))?.[0] ?? ''
+    expect(rule).toMatch(/display:\s*inline-block/)
+    expect(rule).toMatch(/max-width:\s*100%/)
+    expect(rule).toMatch(/overflow-x:\s*auto/)
+  })
+
+  it('tables are laid out fixed, or a pre cell drags the page with it', () => {
+    /*
+     * An auto-laid table sizes to its widest cell, and a cell holding a
+     * non-wrapping keyword call has no width to give back: selectors.md
+     * overflowed by 192px until this was set. `display: block` would also fix
+     * it and would cost the table its semantics for a screen reader.
+     */
+    const rule = /\.doc table \{[^}]*\}/.exec(read('app/assets/css/doc.css'))?.[0] ?? ''
+    expect(rule).toMatch(/table-layout:\s*fixed/)
   })
 
   it('keyword pills wrap rather than overflow on a narrow screen', () => {

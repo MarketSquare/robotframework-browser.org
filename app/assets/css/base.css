@@ -158,11 +158,35 @@ samp {
   font-size: 0.92em;
 }
 
-/* Inline code on paper — distinct from the dark plate used for blocks. */
+/*
+ * Inline code on paper — distinct from the dark plate used for blocks.
+ *
+ * `white-space: pre` does two things this site needs, and HTML gets both wrong
+ * by default. It keeps runs of spaces, so a Robot Framework call written as
+ * `Click    text=Sign in` still shows the separator that makes it valid — the
+ * default `normal` collapses those four spaces to one and quietly turns the
+ * example into something that does not run. And it stops the browser breaking
+ * a line inside the span, so a keyword call, a selector or an env var stays in
+ * one piece instead of being split across two lines.
+ *
+ * The cost is that a long span can no longer wrap, so it is boxed below.
+ */
 :not(pre) > code {
   background: var(--chrome);
   border: 1px solid var(--line);
   padding: 0.05em 0.3em;
+  white-space: pre;
+
+  /*
+   * Contain the overflow rather than letting it push the page sideways.
+   * An inline-block that scrolls keeps the long span whole, keeps it inside
+   * the column, and leaves the page itself unscrollable horizontally — which
+   * matters most on a phone.
+   */
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  vertical-align: bottom;
 }
 
 table {
