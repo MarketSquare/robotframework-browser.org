@@ -19,6 +19,6 @@
   "playwright": "1.62.1",
   "node": "24.19.0",
   "playwrightBundled": "1.62.1",
-  "playwrightDockerImage": "mcr.microsoft.com/playwright:v1.62.1-noble",
-  "playwrightDocker": "1.62.1"
+  "playwrightDockerImage": "mcr.microsoft.com/playwright:v1.62.0-noble",
+  "playwrightDocker": "1.62.0"
 }

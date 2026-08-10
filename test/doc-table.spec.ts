@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
+import { parse } from 'yaml'
 
 /**
  * The doc-table YAML trap.
@@ -82,5 +83,40 @@ describe('DocTable reports a bad cell usefully', () => {
 
   it('the message tells the author what to do', () => {
     expect(src).toContain('wrap the cell in double quotes')
+  })
+})
+
+describe('every doc-table block is parseable YAML', () => {
+  /*
+   * A malformed block does not fail the build and does not fail any other
+   * test — Nuxt Content renders nothing where the table was. That is how a
+   * corrected paragraph in docker.md silently deleted an entire table: the
+   * continuation lines were re-wrapped to column 0, which ends the YAML
+   * sequence item, and the page shipped with the row missing.
+   *
+   * Parsing is the only thing that catches it, because the failure is silent.
+   */
+  const blocks = contentFiles().flatMap(file =>
+    tableBlocks(readFileSync(file, 'utf8')).map((yaml, index) => ({
+      name: `${file.replace(`${ROOT}/`, '')} #${index + 1}`,
+      yaml: yaml.join('\n'),
+    })),
+  )
+
+  it('found blocks to check', () => {
+    expect(blocks.length).toBeGreaterThan(10)
+  })
+
+  it.each(blocks)('$name parses, with rows that are lists', block => {
+    let parsed: unknown
+    expect(() => { parsed = parse(block.yaml) }, `${block.name}: malformed YAML`).not.toThrow()
+
+    const table = parsed as { rows?: unknown[] }
+    expect(Array.isArray(table?.rows), `${block.name}: no rows`).toBe(true)
+    expect(table.rows!.length, `${block.name}: empty table`).toBeGreaterThan(0)
+
+    for (const row of table.rows!) {
+      expect(Array.isArray(row), `${block.name}: a row is not a list — check the indentation`).toBe(true)
+    }
   })
 })

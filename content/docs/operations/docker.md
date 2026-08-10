@@ -152,10 +152,8 @@ head:
 rows:
   - - "`%%playwrightDockerImage%%`"
     - Ubuntu Noble, Node.js, the browser binaries and every system library they
-      need. The Playwright in the base image is whatever the Dockerfile's `FROM` line
-pins, currently %%playwrightDocker%%, and that can lag the Playwright the
-release is built
-      against.
+      need. Its Playwright is whatever the Dockerfile's `FROM` line pins, and
+      that can lag the one the release was built against.
   - - Python 3.14 in a virtualenv
     - "`/home/pwuser/.venv`, already on `PATH`. `pip` inside the container
       installs into it."
@@ -170,9 +168,10 @@ release is built
 
 That last row is the non-obvious one. The browsers in this image come from the
 Playwright base image, not from `rfbrowser init`. It is why the image is far
-smaller than an install that also downloads its own browser binaries, and it is
-why the
-Playwright version cannot drift from what Browser expects.
+smaller than an install that downloads its own browser binaries on top of the
+base image's — and also why the base image's Playwright can differ from the one
+Browser was built against, since nothing in the image re-downloads browsers to
+match.
 
 ## Checking what you got
 

@@ -108,8 +108,11 @@ does not say what the element *is*, and because text is language-dependent: the
 moment the app is localised, every text selector is a translation away from
 failing.
 
-`text=Sign in` matches by substring, case-insensitively, and trims whitespace.
-Quoting the value — `"Sign in"` — makes it an exact, case-sensitive match.
+`text=Sign in` matches by substring, case-insensitively. Quoting the value —
+`"Sign in"` — makes it a whole-string, case-sensitive match. Both **normalise
+whitespace**: edges trimmed and internal runs collapsed, so `"Sign in"` still
+matches `<p>  Sign    in  </p>`. The regex form is the exception — it runs
+against the raw text, so `text=/^Sign in$/i` will not match a padded node.
 
 ### 4. `css=` — acceptable, not preferable
 
@@ -202,7 +205,10 @@ it.
 ## How a strategy is chosen
 
 You can always be explicit with a `strategy=value` prefix. Spaces around the
-separator are ignored, so `css=foo`, `css= foo` and `css = foo` are equivalent.
+separator are ignored by `css=`, `xpath=` and `text=`, so `css=foo`, `css= foo`
+and `css = foo` are equivalent. They are **not** ignored by `id=` or the
+test-id engines: the space becomes part of the value, so `id = save` silently
+matches nothing.
 
 Without a prefix, the strategy is inferred:
 
@@ -234,14 +240,14 @@ combine in a single string, left to right, with `>>`. Each step searches inside
 the result of the previous one.
 
 ```robot-repl
-# Find the element with text "Login", then its parent input
+# Find the element with text "Login", then the input beside it
 Click    "Login" >> xpath=../input
 
 # Find a css element, then a button inside it by text
 Click    css=.checkout >> text=Confirm
 
 # Start with a role, narrow with css
-Get Text    role=listitem[name="Basket"] >> css=.price
+Get Text    role=listitem >> css=.price
 ```
 
 That means you rarely need one clever selector. You need two obvious ones.
@@ -358,7 +364,7 @@ rows:
   - - "`:visible`"
     - Only elements that are visible
   - - "`:is(a, b)`"
-    - Several conditions on one element
+    - An element matching *any* of the listed selectors
   - - "`:nth-match(sel, n)`"
     - The n-th match, one-based, across the whole query
 ---
@@ -436,8 +442,8 @@ Piercing is what most engines do — `css`, `text`, `role` and the attribute
 engines all cross open shadow roots. `xpath` does not. Every descendant
 combinator, including the implicit one at the start of a selector, crosses any
 number of open roots. Elements are searched in the light DOM first, then inside
-open shadow roots, in document order. Neither engine enters an iframe — that
-needs [`>>>`](#crossing-into-iframes-with-).
+open shadow roots, in document order. No engine enters an iframe — that needs
+[`>>>`](#crossing-into-iframes-with-).
 
 ### Turning piercing off
 
@@ -453,10 +459,11 @@ Get Text    css:light=my-widget .label
 ```
 
 ::doc-note{kind="warning"}
-The other `:light` engines are gone. `text:light=`, `id:light=`, `xpath:light=`,
-`data-testid:light=`, `data-test-id:light=` and `data-test:light=` were removed
-from the bundled Playwright and now raise `"…" selector is not supported` the
-moment they match an element. Write `css:light=[id="foo"]` instead of
+The other `:light` engines are deprecated. `text:light=`, `id:light=`,
+`xpath:light=`, `data-testid:light=`, `data-test-id:light=` and `data-test:light=`
+still parse, but the moment they match an element the bundled Playwright raises
+`"…" selector is not supported`. Matching nothing gives no error and no match,
+which is the worse outcome. Write `css:light=[id="foo"]` instead of
 `id:light=foo`.
 ::
 

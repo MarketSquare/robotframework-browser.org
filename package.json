@@ -38,7 +38,8 @@
     "nuxt-studio": "^1.7.0",
     "playwright-core": "^1.62.1",
     "sanitize-html": "^2.17.6",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "yaml": "^2.9.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
