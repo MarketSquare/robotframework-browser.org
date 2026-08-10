@@ -18,9 +18,23 @@
  * render-time throw would take the page down for a typo. `versions.spec.ts`
  * fails the build for one instead.
  */
-const props = defineProps<{ name: string }>()
+const props = defineProps<{
+  name: string
+  /**
+   * Render inside `<code>`.
+   *
+   * A version can appear as code in prose — an image tag, for instance — and a
+   * Markdown code span cannot contain a component, so `` `:ver{...}` `` would
+   * print the component source instead of running it. The prop moves the code
+   * styling inside the component, where it can.
+   */
+  code?: boolean
+}>()
 
 const value = computed(() => resolveTokenString(`%%${props.name}%%`))
 </script>
 
-<template>{{ value }}</template>
+<template>
+  <code v-if="props.code">{{ value }}</code>
+  <template v-else>{{ value }}</template>
+</template>

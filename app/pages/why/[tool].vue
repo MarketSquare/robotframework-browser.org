@@ -26,8 +26,8 @@ if (!doc.value) {
 const toc = computed(() => tocFromBody(doc.value?.body?.value as MarkNode[] | undefined))
 
 useHead(() => ({
-  title: `${rendered?.title} — Robot Framework Browser`,
-  meta: [{ name: 'description', content: rendered?.tagline ?? '' }],
+  title: `${rendered.value?.title} — Robot Framework Browser`,
+  meta: [{ name: 'description', content: rendered.value?.tagline ?? '' }],
 }))
 
 /*

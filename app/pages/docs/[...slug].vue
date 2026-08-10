@@ -75,8 +75,8 @@ const neighbours = computed(() => {
 const toc = computed(() => tocFromBody(doc.value?.body?.value as MarkNode[] | undefined))
 
 useHead(() => ({
-  title: `${rendered?.title} — Robot Framework Browser`,
-  meta: [{ name: 'description', content: rendered?.description ?? '' }],
+  title: `${rendered.value?.title} — Robot Framework Browser`,
+  meta: [{ name: 'description', content: rendered.value?.description ?? '' }],
 }))
 
 /*

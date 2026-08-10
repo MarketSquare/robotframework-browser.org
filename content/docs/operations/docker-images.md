@@ -89,8 +89,9 @@ things must agree:
 3. the browser binaries baked into the image.
 
 The published image gets this right by construction: it starts from
-`%%playwrightDockerImage%%`, and the Browser release it installs is built
-against Playwright %%playwrightBundled%%. Those two can differ by a patch — the
+:ver{name="playwrightDockerImage" code}, and the Browser release it installs is
+built against Playwright :ver{name="playwrightBundled"}. Those two can differ by
+a patch — the
 `FROM` line is bumped by hand — so if you are chasing a binary-level mismatch,
 compare them rather than assuming they agree.
 
