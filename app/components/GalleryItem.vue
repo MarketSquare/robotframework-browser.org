@@ -24,6 +24,7 @@ const { data: doc } = await useAsyncData(`gallery-${props.path}`, async () => {
   }
   return null
 })
+
 </script>
 
 <template>

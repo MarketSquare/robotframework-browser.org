@@ -32,8 +32,14 @@ const tight = (col: number) => props.nowrap.includes(col)
  * function", naming neither the file nor the cell. Checking here turns that
  * into a message that says what to do.
  */
+/*
+ * Version tokens resolve here rather than before the content reaches the
+ * renderer: Nuxt Studio writes whatever <ContentRenderer> is handed straight
+ * back to the file, so resolving above it destroys the tokens in the source.
+ * See app/utils/version-tokens.ts.
+ */
 function cellText(cell: unknown, row: number, col: number): string {
-  if (typeof cell === 'string') return cell
+  if (typeof cell === 'string') return resolveTokenString(cell)
   throw new TypeError(
     `doc-table cell [${row}][${col}] is ${typeof cell}, not a string: ${JSON.stringify(cell)}. `
     + 'A YAML scalar containing ": " parses as a mapping — wrap the cell in double quotes.',
@@ -47,7 +53,9 @@ function cellText(cell: unknown, row: number, col: number): string {
       <thead>
         <tr>
           <!-- scope, or every cell in a table this size reads as unassociated. -->
-          <th v-for="(h, j) in props.head" :key="j" scope="col" :class="{ tight: tight(j) }">{{ h }}</th>
+          <th v-for="(h, j) in props.head" :key="j" scope="col" :class="{ tight: tight(j) }">
+            {{ resolveTokenString(h) }}
+          </th>
         </tr>
       </thead>
       <tbody>

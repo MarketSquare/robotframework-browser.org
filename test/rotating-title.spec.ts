@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
+import { parse } from 'yaml'
 
 const ROOT = process.cwd()
 const read = (p: string) => readFileSync(join(ROOT, p), 'utf8')
@@ -9,18 +10,33 @@ const read = (p: string) => readFileSync(join(ROOT, p), 'utf8')
 const component = read('app/components/content/RotatingTitle.vue')
 const landing = read('content/index.md')
 
-/** The headlines, straight out of the page's frontmatter block. */
-const titles = landing
-  .slice(landing.indexOf('titles:'), landing.indexOf('---\n:::', landing.indexOf('titles:')))
-  .split('\n')
-  .slice(1)
-  /*
-   * Strip the list marker and any surrounding quotes. Quoted is the form to
-   * keep: a formatter once rewrote these as `- |` block scalars, which
-   * preserve the newline, so every headline rendered with a line break in it.
-   */
-  .map(l => l.replace(/^\s*-\s*/, '').trim().replace(/^"(.*)"$/, '$1'))
-  .filter(Boolean)
+/**
+ * The headlines, parsed out of the `rotating-title` block.
+ *
+ * Parsed, not sliced. This used to cut the file between two literal strings and
+ * strip list markers by hand, which meant any reformatting broke it: Nuxt
+ * Studio rewrote the quoted scalars as indented `|-` blocks and the extraction
+ * started returning YAML syntax as headlines. The block is YAML, so read it as
+ * YAML and the shape on disk stops mattering.
+ *
+ * Both forms mean the same thing to a parser -- `"a\nb"` and a `|-` block are
+ * one string with a newline in it -- which is why the page kept rendering
+ * correctly while the test failed.
+ */
+function headlines(md: string): string[] {
+  const open = /^\s*:{2,}rotating-title\s*$/m.exec(md)
+  if (!open) throw new Error('content/index.md has no ::rotating-title block')
+  const after = md.slice(open.index + open[0].length)
+  const body = /^\s*---\n([\s\S]*?)\n\s*---/.exec(after)
+  if (!body) throw new Error('::rotating-title has no YAML block')
+  // Studio indents the whole block; YAML needs it flush.
+  const lines = body[1]!.split('\n')
+  const indent = Math.min(...lines.filter(l => l.trim()).map(l => l.match(/^ */)![0].length))
+  const yaml = lines.map(l => l.slice(indent)).join('\n')
+  return (parse(yaml) as { titles: string[] }).titles
+}
+
+const titles = headlines(landing)
 
 describe('the rotating headline', () => {
   it('has several headlines to rotate through', () => {

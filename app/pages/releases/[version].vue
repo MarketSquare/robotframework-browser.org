@@ -47,6 +47,20 @@ useHead(() => ({
   title: `Browser ${version.value} release notes — Robot Framework Browser`,
   meta: [{ name: 'description', content: doc.value?.headline || `What changed in Browser ${version.value}.` }],
 }))
+
+/*
+ * The renderer gets the document exactly as it is on disk.
+ *
+ * Nuxt Studio serialises whatever object is handed to <ContentRenderer> back
+ * into the Markdown file, so passing a token-resolved copy here silently
+ * rewrote `%%browser%%` to a frozen version number the moment a page was opened
+ * in the editor. Tokens are resolved further down instead, by the component
+ * that owns the text -- see app/utils/version-tokens.ts.
+ *
+ * `rendered` is for template interpolation of frontmatter only. Studio never
+ * reads it.
+ */
+const rendered = computed(() => resolveTokens(doc.value))
 </script>
 
 <template>
@@ -55,27 +69,27 @@ useHead(() => ({
 
     <main class="main">
       <nav class="crumb" aria-label="Breadcrumb">
-        <NuxtLink to="/releases">Releases</NuxtLink><span>/</span><span>{{ doc.version }}</span>
+        <NuxtLink to="/releases">Releases</NuxtLink><span>/</span><span>{{ rendered.version }}</span>
       </nav>
 
       <header class="head">
-        <h1>Browser {{ doc.version }}</h1>
-        <p v-if="doc.date" class="date">Released {{ doc.date }}</p>
+        <h1>Browser {{ rendered.version }}</h1>
+        <p v-if="rendered.date" class="date">Released {{ rendered.date }}</p>
 
         <dl class="facts">
           <div v-if="doc.playwright">
             <dt>Playwright</dt>
-            <dd>{{ doc.playwright }}</dd>
+            <dd>{{ rendered.playwright }}</dd>
           </div>
           <div v-if="doc.supports">
             <dt>Supports</dt>
-            <dd>{{ doc.supports }}</dd>
+            <dd>{{ rendered.supports }}</dd>
           </div>
         </dl>
 
         <BtnRow>
           <Btn :to="isLatest ? '/keywords' : `/keywords/${doc.version}`" primary>
-            Keyword reference for {{ doc.version }}
+            Keyword reference for {{ rendered.version }}
           </Btn>
           <Btn :to="`https://github.com/MarketSquare/robotframework-browser/releases/tag/v${doc.version}`">
             On GitHub

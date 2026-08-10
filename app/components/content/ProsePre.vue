@@ -67,10 +67,16 @@ const hasChrome = computed(() => Boolean(props.filename))
 
 const name = computed(() => props.filename || LABEL[props.language ?? ''] || (props.language ?? 'text'))
 
+/*
+ * `code` carries the fence's text, so a `%%browser%%` in a shell command is
+ * resolved here. It has to be here and not above <ContentRenderer>, because
+ * Studio serialises what that component is given back into the Markdown file.
+ * See app/utils/version-tokens.ts.
+ */
 const file = computed(() => ({
   name: name.value,
   lang: lang.value,
-  code: props.code ?? '',
+  code: resolveTokenString(props.code ?? ''),
   highlightLines: props.highlights,
 }))
 </script>

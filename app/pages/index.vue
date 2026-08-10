@@ -23,6 +23,7 @@ useHead(() => ({
   title: 'Robot Framework Browser — modern web automation, powered by Playwright',
   meta: [{ name: 'description', content: doc.value?.description ?? '' }],
 }))
+
 </script>
 
 <template>

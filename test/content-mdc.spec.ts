@@ -46,6 +46,19 @@ function proseLines(src: string): { text: string; n: number }[] {
 
 const files = contentFiles()
 
+/*
+ * Only balance is checked, not the length of the delimiters.
+ *
+ * This suite used to require that an outer block carry more colons than the
+ * block inside it. That is a Markdown code-fence rule, and remark-mdc does not
+ * apply it: `::::` outside `::`, `::` outside `::::`, and three blocks all
+ * using `::` were each parsed into the identical tree. The parser pairs an
+ * opener with a closer by nesting depth alone.
+ *
+ * The rule also could not have caught anything on the landing page, because
+ * Studio indents what it rewrites and the anchored pattern skipped every
+ * indented line -- it passed by not looking.
+ */
 describe('MDC block nesting', () => {
   it('has content to check', () => {
     expect(files.length).toBeGreaterThan(10)
@@ -55,35 +68,21 @@ describe('MDC block nesting', () => {
     const stack: { colons: number; name: string; n: number }[] = []
 
     for (const { text, n } of proseLines(readFileSync(file, 'utf8'))) {
-      // An opener is two-or-more colons followed by a component name.
-      const open = /^(:{2,})([a-z][\w-]*)/.exec(text)
+      /*
+       * Indentation is allowed. Nuxt Studio indents nested blocks when it
+       * rewrites a file, and this suite has to accept anything Studio can
+       * legally produce or it fails on content the site renders correctly.
+       */
+      const open = /^\s*(:{2,})([a-z][\w-]*)/.exec(text)
       if (open) {
-        const colons = open[1]!.length
-        const parent = stack.at(-1)
-        /*
-         * The failure the user saw: an inner block opened with as many colons
-         * as its parent ends the parent instead of nesting inside it.
-         */
-        if (parent) {
-          expect(
-            colons,
-            `line ${n}: ::${open[2]} opens with ${colons} colons inside ::${parent.name}, `
-            + `which also uses ${parent.colons}. The outer block needs more colons than the inner one.`,
-          ).toBeLessThan(parent.colons)
-        }
-        stack.push({ colons, name: open[2]!, n })
+        stack.push({ colons: open[1]!.length, name: open[2]!, n })
         continue
       }
 
-      const close = /^(:{2,})\s*$/.exec(text)
+      const close = /^\s*(:{2,})\s*$/.exec(text)
       if (close) {
-        const colons = close[1]!.length
         const top = stack.at(-1)
         expect(top, `line ${n}: ${close[1]} closes a block that was never opened`).toBeDefined()
-        expect(
-          colons,
-          `line ${n}: ${close[1]} does not match ::${top!.name} opened with ${top!.colons} colons on line ${top!.n}`,
-        ).toBe(top!.colons)
         stack.pop()
       }
     }
@@ -107,7 +106,8 @@ describe('the landing page is content, not markup', () => {
 
   it('uses the reusable components rather than bespoke ones', () => {
     for (const c of ['page-hero', 'page-section', 'card-grid', 'card', 'feature-grid']) {
-      expect(md, `content/index.md should use ::${c}`).toMatch(new RegExp(`^:{2,}${c}\\b`, 'm'))
+      // Leading whitespace allowed: Studio indents nested blocks.
+      expect(md, `content/index.md should use ::${c}`).toMatch(new RegExp(`^\\s*:{2,}${c}\\b`, 'm'))
     }
   })
 })

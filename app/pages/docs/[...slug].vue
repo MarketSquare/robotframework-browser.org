@@ -75,9 +75,23 @@ const neighbours = computed(() => {
 const toc = computed(() => tocFromBody(doc.value?.body?.value as MarkNode[] | undefined))
 
 useHead(() => ({
-  title: `${doc.value?.title} — Robot Framework Browser`,
-  meta: [{ name: 'description', content: doc.value?.description ?? '' }],
+  title: `${rendered?.title} — Robot Framework Browser`,
+  meta: [{ name: 'description', content: rendered?.description ?? '' }],
 }))
+
+/*
+ * The renderer gets the document exactly as it is on disk.
+ *
+ * Nuxt Studio serialises whatever object is handed to <ContentRenderer> back
+ * into the Markdown file, so passing a token-resolved copy here silently
+ * rewrote `%%browser%%` to a frozen version number the moment a page was opened
+ * in the editor. Tokens are resolved further down instead, by the component
+ * that owns the text -- see app/utils/version-tokens.ts.
+ *
+ * `rendered` is for template interpolation of frontmatter only. Studio never
+ * reads it.
+ */
+const rendered = computed(() => resolveTokens(doc.value))
 </script>
 
 <template>
@@ -101,8 +115,8 @@ useHead(() => ({
       <main class="main">
         <header class="head">
           <p class="label">{{ SECTIONS.find(s => s.id === doc.section)?.name }}</p>
-          <h1>{{ doc.title }}</h1>
-          <p class="lede">{{ doc.description }}</p>
+          <h1>{{ rendered.title }}</h1>
+          <p class="lede">{{ rendered.description }}</p>
         </header>
 
         <ContentRenderer :value="doc" class="doc" />

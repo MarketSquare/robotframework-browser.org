@@ -265,7 +265,7 @@ each, sharing everything else. Starting Browser has never required abandoning
 SeleniumLibrary.
 
 ::doc-note
-Checked against SeleniumLibrary 6.7 on Selenium 4 and Browser %%browser%%. If
+Checked against SeleniumLibrary 6.7 on Selenium 4 and Browser :ver{name="browser"}. If
 anything here is wrong or has aged badly,
 [tell us](https://github.com/MarketSquare/robotframework-browser/issues) —
 we would rather fix it than let an unfair comparison stand.

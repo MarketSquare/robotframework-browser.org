@@ -213,7 +213,7 @@ the report, testers who are not JavaScript developers — the constraints start 
 cost you, and Robot Framework was built for the job you actually have.
 
 ::doc-note
-Facts on this page are checked against Cypress 15 and Browser %%browser%%. If
+Facts on this page are checked against Cypress 15 and Browser :ver{name="browser"}. If
 something here has become wrong,
 [tell us](https://github.com/MarketSquare/robotframework-browser/issues) —
 a comparison page that quietly rots is worse than none.

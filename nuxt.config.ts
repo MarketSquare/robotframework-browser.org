@@ -52,22 +52,18 @@ export default defineNuxtConfig({
 
   devtools: { enabled: false },
 
-  hooks: {
-    'content:file:beforeParse'(ctx) {
-      if (!ctx.file.body || typeof ctx.file.body !== 'string') return
-      ctx.file.body = ctx.file.body.replace(/%%(\w+)%%/g, (whole, name: string) => {
-        const value = VERSIONS[name]
-        if (value === undefined) {
-          // Loud, not silent: a typo would otherwise ship as literal text.
-          throw new Error(
-            `${ctx.file.id}: unknown version token ${whole}. `
-            + `Known: ${Object.keys(VERSIONS).join(', ')}`,
-          )
-        }
-        return value
-      })
-    },
-  },
+  /*
+   * There is deliberately no `content:file:beforeParse` substitution here.
+   *
+   * `%%browser%%` and friends used to be replaced in the Markdown source
+   * before it was parsed, which left the parsed content and the file on disk
+   * saying different things. Nuxt Studio seeds its editor from the parsed side
+   * and writes that back, so merely *opening* a page in Studio -- no edit, no
+   * save -- rewrote every token in the file to a frozen version number.
+   *
+   * Tokens now survive the whole content pipeline untouched and are resolved
+   * when the page renders. See app/utils/version-tokens.ts.
+   */
 
   // Static output for GitHub Pages. No server, no runtime API.
   ssr: true,

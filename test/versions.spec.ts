@@ -100,7 +100,22 @@ describe('content quotes versions by token, not by hand', () => {
      * site documents several. Using it as a template delimiter would have
      * turned a page about %{PATH} into a build failure.
      */
-    expect(read('nuxt.config.ts')).toContain('%%(\\w+)%%')
+    expect(read('app/utils/version-tokens.ts')).toContain('%%(\\w+)%%')
+  })
+
+  it('resolves at render time, never by rewriting the source', () => {
+    /*
+     * A `content:file:beforeParse` hook used to substitute tokens in the
+     * Markdown body. That made the parsed content and the file on disk
+     * disagree, and Nuxt Studio seeds its editor from the parsed side: opening
+     * a page in Studio -- without editing or saving -- wrote the resolved
+     * version numbers back into the file and destroyed every token in it.
+     */
+    // The name appears in that file's own comment explaining why it is absent,
+    // so match the hook declaration rather than the word.
+    expect(read('nuxt.config.ts'), 'the source-mutating hook is back').not.toMatch(
+      /['"]content:file:beforeParse['"]\s*\(/,
+    )
   })
 })
 

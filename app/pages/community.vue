@@ -23,6 +23,7 @@ useHead(() => ({
   title: `${doc.value?.title} — Robot Framework Browser`,
   meta: [{ name: 'description', content: doc.value?.description ?? '' }],
 }))
+
 </script>
 
 <template>
