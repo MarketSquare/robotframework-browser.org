@@ -41,11 +41,11 @@ rows:
     - The visible text is the thing you actually mean, and the app is
       single-language.
   - - "4"
-    - css=
-    - None of the above identify the element.
-  - - "5"
     - id=
     - You know the id is contractual, not incidental.
+  - - "5"
+    - css=
+    - None of the above identify the element.
   - - "6"
     - xpath=
     - Genuinely nothing else can select it.
@@ -118,25 +118,7 @@ whitespace**: edges trimmed and internal runs collapsed, so `"Sign in"` still
 matches `<p> Sign in </p>`. The regex form is the exception — it runs
 against the raw text, so `text=/^Sign in$/i` will not match a padded node.
 
-### 4. `css=` — acceptable, not preferable
-
-```robot-repl
-Click    css=button.primary
-Click    .checkout > button
-```
-
-CSS is web-native and every web developer reads it, which is a real advantage:
-a developer looking at your selector understands it immediately and can tell
-you when a change will break it.
-
-It ranks below the three above because it selects on *structure and styling* —
-exactly the things a redesign changes. A class name is a styling decision, not a
-contract with you.
-
-CSS is the implicit default: a selector that is not obviously something else is
-treated as CSS.
-
-### 5. `id=` — less stable than it looks
+### 4. `id=` — less stable than it looks
 
 ```robot-repl
 Click    id=submit-button
@@ -153,6 +135,22 @@ these particular ids are contractual.
 `#` starts a comment in Robot Framework syntax, so a CSS id selector must be
 escaped as `\#submit-button`, or written as `id=submit-button`.
 ::
+
+### 5. `css=` — acceptable, not preferable
+
+```robot-repl
+Click    css=button.primary
+Click    .checkout > button
+```
+
+CSS is web-native and every web developer reads it, which is a real advantage:
+a developer looking at your selector understands it immediately and can tell
+you when a change will break it.
+
+It ranks below the four above because it selects on *structure and styling* —
+exactly the things a redesign changes. A class name is a styling decision, typically not a contract with you.
+
+CSS is the implicit default: a selector that is not obviously something else is treated as CSS.
 
 ### 6. `xpath=` — the last resort
 
@@ -215,7 +213,7 @@ Here XPath is doing something useful and narrowly scoped: **navigating relative 
 
 That is a good use of XPath.
 
-### Also available: the test-id aliases
+### Also available: the `data-testid` aliases
 
 `data-testid=` has two siblings that do exactly the same job against a--- Unknown node: hardBreak ---different attribute. Which one you use is decided by what your developers--- Unknown node: hardBreak ---already put in the markup, not by preference:
 
@@ -376,7 +374,28 @@ right tells you exactly what it does, and reading it in any other order tells
 you something false.
 ::
 
-## Filtering inside a CSS selector
+## CSS Basics and Advanced
+
+### CSS Basics
+
+| Syntax           | Meaning                          | Example                           |
+| ---------------- | -------------------------------- | --------------------------------- |
+| `tag`            | Element type                     | `button`                          |
+| `.class`         | Class                            | `.submit-button`                  |
+| `#id`            | ID                               | `#email`                          |
+| `[attr]`         | Has attribute                    | `[disabled]`                      |
+| `[attr="value"]` | Attribute equals                 | `[type="submit"]`                 |
+| `A B`            | Descendant                       | `form button`                     |
+| `A > B`          | Direct child                     | `form > button`                   |
+| `A + B`          | **Next sibling**                 | `label + input`                   |
+| `A ~ B`          | **Any following sibling**        | `label ~ button`                  |
+| `:nth-child(n)`  | Child by position                | `li:nth-child(2)`                 |
+| `:not(...)`      | Exclude matches                  | `button:not([disabled])`          |
+| `:has(...)`      | Has matching descendant/relative | `.field:has(input[name="email"])` |
+
+One useful distinction to xpath: CSS can select **following** siblings with `+` and `~`, but it has no simple equivalent of XPath's `..` for selecting a parent directly.
+
+### Filtering inside a CSS selector
 
 Playwright adds pseudo-classes to CSS that stay inside one step, rather than
 becoming another link in the chain. These are strategies-with-conditions, not
@@ -421,7 +440,7 @@ Get Text    css=.card:has(img) >> css=.title
 `:text()`: `tr:has-text("Ada")` is the whole row, while `tr :text("Ada")` is the
 cell.
 
-## Layout selectors
+### Layout selectors
 
 Playwright can also select by where an element sits relative to another:
 `:right-of()`, `:left-of()`, `:above()`, `:below()` and `:near()`.
@@ -443,6 +462,29 @@ what `role=textbox[name="Postcode"]` uses and what a screen reader uses too.
 Reach for a layout selector when the markup genuinely offers nothing else, and
 treat it as a note that the page has an accessibility problem worth reporting.
 ::
+
+## XPath Basics
+
+XPath has tons of features and was generally designed to navigate in XML trees.
+Here are some of the more common used ones.
+
+As you can see, unlike in CSS, `class` and `id` attributes are not treated specially. To identify an element whose `class` attribute contains `error`, you need to use the `contains()` function.
+
+| Syntax                | Meaning                   | Example                            |
+| --------------------- | ------------------------- | ---------------------------------- |
+| `//`                  | Descendant anywhere below | `//button`                         |
+| `/`                   | Direct child              | `//form/button`                    |
+| `..`                  | Parent                    | `//input/..`                       |
+| `@`                   | Attribute                 | `//input[@name="email"]`           |
+| `[...]`               | Filter / condition        | `//button[@type="submit"]`         |
+| `*`                   | Any element               | `//*[@data-id="123"]`              |
+| `text()`              | Element text              | `//button[text()="Save"]`          |
+| `contains()`          | Partial match             | `//div[contains(@class,"error")]`  |
+| `[1]`, `[2]`          | Positional match          | `(//button)[1]`                    |
+| `ancestor::`          | Navigate upward           | `//input/ancestor::form`           |
+| `following-sibling::` | Following sibling         | `//label/following-sibling::input` |
+
+There are way more functionalities supported by XPath that you may learn somewhere else.
 
 ## Crossing into iframes with `>>>`
 
