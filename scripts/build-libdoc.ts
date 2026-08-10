@@ -3,15 +3,21 @@
  * serves. Spec §7.2. Run before build: `pnpm libdoc`.
  *
  * Emits, per version:
- *   public/libdoc/<version>/index.json          name, shortdoc, group, tags
- *   public/libdoc/<version>/groups.json         rail structure with counts
- *   public/libdoc/<version>/keywords/<slug>.json
- *   public/libdoc/<version>/types/<slug>.json
- *   app/generated/libdoc.json                   latest index + groups, for
- *                                               route generation and the rail
+ *   app/generated/full/<version>.json   every rendered body, read on the server
+ *                                       only, by the KeywordPanels island
+ *   app/generated/index/<version>.json  the small half: index, groups and type
+ *                                       names -- the rail and the search filter
+ * and once:
+ *   app/generated/libdoc.json           the latest index + groups, imported
+ *                                       directly for route generation
  *
- * The 0.83 MB source is never shipped: a keyword page loads its own payload
- * plus the shared index.
+ * The 0.83 MB source is never shipped, and neither is the full payload: the
+ * reference page is prerendered, so the rendered bodies reach the reader as
+ * HTML and the client gets only the index.
+ *
+ * This also used to emit one JSON file per keyword and per type under public/,
+ * for a client-side fetch that the island design removed. Nothing requested
+ * them and 2747 files shipped on every deploy.
  */
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -22,7 +28,6 @@ import { ROBOT_REPL } from '../app/utils/lang.ts'
 
 const ROOT = resolve(import.meta.dirname, '..')
 const SRC = join(ROOT, 'content/libdoc')
-const OUT = join(ROOT, 'public/libdoc')
 const GEN = join(ROOT, 'app/generated')
 
 const SOURCE_BASE = 'https://github.com/MarketSquare/robotframework-browser/blob/main'
@@ -39,7 +44,13 @@ if (!specFiles.length) throw new Error(`no Browser-*.json in ${SRC}`)
 
 const groups = JSON.parse(readFileSync(join(ROOT, 'content/keyword-groups.json'), 'utf8')).groups
 
-rmSync(OUT, { recursive: true, force: true })
+/*
+ * Only this script's own output. `app/generated` is shared -- versions.json is
+ * written by build-versions.ts and is committed -- so clearing the whole
+ * directory would delete another script's work.
+ */
+rmSync(join(GEN, 'full'), { recursive: true, force: true })
+rmSync(join(GEN, 'index'), { recursive: true, force: true })
 mkdirSync(GEN, { recursive: true })
 
 let latestResult: Awaited<ReturnType<typeof transform>> | undefined
@@ -51,12 +62,6 @@ for (const file of specFiles) {
     groups,
     sourceBase: SOURCE_BASE,
   })
-
-  const dir = join(OUT, result.version)
-  write(join(dir, 'index.json'), result.index)
-  write(join(dir, 'groups.json'), result.groups)
-  for (const kw of result.keywords) write(join(dir, 'keywords', `${kw.slug}.json`), kw)
-  for (const t of result.types) write(join(dir, 'types', `${t.slug}.json`), t)
 
   /*
    * Guard against a sanitizer that quietly eats content: libdoc's HTML is the
@@ -141,14 +146,6 @@ for (const file of specFiles) {
 if (!latestResult) {
   throw new Error(`LATEST is "${latest}" but no Browser-${latest}.json was transformed`)
 }
-
-write(join(OUT, 'versions.json'), {
-  latest,
-  versions: specFiles
-    .map(f => f.replace(/^Browser-|\.json$/g, ''))
-    .sort()
-    .reverse(),
-})
 
 // The latest, imported directly for route generation, the header badge and
 // the default reference page. Index and groups only — never the keyword

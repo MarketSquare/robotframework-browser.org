@@ -1,4 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
+
+interface KeywordArg { typeHref?: string }
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
@@ -40,19 +42,27 @@ describe('the committed libdoc sources are machine-independent', () => {
 
 describe.skipIf(!ready)('generated payloads', () => {
   const gen = JSON.parse(readFileSync(GEN, 'utf8'))
-  const dir = join(ROOT, 'public/libdoc', gen.version)
+  /*
+   * The full payload for the current release: every rendered body, read on the
+   * server only. These assertions used to run against one file per keyword
+   * under public/, which nothing ever fetched; the invariants are the same and
+   * the data is the same, so they moved rather than went away.
+   */
+  const full = JSON.parse(
+    readFileSync(join(ROOT, 'app/generated/full', `${gen.version}.json`), 'utf8'),
+  ) as { keywords: { name: string; slug: string; doc: string; args: KeywordArg[]; returnTypeHref?: string }[]
+    types: { name: string; slug: string; usedBy: { slug: string }[] }[] }
 
-  it('emits one payload per keyword in the index', () => {
-    const files = new Set(readdirSync(join(dir, 'keywords')))
+  it('carries one entry per keyword in the index', () => {
+    const slugs = new Set(full.keywords.map(k => k.slug))
     for (const entry of gen.index) {
-      expect(files.has(`${entry.slug}.json`), `missing payload for ${entry.name}`).toBe(true)
+      expect(slugs.has(entry.slug), `missing payload for ${entry.name}`).toBe(true)
     }
-    expect(files.size).toBe(gen.index.length)
+    expect(slugs.size).toBe(gen.index.length)
   })
 
-  it('emits one payload per type', () => {
-    const files = readdirSync(join(dir, 'types'))
-    expect(files.length).toBe(gen.types.length)
+  it('carries one entry per type', () => {
+    expect(full.types.length).toBe(gen.types.length)
   })
 
   it('keeps the build-time index small enough to ship on every page', () => {
@@ -65,42 +75,54 @@ describe.skipIf(!ready)('generated payloads', () => {
     expect(readFileSync(GEN, 'utf8').length).toBeLessThan(source.length / 5)
   })
 
-  it('every argument type link points at a payload that exists', () => {
-    const types = new Set(readdirSync(join(dir, 'types')))
-    for (const entry of gen.index) {
-      const kw = JSON.parse(readFileSync(join(dir, 'keywords', `${entry.slug}.json`), 'utf8'))
+  it('every argument type link points at a type that exists', () => {
+    const types = new Set(full.types.map(t => t.slug))
+    for (const kw of full.keywords) {
       for (const arg of kw.args) {
         if (!arg.typeHref) continue
         const s = arg.typeHref.replace(/^#type--/, '')
-        expect(types.has(`${s}.json`), `${kw.name} -> ${arg.typeHref}`).toBe(true)
+        expect(types.has(s), `${kw.name} -> ${arg.typeHref}`).toBe(true)
       }
       if (kw.returnTypeHref) {
         const s = kw.returnTypeHref.replace(/^#type--/, '')
-        expect(types.has(`${s}.json`), `${kw.name} returns ${kw.returnTypeHref}`).toBe(true)
+        expect(types.has(s), `${kw.name} returns ${kw.returnTypeHref}`).toBe(true)
       }
     }
   })
 
   it('every reverse usage link points at a keyword that exists', () => {
-    const keywords = new Set(readdirSync(join(dir, 'keywords')))
-    for (const file of readdirSync(join(dir, 'types'))) {
-      const t = JSON.parse(readFileSync(join(dir, 'types', file), 'utf8'))
+    const keywords = new Set(full.keywords.map(k => k.slug))
+    for (const t of full.types) {
       for (const u of t.usedBy) {
-        expect(keywords.has(`${u.slug}.json`), `${t.name} -> ${u.slug}`).toBe(true)
+        expect(keywords.has(u.slug), `${t.name} -> ${u.slug}`).toBe(true)
       }
     }
   })
 
   it('leaves no unrewritten libdoc fragment in any payload', () => {
-    for (const file of readdirSync(join(dir, 'keywords'))) {
-      const kw = JSON.parse(readFileSync(join(dir, 'keywords', file), 'utf8'))
+    for (const kw of full.keywords) {
       expect(kw.doc, kw.name).not.toMatch(/href="#[A-Z]/)
     }
   })
 
-  it('records a version manifest for the switcher', () => {
-    const manifest = JSON.parse(readFileSync(join(ROOT, 'public/libdoc/versions.json'), 'utf8'))
-    expect(manifest.latest).toBe(gen.version)
-    expect(manifest.versions).toContain(gen.version)
+  /*
+   * The two generators have to agree. build-versions.ts reads the version from
+   * the library checkout and build-libdoc.ts from content/libdoc/LATEST; if
+   * they diverge the site renders one release's keywords under another's
+   * version number.
+   */
+  it('agrees with the version manifest', () => {
+    const manifest = JSON.parse(readFileSync(join(ROOT, 'app/generated/versions.json'), 'utf8'))
+    expect(manifest.browser).toBe(gen.version)
+    expect(manifest.documented).toContain(gen.version)
+  })
+
+  /*
+   * The payloads nothing fetched. Regenerating must not bring them back: they
+   * were 2747 files and 14 MB on every deploy, and they are what stopped Nuxt
+   * Studio from loading, since it scans all of public/.
+   */
+  it('emits nothing into public/', () => {
+    expect(existsSync(join(ROOT, 'public/libdoc'))).toBe(false)
   })
 })

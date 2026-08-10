@@ -16,4 +16,3 @@ app/generated
 # config, which happens during `pnpm install`'s prepare step — before any
 # script could regenerate it. Ignoring it made a clean clone fail to install.
 !app/generated/versions.json
-public/libdoc

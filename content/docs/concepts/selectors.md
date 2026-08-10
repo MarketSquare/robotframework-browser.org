@@ -12,40 +12,18 @@ software under test.
 This page covers the strategies, the order I would reach for them in, and the
 syntax for chaining, iframes and shadow DOM.
 
-## Pick a strategy in this order
+## Pick a strategy
 
-The ranking below is opinionated. It optimises for one thing: **a selector that
-keeps working when the page is redesigned but the feature is unchanged.**
+::doc-note
+---
+kind: note
+---
+#default
+**The ranking below is opinionated!**
 
-::doc-table
----
-head:
-  - ""
-  - Strategy
-  - Reach for it when
-nowrap: [0, 1]
-rows:
-  - - "1"
-    - role=
-    - The element has a proper accessible role and name. This is the default
-      choice.
-  - - "2"
-    - data-test-id=
-    - Stability matters more than testing the interface as a user meets it.
-  - - "3"
-    - text=
-    - The visible text is the thing you actually mean, and the app is
-      single-language.
-  - - "4"
-    - css=
-    - None of the above identify the element.
-  - - "5"
-    - id=
-    - You know the id is contractual, not incidental.
-  - - "6"
-    - xpath=
-    - Genuinely nothing else can select it.
----
+It optimises for one thing: **a selector that keeps working when the page is redesigned but the feature is unchanged.**
+
+**You have to**
 ::
 
 ### 1. `role=` — how the user finds it
@@ -111,7 +89,7 @@ failing.
 `text=Sign in` matches by substring, case-insensitively. Quoting the value —
 `"Sign in"` — makes it a whole-string, case-sensitive match. Both **normalise
 whitespace**: edges trimmed and internal runs collapsed, so `"Sign in"` still
-matches `<p>  Sign    in  </p>`. The regex form is the exception — it runs
+matches `<p> Sign in </p>`. The regex form is the exception — it runs
 against the raw text, so `text=/^Sign in$/i` will not match a padded node.
 
 ### 4. `css=` — acceptable, not preferable
@@ -188,7 +166,8 @@ already put in the markup, not by preference:
 head:
   - Prefix
   - Matches
-nowrap: [0]
+nowrap:
+  - 0
 rows:
   - - "`data-testid=`"
     - "`data-testid` — Playwright's own default, and the most common in the wild"
@@ -285,7 +264,8 @@ head:
   - Kind
   - Does
   - Examples
-nowrap: [0]
+nowrap:
+  - 0
 rows:
   - - Strategy
     - Finds elements in the page
@@ -349,17 +329,18 @@ filters, because they still describe *which* element you want:
 head:
   - Pseudo-class
   - Matches
-nowrap: [0]
+nowrap:
+  - 0
 rows:
   - - "`:has(sel)`"
     - An element that contains something matching `sel`
-  - - "`:has-text(\"x\")`"
+  - - '`:has-text("x")`'
     - An element containing that text anywhere inside it, case-insensitive
-  - - "`:text(\"x\")`"
+  - - '`:text("x")`'
     - The *smallest* element containing that text
-  - - "`:text-is(\"x\")`"
+  - - '`:text-is("x")`'
     - The smallest element whose text is exactly that
-  - - "`:text-matches(\"re\")`"
+  - - '`:text-matches("re")`'
     - Text matching a regular expression
   - - "`:visible`"
     - Only elements that are visible
@@ -443,7 +424,7 @@ engines all cross open shadow roots. `xpath` does not. Every descendant
 combinator, including the implicit one at the start of a selector, crosses any
 number of open roots. Elements are searched in the light DOM first, then inside
 open shadow roots, in document order. No engine enters an iframe — that needs
-[`>>>`](#crossing-into-iframes-with-).
+`>>>`.
 
 ### Turning piercing off
 

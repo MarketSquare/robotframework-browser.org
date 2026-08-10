@@ -13,7 +13,7 @@ reaches the site.
 pnpm install
 pnpm dev            # http://localhost:3000
 pnpm test           # vitest
-pnpm libdoc         # transform content/libdoc/*.json into public/libdoc/
+pnpm libdoc         # transform content/libdoc/*.json into app/generated/
 pnpm generate       # runs libdoc, then static output into .output/public
 pnpm check:bundle   # fails if server-only weight reached the client
 pnpm verify         # test + generate + check:bundle
