@@ -154,7 +154,7 @@ way to wait for something to disappear: an element that is gone reports
 `stable` is the exception. It is a valid state for `Wait For Elements State`, but
 `Get Element States` never reports it — so `Wait For Condition … contains stable`
 polls until the timeout and fails, always. Wait for `visible` instead, or use
-`Wait For Elements State    selector    stable`.
+`Wait For Elements State` with `stable`.
 ::
 
 ## `Wait For Function`
@@ -206,10 +206,9 @@ Wait For Function    c => c.getContext('2d').getImageData(0,0,1,1).data[3] > 0  
 Two things to know about that first one. `element.style` is the *inline* style
 attribute, not the computed value — it only sees a width the application wrote
 onto the element itself, never one that came from a stylesheet. And computed
-values are not out of reach for the sibling keyword either:
-`Wait For Condition    Style    …` reads `getComputedStyle`, and
-`Wait For Condition    BoundingBox    …` reads geometry. Canvas pixels are the
-genuine case where only JavaScript will do.
+values are not out of reach for the sibling keyword either: `Wait For Condition`
+with `Style` reads `getComputedStyle`, and with `BoundingBox` it reads geometry.
+Canvas pixels are the genuine case where only JavaScript will do.
 
 ::doc-note{kind="warning"}
 The selector is resolved in **strict mode**, so it has to match exactly one

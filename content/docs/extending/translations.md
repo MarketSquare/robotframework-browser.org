@@ -119,7 +119,7 @@ rows:
     - The library's own documentation, the introduction shown at the top of the
       keyword reference.
   - - "`__init__`"
-    - The import parameters — what you see when you look up `Library    Browser`.
+    - The import parameters — what you see when you look up the `Browser` import.
 ---
 ::
 

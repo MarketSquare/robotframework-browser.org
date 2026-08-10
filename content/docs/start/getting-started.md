@@ -58,8 +58,12 @@ needs a few hundred megabytes. You only do it once per environment.
 The assertion is part of the keyword — `Get Title` both reads and checks.
 
 The browser runs **headless** by default, so this prints a result without
-anything appearing on screen. Add `New Browser    chromium    headless=False`
-above `New Page` when you want to watch it.
+anything appearing on screen. To watch it, open the browser yourself above
+`New Page`:
+
+```robot-repl
+New Browser    chromium    headless=False
+```
 
 ```robot [first.robot]
 *** Settings ***
@@ -108,8 +112,8 @@ doing that work:
 
 - **Action keywords** like `Click` wait for the element to be actionable —
   attached, visible, stable and able to receive the click — before acting.
-- **Assertions** like `Get Title    *=    Robot Framework Browser` re-read the value
-  until it matches or the retry window expires.
+- **Assertions** like the `Get Title` line above re-read the value until it
+  matches or the retry window expires.
 
 So a keyword with an assertion operator is itself the wait. A getter *without*
 one reads once and returns. That distinction is the whole of

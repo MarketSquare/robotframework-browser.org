@@ -94,7 +94,7 @@ New Context    viewport={'width': 400, 'height': 900}    hasTouch=True    isMobi
 
 **A descriptor changes the engine only when nothing is open yet.** Every
 descriptor carries `defaultBrowserType`, and `New Context` honours it if there
-is no browser running — so `Get Device    iPhone 13` followed by `New Context`
+is no browser running — so `Get Device` for `iPhone 13` followed by `New Context`
 does launch WebKit. Applied to an *already running* Chromium it changes nothing
 but the emulation: a Chromium reporting an iPhone user agent at an iPhone
 viewport. It is not Safari either way.

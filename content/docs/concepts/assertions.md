@@ -154,7 +154,7 @@ Get Text             .price   validate    float(value.strip("€")) < 100
 Get BoundingBox      #card    ALL         validate    value['width'] > 40
 ```
 
-Getters that return a dictionary — `Get BoundingBox    ALL`, `Get Viewport Size`
+Getters that return a dictionary — `Get BoundingBox` with `ALL`, `Get Viewport Size`
 — are usually asserted this way, indexing into `value` directly. So is
 `Get Browser Catalog`, which returns a list of dictionaries and is not restricted
 to the list operators — though the string ones (`^=`, `$=`, `matches`) raise a
@@ -192,7 +192,7 @@ rows:
   - ['**Number**', '`==` `!=` `>` `>=` `<` `<=` `validate` `then`', '`Get Element Count`']
   - ['**List**', '`==` `!=` `contains` `validate` `then`', '`Get Classes`, `Get Selected Options`, `Get Attribute Names`']
   - ['**Dictionary** (numeric)', 'The list set, plus `>` `>=` `<` `<=` per key — those need a real dictionary, `${{ {...} }}`, not a string', '`Get BoundingBox`, `Get Viewport Size`']
-  - ['**Dictionary** (strict)', '`==` `!=` `contains` `validate` `then`', '`Get Style    ALL`']
+  - ['**Dictionary** (strict)', '`==` `!=` `contains` `validate` `then`', '`Get Style` with `ALL`']
   - ['**Boolean**', '`==` `!=` only', '`Get Checkbox State`']
   - ['**Element states**', 'Set operators, including `not contains`', '`Get Element States`']
 ---

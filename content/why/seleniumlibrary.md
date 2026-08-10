@@ -167,10 +167,10 @@ rows:
     - Yes, in the Robot Framework log
     - Yes, in the Robot Framework log
   - - Video of the run
-    - "`New Context    recordVideo=...`"
+    - "`New Context` with `recordVideo=…`"
     - Not built in
   - - Trace
-    - "`New Context    tracing=True` — DOM snapshots per action, network, console, timeline"
+    - "`New Context` with `tracing=True` — DOM snapshots per action, network, console, timeline"
     - No equivalent
   - - Network inspection
     - Built in, including request interception

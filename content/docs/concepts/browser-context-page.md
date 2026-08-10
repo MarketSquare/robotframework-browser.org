@@ -146,8 +146,8 @@ Starting A Browser With A Page
 
 A popup, a target-blank link or a second tab is another page in the same
 context, so it shares the login. It does **not** become the active page on its
-own — reach it with `Switch Page    NEW`, which returns the id of the page you
-came from:
+own — reach it with `Switch Page`, given `NEW`, which returns the id of the page
+you came from:
 
 ```robot-repl
 Click          text=Open report
