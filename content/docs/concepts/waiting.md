@@ -39,6 +39,10 @@ ${status} =    Get Text    .status
 That difference is the single most useful thing to know about waiting in this
 library. A getter *with* an assertion retries; a getter *without* one does not.
 
+Both settings can be changed at import, and at runtime with `Set Browser Timeout`
+and `Set Retry Assertions For` — each of which takes a scope, so you can widen
+them for one test without widening them for the suite.
+
 ## When that is not enough
 
 The built-in waiting covers the element you are about to touch and the value you
@@ -76,18 +80,22 @@ Wait For Condition    Style           body    display    ==    block
 ```
 
 ::doc-note
-`timeout` here extends how long the **assertion** is retried, not how long an
-element is looked for. It temporarily raises `retry_assertions_for` — and raises
-`timeout` too, if it would otherwise be the shorter of the two — then puts both
-back afterwards.
+`timeout` here governs how long the **assertion** is retried, not how long an
+element is looked for. It temporarily *sets* `retry_assertions_for` to that
+value — so a short one shortens the retry window just as a long one lengthens it
+— and additionally raises the browser `timeout` if that would otherwise be the
+shorter of the two. Both are restored afterwards.
 
 ```robot-repl
 Wait For Condition    Text    id=status_bar    contains    Done    timeout=30s
 ```
 ::
 
-Twenty-four getters can be used this way, which is every getter that takes an
-assertion: `Attribute`, `Attribute Names`, `BoundingBox`, `Browser Catalog`,
+Twenty-three getters can be used this way. It is *most* of the assertion
+getters, not all of them — `Console Log`, `Page Errors`, `Aria Snapshot`, the id
+getters and the two storage getters are not among them, and passing one fails
+with a conversion error rather than waiting. The full list:
+`Attribute`, `Attribute Names`, `BoundingBox`, `Browser Catalog`,
 `Checkbox State`, `Classes`, `Client Size`, `Download State`, `Element Count`,
 `Element States`, `Page Source`, `Property`, `Scroll Position`, `Scroll Size`,
 `Select Options`, `Selected Options`, `Style`, `Table Cell Index`,
@@ -115,7 +123,7 @@ Wait For Condition    Element States    button#submit    contains    enabled
 Wait For Condition    Element States    input#search    contains    defocused
 ```
 
-The states, all sixteen of them:
+The states, all fifteen of them:
 
 ::doc-table
 ---
@@ -125,7 +133,7 @@ rows:
   - ['`attached`', 'Is present in the DOM']
   - ['`detached`', 'Is not present in the DOM']
   - ['`visible`', 'Has a non-empty bounding box and no `visibility: hidden`']
-  - ['`hidden`', 'Is detached, or has an empty bounding box, or `visibility: hidden`']
+  - ['`hidden`', 'Is attached but has an empty bounding box or `visibility: hidden`. A detached element reports `detached` alone, never `hidden`']
   - ['`enabled`', 'Is not disabled']
   - ['`disabled`', 'Is disabled — `button`, `fieldset`, `input`, `optgroup`, `option`, `select`, `textarea`']
   - ['`editable`', 'Is not read-only']
@@ -136,7 +144,7 @@ rows:
   - ['`defocused`', 'Is not the `activeElement`']
   - ['`checked`', 'Is checked — `input`']
   - ['`unchecked`', 'Is not checked']
-  - ['`stable`', 'Is both visible and has stopped moving']
+  - ['`stable`', '**Not reported here.** `Get Element States` never returns it — only `Wait For Elements State` accepts it']
 ---
 ::
 
@@ -161,7 +169,9 @@ nowrap: [0]
 rows:
   - ['`Wait For Elements State`', 'One state of one element. See the note above.']
   - ['`Wait For Function`', 'A JavaScript expression to become truthy — the escape hatch when the condition is not something a getter can express']
-  - ['`Wait For Load State`', 'The page to reach `load`, `domcontentloaded` or `networkidle`']
+  - ['`Wait For Load State`', 'The page to reach `load`, `domcontentloaded` or `networkidle`. `commit` is accepted but returns immediately without waiting']
+  - ['`Wait For Response` / `Wait For Request`', 'A network response or request matching a glob or regular expression — usually promised, see below']
+  - ['`Wait For Navigation`', 'A navigation to complete, usually promised around the click that causes it']
 ---
 ::
 
@@ -171,6 +181,10 @@ that lives only in the page:
 ```robot-repl
 Wait For Function    () => window.myApp.ready === true    timeout=10s
 ```
+
+It also takes `selector=`, which is passed to your function as its first
+argument, and `polling=`, which defaults to `raf` — every animation frame —
+rather than to a time interval.
 
 ## Promises
 
@@ -213,9 +227,10 @@ Catch The Response Of A Delayed Request
     ${body} =       Wait For      ${promise}
 ```
 
-1. **`Promise To`** starts the keyword and returns the promise. It does not
-   return until the keyword has actually begun, so by the time the next line
-   runs the listener is already in place.
+1. **`Promise To`** starts the keyword and returns the promise. It waits until
+   the promised keyword's thread is actually running before returning, which
+   removes the worst of the race — though it does not wait for the browser-side
+   listener itself to be registered.
 2. **The thing that triggers it** — a click, a navigation, whatever.
 3. **`Wait For`** collects the result, blocking only if it is not ready.
 
@@ -263,19 +278,27 @@ ${clicked} =    Promise To    Click    text=Submit
 ${state} =      Promise To    Wait For Condition    Element States    .row    contains    visible
 ```
 
-Which means you can genuinely run work in parallel. Two independent pages, two
-independent waits, one wall-clock cost:
+Which means two slow waits can overlap instead of queueing:
 
 ```robot
 *** Test Cases ***
-Two Slow Things At Once
-    ${left} =     Promise To    Wait For Condition    Text    .left-panel     contains    Loaded
-    ${right} =    Promise To    Wait For Condition    Text    .right-panel    contains    Loaded
+Two Slow Panels At Once
+    ${left} =     Promise To    Get Text    .left-panel     contains    Loaded
+    ${right} =    Promise To    Get Text    .right-panel    contains    Loaded
     Wait For    ${left}    ${right}
 ```
 
-Promises run on a thread pool, so several really are in flight at once rather
-than taking turns.
+Both getters retry independently, so the test waits about as long as the slower
+one rather than the sum of the two. Promises run on a thread pool — up to 256 at
+once — so they really are in flight together rather than taking turns.
+
+::doc-note{kind="warning"}
+Promise assertion getters like `Get Text`, not `Wait For Condition`.
+`Wait For Condition` works by temporarily rewriting the library's
+`retry_assertions_for` and `timeout` and restoring them when it finishes — so
+two of them running concurrently overwrite each other's settings, and which
+value survives is a matter of timing.
+::
 
 ::doc-note{kind="warning"}
 Only Browser library keywords can be promised. Anything else — a BuiltIn
@@ -305,7 +328,10 @@ Wait For     ${up}
 
 `Promise To Upload File` waits for the *file chooser dialog* to appear, so the
 click that opens it has to come after the promise — the same order as everything
-else on this page.
+else on this page. It fails immediately if the path is not an existing file.
+
+If you can set the file directly, `Upload File By Selector` does it in one
+keyword and avoids the ordering question entirely.
 
 ## In short
 
@@ -317,4 +343,5 @@ else on this page.
 - `timeout` on `Wait For Condition` extends the *assertion* retry.
 - Promises are start-now, collect-later. The order is always
   **`Promise To` → trigger → `Wait For`**.
-- Any Browser keyword can be promised, and promises really do run in parallel.
+- Any Browser keyword can be promised, and promises really do run in parallel —
+  promise the getters rather than `Wait For Condition`.
