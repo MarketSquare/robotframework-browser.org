@@ -86,6 +86,28 @@ describe('content survives a Studio round-trip', () => {
   )
 })
 
+describe('no editor placeholder reaches the content', () => {
+  /*
+   * When Studio's editor meets a node its schema does not know, it renders a
+   * placeholder -- and if the file is then saved, it writes that placeholder
+   * into the Markdown as literal text.
+   *
+   * It happened to selectors.md: six `--- Unknown node: hardBreak ---` markers
+   * replaced the author's line breaks, were committed, and shipped to the
+   * built page. Nothing caught it, because the file stayed valid Markdown and
+   * the marker is only visible if you read the sentence.
+   */
+  it.each(files.map(f => [f.slice(ROOT.length + 1), f]))('%s has no editor placeholder', (_name, file) => {
+    const source = readFileSync(file, 'utf8')
+    const hit = /-{2,}\s*Unknown node:\s*(\w+)\s*-{2,}/.exec(source)
+    expect(
+      hit?.[0],
+      `${_name} contains a Studio editor placeholder for a "${hit?.[1]}" node. `
+      + 'It was written into the file on save; replace it with whatever the author meant.',
+    ).toBeUndefined()
+  })
+})
+
 describe('the token mechanism stays render-time', () => {
   /*
    * The other half of Studio safety, and the reason the tokens survive at all:

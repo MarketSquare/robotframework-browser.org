@@ -159,7 +159,10 @@ Click    xpath=//button[@type="submit"]
 Click    //div[@class="row"]//button
 ```
 
-XPath is CSS's powerful, unpleasant relative. It is more verbose for the same--- Unknown node: hardBreak ---result, many web developers do not read it fluently, it is not web-native, and--- Unknown node: hardBreak ---it invites selecting by document position rather than function — which is the most brittle thing you can possibly do.
+XPath is CSS's powerful, unpleasant relative. It is more verbose for the same
+result, many web developers do not read it fluently, it is not web-native, and
+it invites selecting by document position rather than function — which is the
+most brittle thing you can possibly do.
 
 It is genuinely more powerful, and occasionally something is unselectable
 without it. Use it then, and only then. It is the last resort, not a
@@ -172,7 +175,9 @@ devtools:
 Click    /html/body/div[3]/div/div[2]/button
 ```
 
-**DON'T!** That selector describes where the button sits today, not what it is. It will--- Unknown node: hardBreak ---break on the next layout change, and the failure will look like a bug in the--- Unknown node: hardBreak ---software rather than in the test.
+**DON'T!** That selector describes where the button sits today, not what it is.
+It will break on the next layout change, and the failure will look like a bug in
+the software rather than in the test.
 
 A legitimate use for XPath is **relative navigation**: start from an element you can identify reliably, then move through the DOM to an otherwise ambiguous element.
 
@@ -215,7 +220,9 @@ That is a good use of XPath.
 
 ### Also available: the `data-testid` aliases
 
-`data-testid=` has two siblings that do exactly the same job against a--- Unknown node: hardBreak ---different attribute. Which one you use is decided by what your developers--- Unknown node: hardBreak ---already put in the markup, not by preference:
+`data-testid=` has two siblings that do exactly the same job against a different
+attribute. Which one you use is decided by what your developers already put in
+the markup, not by preference:
 
 ::doc-table
 ---
