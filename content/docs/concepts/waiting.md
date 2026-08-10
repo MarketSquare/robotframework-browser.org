@@ -176,13 +176,15 @@ Wait For Function    () => window.__STORE__.getState().cart.items.length > 0
 # A third-party widget has attached itself
 Wait For Function    () => typeof window.Intercom === 'function'
 
-# Every image has actually decoded, not merely been requested
+# Every image has finished loading — successfully or not
 Wait For Function    () => [...document.images].every(i => i.complete)
 ```
 
 That last one is the flavour of problem this keyword exists for: nothing about
-"all images finished decoding" is expressible as a selector, and no getter
-returns it.
+"every image has settled" is expressible as a selector, and no getter returns
+it. Note what `complete` actually means — loading *finished*, including having
+failed. If you need them to have loaded successfully, add
+`&& i.naturalWidth > 0`.
 
 ### Waiting on one element
 
@@ -191,18 +193,31 @@ argument**. The condition then becomes a question about that element, evaluated
 in the page where the real computed values live:
 
 ```robot-repl
-# The progress bar reached full width — a computed style, not an attribute
+# The app has written an inline width of 100% onto the bar
 Wait For Function    element => element.style.width === '100%'    selector=#progress_bar
 
-# The CSS transition has finished, so the element has stopped moving
+# The sticky header has settled at the top of the viewport
 Wait For Function    el => el.getBoundingClientRect().top === 0    selector=.sticky-header
 
-# A canvas has actually been drawn into
-Wait For Function    c => c.getContext('2d').getImageData(0,0,1,1).data[3] > 0    selector=canvas
+# Something has actually been drawn into the canvas
+Wait For Function    c => c.getContext('2d').getImageData(0,0,1,1).data[3] > 0    selector=canvas#chart
 ```
 
-These are the cases `Wait For Condition` cannot reach: computed geometry, canvas
-pixels, live style values mid-animation.
+Two things to know about that first one. `element.style` is the *inline* style
+attribute, not the computed value — it only sees a width the application wrote
+onto the element itself, never one that came from a stylesheet. And computed
+values are not out of reach for the sibling keyword either:
+`Wait For Condition    Style    …` reads `getComputedStyle`, and
+`Wait For Condition    BoundingBox    …` reads geometry. Canvas pixels are the
+genuine case where only JavaScript will do.
+
+::doc-note{kind="warning"}
+The selector is resolved in **strict mode**, so it has to match exactly one
+element — which is why the canvas example says `canvas#chart` rather than
+`canvas`. It is also resolved **once**, before polling starts, and the same
+element is handed to every poll. If the application re-renders and replaces the
+node, the function keeps testing the old one.
+::
 
 ### Polling
 
@@ -218,14 +233,18 @@ Wait For Function    () => window.jobStatus === 'done'    polling=2s    timeout=
 ### Two things that catch people
 
 **Truthy is JavaScript's truthy.** `0`, `''`, `null` and `undefined` all read as
-"not yet", so `() => element.children.length` waits for a *non-empty* list
-without you writing the comparison — and `() => document.querySelector('.x')`
-waits for the element to exist, because a missing one is `null`.
+"not yet", so `element => element.children.length` waits for a *non-empty* list
+without you writing the comparison, and `() => document.querySelector('.x')`
+waits for the element to exist, because a missing one is `null`. If your function
+takes the element, declare the parameter — a bare `element` inside a zero-argument
+arrow is not defined and, thanks to the next paragraph, costs you the whole
+timeout before it says so.
 
-**Errors are treated as "not yet"**, not as failures. If your expression throws
-because the object does not exist on the first poll, that is suppressed and
-retried until the timeout — which is what makes
-`() => window.myApp.ready` safe to run before `myApp` exists.
+**Any error is treated as "not yet"**, for the length of the timeout. That is
+what makes `() => window.myApp.ready` safe to run before `myApp` exists — but it
+applies to every error, not only the one you were expecting. A typo in your
+JavaScript, or a selector that matches two elements, is retried silently for the
+full timeout and only then surfaces.
 
 ## Choosing between them
 
@@ -245,8 +264,8 @@ rows:
 ::
 
 Prefer the first wherever it fits. A condition written against a getter fails
-with a message naming what the value actually was; a JavaScript one fails with a
-timeout and leaves you to work out why.
+with a message naming what the value actually was; a JavaScript one that simply
+stayed false fails with a timeout and leaves you to work out why.
 
 ## Promises
 
@@ -337,7 +356,7 @@ arguments:
 ```robot-repl
 ${title} =      Promise To    Get Title
 ${clicked} =    Promise To    Click    text=Submit
-${state} =      Promise To    Wait For Condition    Element States    .row    contains    visible
+${count} =      Promise To    Get Element Count    .row    ==    ${10}
 ```
 
 Which means two slow waits can overlap instead of queueing:
