@@ -22,8 +22,8 @@ if (!doc.value) {
   throw createError({ statusCode: 404, statusMessage: 'No such comparison', fatal: true })
 }
 
-/** On-this-page, from the rendered headings. */
-const toc = computed(() => doc.value?.body?.toc?.links ?? [])
+/** On-this-page, from the headings themselves. See app/utils/toc.ts. */
+const toc = computed(() => tocFromBody(doc.value?.body?.value as MarkNode[] | undefined))
 
 useHead(() => ({
   title: `${doc.value?.title} — Robot Framework Browser`,
@@ -51,8 +51,14 @@ useHead(() => ({
 
         <aside v-if="toc.length" class="toc">
           <p class="toc-label">On this page</p>
-          <a v-for="link in toc" :key="link.id" :href="`#${link.id}`" :class="`d${link.depth}`">
-            {{ link.text }}
+          <a
+            v-for="link in toc"
+            :key="link.id"
+            :href="`#${link.id}`"
+            :class="`d${link.depth}`"
+            :title="tocPlainText(link.nodes)"
+          >
+            <TocText :nodes="link.nodes" />
           </a>
         </aside>
       </div>

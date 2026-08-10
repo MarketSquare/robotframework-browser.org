@@ -14,16 +14,42 @@ syntax for chaining, iframes and shadow DOM.
 
 ## Pick a strategy
 
-::doc-note
----
-kind: note
----
-#default
+::doc-note{kind="note"}
 **The ranking below is opinionated!**
 
-It optimises for one thing: **a selector that keeps working when the page is redesigned but the feature is unchanged.**
+It optimises for one thing: *a selector that keeps working when the page is redesigned but the feature is unchanged.*
 
-**You have to**
+Every project is different, and you should base your selector strategy on other criteria as well. For example, prior knowledge, GUI framework, or other factors.
+::
+
+::doc-table
+---
+head:
+  - ""
+  - Strategy
+  - Reach for it when
+rows:
+  - - "1"
+    - role=
+    - The element has a proper accessible role and name. This is the default
+      choice.
+  - - "2"
+    - data-testid=
+    - Stability matters more than testing the interface as a user meets it.
+  - - "3"
+    - text=
+    - The visible text is the thing you actually mean, and the app is
+      single-language.
+  - - "4"
+    - css=
+    - None of the above identify the element.
+  - - "5"
+    - id=
+    - You know the id is contractual, not incidental.
+  - - "6"
+    - xpath=
+    - Genuinely nothing else can select it.
+---
 ::
 
 ### 1. `role=` — how the user finds it
@@ -53,10 +79,10 @@ because the element has no proper role or no accessible name, **you have found
 an accessibility bug**. A screen-reader user cannot identify that control
 either. That is worth an issue, not a workaround.
 
-### 2. `data-test-id=` — the one attribute that belongs to us
+### 2. `data-testid=` — the one attribute that belongs to us
 
 ```robot-repl
-Click    [data-test-id="checkout-submit"]
+Click    [data-testid="checkout-submit"]
 ```
 
 Every other attribute on the page belongs to someone else. Classes belong to the
@@ -128,17 +154,14 @@ these particular ids are contractual.
 escaped as `\#submit-button`, or written as `id=submit-button`.
 ::
 
-### 6. `xpath=` — the ugly cousin
+### 6. `xpath=` — the last resort
 
 ```robot-repl
 Click    xpath=//button[@type="submit"]
 Click    //div[@class="row"]//button
 ```
 
-XPath is CSS's powerful, unpleasant relative. It is more verbose for the same
-result, many web developers do not read it fluently, it is not web-native, and
-it invites selecting by document position — which is the most brittle thing you
-can possibly do.
+XPath is CSS's powerful, unpleasant relative. It is more verbose for the same--- Unknown node: hardBreak ---result, many web developers do not read it fluently, it is not web-native, and--- Unknown node: hardBreak ---it invites selecting by document position rather than function — which is the most brittle thing you can possibly do.
 
 It is genuinely more powerful, and occasionally something is unselectable
 without it. Use it then, and only then. It is the last resort, not a
@@ -151,15 +174,50 @@ devtools:
 Click    /html/body/div[3]/div/div[2]/button
 ```
 
-...that selector describes where the button sits today, not what it is. It will
-break on the next layout change, and the failure will look like a bug in the
-software rather than in the test.
+**DON'T!** That selector describes where the button sits today, not what it is. It will--- Unknown node: hardBreak ---break on the next layout change, and the failure will look like a bug in the--- Unknown node: hardBreak ---software rather than in the test.
+
+A legitimate use for XPath is **relative navigation**: start from an element you can identify reliably, then move through the DOM to an otherwise ambiguous element.
+
+For example, imagine a form with several fields, each with the same info button:
+
+```html [DOM]
+...
+<div class="field">
+    <label for="email">Email</label>
+    <div class="control">
+        <input id="email" type="text">
+        <button type="button" aria-label="More information">ⓘ</button>
+    </div>
+</div>
+<div class="field">
+    <label for="phone">Phone</label>
+    <div class="control">
+        <input id="phone" type="text">
+        <button type="button" aria-label="More information">ⓘ</button>
+    </div>
+</div>
+...
+```
+
+`role=button[name="More information"]` alone is ambiguous: there are two of them. But the Email textbox is easy to identify. We can anchor there, move up to the common parent, and then find the button within it:
+
+```robot-repl [Bad Example]
+Click    xpath=//label[text()="Email"]/..//button[@aria-label="More information"]
+```
+
+The above example solves the problem but just because you need one functionality of XPath, does not mean you have to use it all the way. See [Cascading Selectors](#chaining-with)
+
+```robot-repl [Good Example]
+Click    role=textbox[name="Email"] >> xpath=.. >> role=button[name="More information"]
+```
+
+Here XPath is doing something useful and narrowly scoped: **navigating relative to a reliably identified element**. We are not describing where the element happens to sit in the entire document; we are expressing a local relationship between two elements.
+
+That is a good use of XPath.
 
 ### Also available: the test-id aliases
 
-`data-test-id=` has two siblings that do exactly the same job against a
-different attribute. Which one you use is decided by what your developers
-already put in the markup, not by preference:
+`data-testid=` has two siblings that do exactly the same job against a--- Unknown node: hardBreak ---different attribute. Which one you use is decided by what your developers--- Unknown node: hardBreak ---already put in the markup, not by preference:
 
 ::doc-table
 ---
@@ -181,7 +239,7 @@ rows:
 All three behave identically. Pick the one your application emits and stay with
 it.
 
-## How a strategy is chosen
+## How a strategy is used
 
 You can always be explicit with a `strategy=value` prefix. Spaces around the
 separator are ignored by `css=`, `xpath=` and `text=`, so `css=foo`, `css= foo`
@@ -206,13 +264,13 @@ rows:
 ---
 ::
 
-```robot-repl
+```robot-repl [Implicit Selector Strategies]
 Get Element    //html/body/div      # xpath
-Get Element    "foo"                # text
+Get Element    "foo"                # text exact match
 Get Element    div                  # css
 ```
 
-## Chaining with `>>`
+## Cascading Selectors with `>>`
 
 This is the part that makes Browser's selectors worth learning. Strategies
 combine in a single string, left to right, with `>>`. Each step searches inside
@@ -439,18 +497,15 @@ Get Text    css=my-widget .label
 Get Text    css:light=my-widget .label
 ```
 
-::doc-note{kind="warning"}
-The other `:light` engines are deprecated. `text:light=`, `id:light=`,
-`xpath:light=`, `data-testid:light=`, `data-test-id:light=` and `data-test:light=`
-still parse, but the moment they match an element the bundled Playwright raises
-`"…" selector is not supported`. Matching nothing gives no error and no match,
-which is the worse outcome. Write `css:light=[id="foo"]` instead of
-`id:light=foo`.
-::
-
 Reach for `css:light=` when you specifically need to assert that something is
 *not* inside a shadow root. The rest of the time the piercing default is what
 you want.
+
+::doc-note{kind="warning"}
+The other `:light` engines are deprecated. `text:light=`, `id:light=`,
+`xpath:light=`, `data-testid:light=`, `data-testid:light=` and `data-test:light=`
+do not work anymore.
+::
 
 ## Strict mode
 
@@ -497,7 +552,7 @@ the value is already an ordinary selector, so it needs no strategy in front of i
 ## In short
 
 - Reach for `role=` first. If you cannot, you may have found an accessibility bug.
-- Use `data-test-id=` when stability is the priority, knowing what it trades away.
+- Use `data-testid=` when stability is the priority, knowing what it trades away.
 - `text=` is fine until you localise.
 - `css=` is acceptable; `id=` is less stable than it looks.
 - `xpath=` last, and never by document position.
