@@ -81,13 +81,15 @@ The zip is written when the **context closes** — automatically at the
 auto-closing level, or when you call `Close Context`. Do not go looking for it
 while the browser is still open.
 
-To record for a whole run without touching the tests, set the environment
-variable `ROBOT_FRAMEWORK_BROWSER_TRACING=True`. And
+To record without passing `tracing=` in every test, set the environment variable
+`ROBOT_FRAMEWORK_BROWSER_TRACING=True`. It applies to every `New Context` and
+`New Persistent Context` — a context that `New Page` creates implicitly is *not*
+traced, so a suite that never calls `New Context` records nothing. And
 `auto_delete_passed_tracing=True` at import keeps only the traces of failed
 tests, which is what makes this affordable in CI:
 
 ```bash
-ROBOT_FRAMEWORK_BROWSER_TRACING=True robot tests/
+ROBOT_FRAMEWORK_BROWSER_TRACING=True robot --outputdir output tests/
 ```
 
 Open the result either way:
@@ -123,7 +125,8 @@ rfbrowser coverage output/browser/coverage/ output/report
 ```
 
 Combining needs the raw data, which is why `Start Coverage` above passes
-`raw=True` — without it there is nothing to merge and the command fails with
+`raw=True`. Note that `raw` is ignored when you also pass `config_file` — then
+you have to add `['raw']` to `reports` in the config yourself — without it there is nothing to merge and the command fails with
 `No raw reports found`. The same thing is available as the
 `Merge Coverage Reports` keyword.
 

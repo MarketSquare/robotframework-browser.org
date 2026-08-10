@@ -33,15 +33,23 @@ rows:
   - - "`ROBOT_FRAMEWORK_BROWSER_PINO_LOG_LEVEL`"
     - Yes
     - Log level of the Node process's own logger, default `info`. Set it to
-      `debug` for more in `playwright-log.txt`; the `rfbrowser` CLI sets it to
-      `error` for its own runs.
+      `debug` for more in `playwright-log.txt`. The `rfbrowser` subcommands
+      that start a browser themselves — `show-trace`, `launch-browser-server` —
+      force it to `error` so their console output stays clean, overriding
+      whatever you set.
 ---
 ::
 
-One more is read outside the Node process itself:
-`ROBOT_FRAMEWORK_BROWSER_TRACING`. Any truthy value — `true`, `1`, `yes` — turns
-tracing on for every new context, which is the way to record traces for a whole
-run without editing the tests.
+One more is read by the Python side rather than by Node:
+`ROBOT_FRAMEWORK_BROWSER_TRACING`. Any truthy value — `true`, `1`, `yes` — is
+equivalent to passing `tracing=True` to `New Context`, which is the way to record
+traces for a whole run without editing the tests. A Robot Framework variable of
+the same name works too, and is checked first.
+
+It only reaches contexts you create yourself. `New Page` and `Open Browser`
+against no open browser create their context on the Node side, which never
+consults the variable — so those contexts are not traced. If you want a trace,
+open the context explicitly.
 
 ## Prefer the import parameter
 
@@ -74,11 +82,17 @@ you installed yourself or from the one bundled in
 [robotframework-browser-batteries](https://pypi.org/project/robotframework-browser-batteries/).
 
 ::doc-note
-That was not always true. In **Browser 20.1.0 and earlier**, `NODE_COVERAGE` and
-`NODE_DEBUG_OPTIONS` were silently ignored when BrowserBatteries was installed:
-the Node process was a prebuilt binary that could not accept Node arguments. If
-you are on an older release and a debug flag appears to do nothing, this is why.
+That was not always true. In older releases these two were silently ignored when
+BrowserBatteries was installed, because its bundled Node.js was a packaged binary
+that could not accept Node arguments. If a debug flag appears to do nothing,
+check whether you are on a current release before looking anywhere else.
 ::
+
+One difference is still real. Where the plain library defaults
+`PLAYWRIGHT_BROWSERS_PATH` to `0`, BrowserBatteries defaults it to the resolved
+path of its own browser directory. Both put the binaries somewhere Browser owns,
+and setting the variable yourself wins in either case — but the value you see if
+you print it differs.
 
 ## What is not here
 

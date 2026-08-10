@@ -162,11 +162,15 @@ ${links} =    Evaluate JavaScript    a
 ```
 
 ::doc-note
-Practise in your browser's devtools console before writing an extension: both
-run in the page. One difference — the string you pass to `Evaluate JavaScript`
-is compiled in Node first, so wrap what you paste in an arrow function,
-`() => document.querySelectorAll('a').length`, rather than pasting a bare
-expression. A bare one can be evaluated by Node and its *result* sent to the
-page, which produces errors that make no sense, like
-`ReferenceError: object is not defined`.
+Practise in your browser's devtools console before writing an extension: both run
+in the page. Browser first tries to turn the string into a function in Node; if
+that throws — as it does for anything touching `document`, `window` or
+`location` — the raw string is passed through and evaluated in the page instead,
+so pasting a bare expression normally just works.
+
+The exception is an expression Node *can* evaluate. `Object.keys({a: 1})`
+becomes the array `["a"]` in Node, is stringified on the way into the page, and
+fails there with `ReferenceError: a is not defined`. Wrapping what you paste in
+an arrow function, `() => document.querySelectorAll('a').length`, sidesteps the
+question entirely.
 ::

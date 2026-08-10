@@ -88,6 +88,34 @@ function bundledPlaywright(): string {
   return found
 }
 
+/**
+ * Refuse to run against the wrong checkout.
+ *
+ * Every version below `browser` is read out of `libraryRoot` — the Dockerfile,
+ * the Node pin, the Playwright dependency. If that checkout is on a branch or a
+ * tag other than the release whose Libdoc this site renders, the manifest ends
+ * up describing a version nobody can install, and nothing downstream notices:
+ * the numbers are all well-formed, the build is green, the tests pass. It has
+ * already happened once, from a `version-drift-docker` branch, and the only
+ * visible symptom was a Playwright patch number one off.
+ *
+ * The library states its own version, so the mismatch is cheap to detect.
+ */
+function assertCheckoutMatches(): void {
+  const path = join(libraryRoot, 'Browser/version.py')
+  const found = /__version__\s*=\s*"([^"]+)"/.exec(readFileSync(path, 'utf8'))?.[1]
+  if (!found) throw new Error(`No __version__ in ${path}`)
+  if (found !== browser) {
+    throw new Error(
+      `Library checkout is ${found}, but content/libdoc/LATEST is ${browser}.\n`
+      + `Check out v${browser} in ${libraryRoot} before regenerating versions.json —\n`
+      + `every version in it is read from that checkout.`,
+    )
+  }
+}
+
+assertCheckoutMatches()
+
 const docker = dockerBase()
 
 /*

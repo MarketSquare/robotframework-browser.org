@@ -10,8 +10,9 @@ Install the library and its browser binaries, write one test, run it.
 ## Before you start
 
 You need **Python 3.10 or newer** and **Node.js with npm on your PATH** —
-`rfbrowser init` runs `npm ci` and `npx playwright install` underneath, and fails
-with a clear message if npm is missing.
+`rfbrowser init` runs `npm ci --omit=dev` and `npx playwright install`
+underneath, and if npm is not on the PATH it stops with *Couldn't execute npm.
+Please ensure you have node.js and npm installed and in PATH.*
 
 Do this in a virtual environment — `uv`, `venv` or `pyenv`, whichever your team
 uses. **Never install into the system Python:** the install writes into
@@ -32,20 +33,20 @@ sessions:
         output:
           - Successfully installed robotframework-browser-%%browser%%
       - command: rfbrowser init
-        status:
-          - { ok: true, text: chromium downloaded }
-          - { ok: true, text: firefox downloaded }
-          - { ok: true, text: webkit downloaded }
+        output:
+          - Installing node dependencies...
+          - Installing browser binaries to 0
+          - rfbrowser init completed
   - shell: powershell
     steps:
       - command: py -m pip install robotframework-browser
         output:
           - Successfully installed robotframework-browser-%%browser%%
       - command: rfbrowser init
-        status:
-          - { ok: true, text: chromium downloaded }
-          - { ok: true, text: firefox downloaded }
-          - { ok: true, text: webkit downloaded }
+        output:
+          - Installing node dependencies...
+          - Installing browser binaries to 0
+          - rfbrowser init completed
 ---
 :::
 
@@ -68,12 +69,18 @@ Library    Browser
 Open The Keyword Reference
     New Page     https://robotframework-browser.org
     Get Title    *=    Robot Framework Browser
-    Click        text=Keywords
+    Click        text="Keywords"
     Get Title    *=    Keyword reference
 ```
 
 It drives this site, so you can run it right now without an application of your
 own — and the pages it touches are the ones you are reading.
+
+The quotes around `"Keywords"` are not decoration. Without them `text=Keywords`
+is a case-insensitive *substring* match, and this page has three elements whose
+text contains it. Playwright is strict: a selector that matches more than one
+element is an error, not a silent first-match. Quoting makes it an exact match on
+the link. See [selectors](/docs/concepts/selectors).
 
 ## Run it
 
@@ -84,12 +91,13 @@ sessions:
     steps:
       - command: robot first.robot
         output:
-          - "Open The Keyword Reference                                   | PASS |"
+          - "Open The Keyword Reference                                            | PASS |"
           - "1 test, 1 passed, 0 failed"
 ---
 :::
 
-Robot Framework writes `log.html` next to the test. Open it — every keyword,
+Robot Framework writes `log.html` into the directory you ran `robot` from — not
+next to the test file — unless you pass `--outputdir`. Open it — every keyword,
 its arguments and its result are in there, and it is the first place to look
 when something fails.
 

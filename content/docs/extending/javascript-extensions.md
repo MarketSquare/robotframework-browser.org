@@ -9,8 +9,10 @@ A JavaScript module adds keywords that run on the Node side, with the Playwright
 `page` object in hand. It is the lighter of the two extension points: no Python,
 no class, just exported functions.
 
-The module must be CommonJS: Browser loads it with `require()`, so an ESM module
-using `export`/`import` will not load.
+Browser loads the module with `require()`. CommonJS is the safe default and what
+the library's own tests use, but on the Node versions Browser supports `require()`
+also loads ESM, so `export`/`import` works. The one thing it cannot load is an
+ESM module using top-level `await`, which fails with `ERR_REQUIRE_ASYNC_MODULE`.
 
 ## A module
 
@@ -183,9 +185,10 @@ Set it for the debug session rather than globally. For RobotCode, in
 kind: warning
 ---
 With `--inspect-brk` you have to attach quickly: the Playwright process start
-has a timeout of about **15 seconds** — macOS retries once, so roughly 30. Miss
-it and the run fails before
-you are attached.
+has a timeout of about **15 seconds**. Miss it and the run fails before you are
+attached. On macOS a failed start is retried once, but the first process is
+killed and a second one started, so you still only get those 15 seconds to
+attach to any one process.
 ::
 
 ### 2. Attach

@@ -39,7 +39,7 @@ class SimplePythonPlugin(LibraryComponent):
     def cookie_via_public_api(self) -> dict:
         """Uses Browser's own public API."""
         cookies = self.library.get_cookies()
-        logger.debug(json.dumps(cookies, indent=4))
+        logger.debug(json.dumps(cookies, indent=4, default=str))
         assert len(cookies) == 1, "Too many cookies."
         return {"name": cookies[0]["name"], "value": cookies[0]["value"]}
 
@@ -81,7 +81,12 @@ Two rules that fail loudly, and one that does not:
 - A plugin that does not inherit `LibraryComponent` fails with `PluginError`.
 - A plugin keyword whose **method name** matches a built-in silently replaces
   it. Plugins load last — library keywords, then JavaScript extensions, then
-  plugins — so last wins, with no warning. Every plugin keyword is tagged
+  plugins — so last wins, with no warning. The exception is the handful of
+  keywords declared with an explicit `@keyword(name=...)`, such as
+  `Evaluate JavaScript`, `Get BoundingBox` and the storage keywords: matching
+  their method name creates a duplicate instead, and the suite fails with
+  *Keyword with same name defined multiple times*. Give your method the same
+  `@keyword(name=...)` to replace one of those. Every plugin keyword is tagged
   `Plugin`, which is how you spot one in Libdoc.
 
 ## Selectors inside a plugin
@@ -111,8 +116,9 @@ def highlight_and_blur(self, selector):
     self.call_js_keyword("myBlur", selector=selector)
 ```
 
-`call_js_keyword` reaches a keyword from a JavaScript module this plugin loaded
-with `initialize_js_extension` — it is not a way to call arbitrary Playwright
+`call_js_keyword` reaches a keyword from any JavaScript module registered on the
+Node side — one this plugin loaded with `initialize_js_extension`, or one loaded
+through the library's `jsextension=` argument — it is not a way to call arbitrary Playwright
 methods, so `myBlur` has to exist in that module.
 
 ## Calling JavaScript from a Python plugin

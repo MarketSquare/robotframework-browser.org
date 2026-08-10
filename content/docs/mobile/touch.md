@@ -23,7 +23,7 @@ into view first.
 ::doc-note{kind="warning"}
 **`Tap` requires `hasTouch=True` on the context.** Without it, Playwright
 refuses. This is the first thing that goes wrong for everybody, and the error is
-clear once you know to look for it. A device descriptor sets `hasTouch` for you;
+clear once you know to look for it. A mobile device descriptor sets `hasTouch` for you — the `Desktop *` ones do not;
 a bare `viewport=` does not.
 ::
 
@@ -98,9 +98,12 @@ Grant Permissions    camera    microphone    origin=https://example.com
 Clear Permissions
 ```
 
-Available permissions — though support is per-browser. Chromium and WebKit
-accept nearly all of these; **Firefox supports only `geolocation` and
-`notifications`**, and passing any other value makes the keyword fail outright.
+Available permissions — though only **Chromium accepts all of them**. WebKit
+accepts `geolocation`, `notifications`, `camera`, `microphone` and
+`clipboard-read`; Firefox accepts `geolocation`, `notifications` and
+`local-network-access`. Anything else fails — from `New Context` or
+`Grant Permissions` on Chromium and Firefox, but on WebKit not until the next
+`New Page`, which makes it look like a navigation problem.
 
 ::doc-table
 ---

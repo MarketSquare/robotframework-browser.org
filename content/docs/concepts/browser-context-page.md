@@ -28,9 +28,9 @@ the whole reason the layers are worth learning.
 ---
 head: [Layer, Is, Costs, Opened with]
 rows:
-  - ['**Browser**', 'A Chromium, Firefox or WebKit process', 'Seconds', '`New Browser`']
-  - ['**Context**', 'An isolated session inside it', 'Milliseconds', '`New Context`']
-  - ['**Page**', 'A tab, with its own history', 'Milliseconds', '`New Page`']
+  - ['**Browser**', 'A Chromium, Firefox or WebKit process', 'Slowest', '`New Browser`']
+  - ['**Context**', 'An isolated session inside it', 'Cheapest', '`New Context`']
+  - ['**Page**', 'A tab, with its own history', 'Cheap', '`New Page`']
 ---
 ::
 
@@ -103,13 +103,17 @@ The context is also where the interesting configuration lives:
 New Context    viewport={'width': 1920, 'height': 1080}
 New Context    locale=de-DE    timezoneId=Europe/Berlin
 New Context    geolocation={'latitude': 48.86, 'longitude': 2.35}
-New Context    httpCredentials={'username': 'admin', 'password': 'secret'}
+New Context    httpCredentials={'username': '$user', 'password': '$pwd'}
 New Context    acceptDownloads=True
 New Context    colorScheme=dark
 ```
 
 Downloads are accepted by default. Pass `acceptDownloads=False` if you want the
 browser to refuse them.
+
+The `$user` and `$pwd` above are not a typo. `httpCredentials` refuses a plain
+value — it takes the `$name` placeholder form, and resolves the names from
+variables, so the password never reaches the log.
 
 Tracing and video recording are context-level too, which is why a trace covers
 exactly one session:
@@ -137,7 +141,7 @@ Starting A Browser With A Page
     New Browser    chromium    headless=False
     New Context    viewport={'width': 1920, 'height': 1080}
     New Page       https://robotframework-browser.org
-    Get Title      ==    Robot Framework Browser
+    Get Title      *=    Robot Framework Browser
 ```
 
 A popup, a target-blank link or a second tab is another page in the same
@@ -170,22 +174,27 @@ Every browser, context and page has an id, and `Get Browser Catalog` returns the
 whole tree:
 
 ```text
-Browser  chromium  browser=94c1…            activeBrowser: true
-├── Context  context=7f2a…                  activeContext: true
-│   ├── Page  page=3dce…  /login            activePage: true
+Browser  chromium  browser=94c1…   activeBrowser: true
+                             activeContext: context=7f2a…
+├── Context  context=7f2a…   activePage: page=3dce…
+│   ├── Page  page=3dce…  /login
 │   └── Page  page=8b17…  /cart
-└── Context  context=b3d9…
+└── Context  context=b3d9…   activePage: page=1f60…
     └── Page  page=1f60…  /admin
 
 Browser  firefox  browser=1ae8…
-└── Context  context=5c04…
+└── Context  context=5c04…   activePage: page=42aa…
     └── Page  page=42aa…  about:blank
 ```
 
 Drawn as a tree here for readability; the keyword returns a list of
-dictionaries, one per browser, each carrying its contexts and their pages. The
-`active*` flags are the part worth reading — they tell you which browser,
-context and page the next keyword will act on.
+dictionaries, one per browser, each carrying its contexts and their pages.
+
+The `active*` fields are the part worth reading, and they are not all the same
+shape: `activeBrowser` is a boolean on the browser, while `activeContext` and
+`activePage` hold *ids* — and every browser and context carries one, whether or
+not it is the active branch. So `activeBrowser` is what picks the branch the
+next keyword will act on.
 
 This is the fastest way to answer "what does the library think is running" when
 a suite has drifted from what you expected. `Get Browser Ids`, `Get Context Ids`
@@ -198,7 +207,9 @@ and `Switch Browser`, `Switch Context` and `Switch Page` move that pointer.
 
 By default, the **contexts and pages** a test opened are closed when the test
 ends. Browsers are not: no auto-closing level closes a browser per test or per
-suite, so a browser lives until execution ends or you call `Close Browser`.
+suite, so a browser lives until execution ends or you call `Close Browser`. The
+one exception is a browser opened by `New Persistent Context` — it is closed
+together with its context.
 
 That setting is `auto_closing_level`, and it has four values:
 

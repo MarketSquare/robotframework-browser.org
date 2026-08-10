@@ -78,7 +78,7 @@ Navigation Collapses On A Phone
     Get Element States    nav.desktop        contains    hidden    attached
 ```
 
-Contexts are cheap — a fresh, isolated profile in a few milliseconds — so a viewport
+Contexts are cheap — a fresh, isolated profile, far cheaper than a new browser — so a viewport
 per context is the natural unit. Nothing leaks between them: no cookies, no
 storage, no permissions.
 
@@ -95,7 +95,7 @@ Get Element States    nav.desktop    contains    hidden
 ::doc-note{kind="warning"}
 `Set Viewport Size` changes the page's viewport, not the emulated device. A page that renders
 differently because of `isMobile` or touch support will not change just because
-you made the window narrow. For that you want a device descriptor —
+you made the viewport narrow. For that you want a device descriptor —
 [Emulating a device](/docs/mobile/devices).
 ::
 

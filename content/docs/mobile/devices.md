@@ -1,6 +1,6 @@
 ---
 title: Emulating a device
-description: Device descriptors, what the six properties they set actually change, and the one that emulation cannot give you.
+description: Device descriptors, what the six or seven properties they set actually change, and the one that emulation cannot give you.
 order: 2
 section: mobile
 ---
@@ -40,15 +40,19 @@ and case-sensitive: `iPhone 13`, `iPhone 13 Pro Max`, `Pixel 7`, `Galaxy S9+`,
 
 ::doc-note
 Pin the descriptor name in a variable rather than scattering it through a suite.
-Device names change as Playwright updates, and one variable is a
+Pin the name in a variable rather than scattering it through a suite — the list
+is Playwright's, and an upgrade is the one thing that can move it under you. One
+variable is a
 one-line fix.
 ::
 
 ## What a descriptor actually sets
 
 Six or seven properties — most phone and tablet descriptors also carry
-`screen`, the physical screen size `window.screen` reports, which is larger than
-the viewport. It is worth knowing them individually, because each one changes
+`screen`, what `window.screen` reports. On a portrait descriptor it is taller
+than the viewport, which excludes browser chrome; a landscape descriptor keeps
+the *portrait* screen, so `iPhone 13 landscape` is a 750×342 viewport on a
+390×844 screen. It is worth knowing them individually, because each one changes
 something different, and you can set any of them yourself without a descriptor.
 
 ::doc-table
@@ -64,7 +68,7 @@ rows:
       sniffing branches on this.
   - - "`deviceScaleFactor`"
     - Device pixel ratio — 2 to 4.5 depending on the handset, 3 on an iPhone 13
-      and 2.625 on a Pixel 7. Decides which image a
+      and 2.625 on a Pixel 7, down to 1 on older hardware. Decides which image a
       `srcset` picks, and the resolution of your screenshots.
   - - "`isMobile`"
     - Sets the meta viewport behaviour, so the page is laid out the way a phone
@@ -113,12 +117,11 @@ Safari on an actual iPhone. Keep that last mile for
 [real humans on real devices](/docs/mobile/responsive).
 
 ::doc-note{kind="warning"}
-`isMobile` is a Chromium and WebKit feature, and Firefox **ignores it silently**
-— no error. The viewport, touch support and device pixel ratio still apply, so
-the page is laid out at desktop width while everything else claims to be a
-phone. A suite that loops "every device × every engine" will not fail on that
-combination; it will quietly test something you did not mean. Choose the engine
-per device rather than multiplying them.
+Playwright's API documentation still lists `isMobile` as unsupported in Firefox,
+but the version Browser bundles applies it: Firefox honours the meta viewport
+exactly as Chromium does, and raises no error. Treat that note as stale rather
+than as a reason to skip Firefox — but check it against the Playwright you
+ship, since this is undocumented behaviour.
 ::
 
 ## Orientation
@@ -139,7 +142,9 @@ Set Viewport Size    750    342
 Read those numbers off the descriptor rather than transposing the portrait ones
 — `iPhone 13` is 390×664 and its landscape descriptor is 750×342, not a swap.
 And the two routes are not equivalent: the descriptor also carries `screen`, the
-user agent and `isMobile`, while `Set Viewport Size` changes only the viewport.
+user agent and `isMobile`, while `Set Viewport Size` leaves those alone and
+*overwrites* `window.screen` with the new size, so the screen/viewport
+distinction disappears.
 If your app listens for `orientationchange`, the resize is what fires it.
 
 ## A worked example

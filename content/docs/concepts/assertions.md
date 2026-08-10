@@ -156,8 +156,9 @@ Get BoundingBox      #card    ALL         validate    value['width'] > 40
 
 Getters that return a dictionary — `Get BoundingBox    ALL`, `Get Viewport Size`
 — are usually asserted this way, indexing into `value` directly. So is
-`Get Browser Catalog`, which returns a list of dictionaries and accepts every
-operator.
+`Get Browser Catalog`, which returns a list of dictionaries and is not restricted
+to the list operators — though the string ones (`^=`, `$=`, `matches`) raise a
+`TypeError` on a list, so `validate` and `then` are what you actually use.
 
 ### `then` — derive instead of check
 
@@ -170,8 +171,9 @@ ${count} =    Get Text        .total            then    int(value.strip(" items"
 ${upper} =    Get Text        h1                then    value.upper()
 ```
 
-Because it runs after the value is read, `then` is also the retrying way to wait
-for something you have to compute.
+`then` never asserts, so it never retries — if the expression raises, the
+keyword fails immediately. Use `validate` when you need the retry and `then`
+only to reshape a value that is already there.
 
 ## Which operators a keyword allows
 
@@ -188,8 +190,8 @@ head: [Return type, Allowed, Example keyword]
 rows:
   - ['**String**', 'All of them', '`Get Text`, `Get Url`, `Get Property`']
   - ['**Number**', '`==` `!=` `>` `>=` `<` `<=` `validate` `then`', '`Get Element Count`']
-  - ['**List**', '`==` `!=` `contains` `validate` `then`', '`Get Classes`, `Get Select Options`']
-  - ['**Dictionary** (numeric)', 'The list set, plus `>` `>=` `<` `<=` per key', '`Get BoundingBox`, `Get Viewport Size`']
+  - ['**List**', '`==` `!=` `contains` `validate` `then`', '`Get Classes`, `Get Selected Options`, `Get Attribute Names`']
+  - ['**Dictionary** (numeric)', 'The list set, plus `>` `>=` `<` `<=` per key — those need a real dictionary, `${{ {...} }}`, not a string', '`Get BoundingBox`, `Get Viewport Size`']
   - ['**Dictionary** (strict)', '`==` `!=` `contains` `validate` `then`', '`Get Style    ALL`']
   - ['**Boolean**', '`==` `!=` only', '`Get Checkbox State`']
   - ['**Element states**', 'Set operators, including `not contains`', '`Get Element States`']
@@ -286,7 +288,9 @@ Whitespace Does Not Matter
     Get Text    .greeting    ==    Hello World
 ```
 
-Without the formatters that comparison sees `"\n  Hello   World\n"` and fails.
+That works on markup like `<p>Hello&nbsp;&nbsp;World</p>`. Without the
+formatters the comparison sees `"Hello\xa0\xa0World"` — the browser collapses
+ordinary whitespace but not non-breaking spaces — and fails.
 
 They apply **in the order given**, and only to the value:
 
@@ -354,7 +358,8 @@ Get Text    #price    ==    ${99}
 ---
 head: [Symptom, Cause]
 rows:
-  - ['`Assertion operator is mandatory when specifying expected value`', 'An expected value with no operator between them']
+  - ['`... got value ''Welcome'' that cannot be converted to AssertionOperator`', 'An expected value written where the operator belongs']
+  - ['`Assertion operator is mandatory when specifying expected value`', '`assertion_expected=` passed by name, with no operator']
   - ['Two identical-looking values, still fails', 'String against number. Print `{value_type}`']
   - ['`Operator ... is not allowed in this Keyword`', 'A list or dict getter given something outside `==` `!=` `contains` `validate` `then`']
   - ['Fails on invisible whitespace', 'No formatter. Add `strip` and `normalize spaces`']
@@ -370,8 +375,9 @@ rows:
   lists refuse `not contains`, booleans take only `==` and `!=`.
 - `retry_assertions_for` is for values, `timeout` is for elements.
 - Match the type. `Get Text` returns a string.
-- Lists and dictionaries only take `==` `!=` `contains` `validate` `then`, and
-  `==` ignores order.
+- Lists take `==` `!=` `contains` `validate` `then`, and `==` ignores order.
+  Dictionaries take the same set; the numeric ones also take `>` `>=` `<` `<=`,
+  applied per key against a real dictionary.
 - `validate` for whatever the operators do not cover, `then` when you want a
   value rather than a check, `matches` when you want both — and it is only ever
   spelled `matches`.

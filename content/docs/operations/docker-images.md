@@ -9,7 +9,7 @@ The published image runs a plain Robot Framework suite. As soon as your suite
 imports another library, needs a driver, or wants a specific Python version, you
 need an image of your own.
 
-The good news is that it is a two-line Dockerfile — the published image already
+The good news is that it is a handful of lines — the published image already
 runs as `pwuser`, so the `USER` line below is only insurance. The thing to be careful
 about is the version lock described further down — it is the one way to build an
 image that looks fine and fails at runtime.
@@ -42,8 +42,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends your-package \
 USER pwuser
 ```
 
-Keep `pwuser` as the final `USER`. Running as root is unsupported and produces
-failures that look like browser crashes rather than permission problems. See
+Keep `pwuser` as the final `USER`. The image's dependencies and caches are set
+up for that user, and running as root or any other user causes problems. See
 [Running in Docker](/docs/operations/docker).
 ::
 
@@ -112,9 +112,10 @@ upgrade procedure, and it is the reason the tag exists.
 
 If you genuinely must install a different Browser version in the same image, you
 own the whole chain: reinstall the Node side and let it fetch matching binaries
-(`rfbrowser clean-node && rfbrowser init`, which *adds* a matching browser set
-inside the library while the base image's binaries stay where they are — so you
-pay for both), or install browsers separately and
+(`rfbrowser clean-node && rfbrowser init`, which downloads a second, matching browser set — into the library's
+`node_modules` when `PLAYWRIGHT_BROWSERS_PATH` is unset, otherwise wherever it
+points, which in this base image is Playwright's own directory — while the base
+image's binaries stay on disk, so you pay for both), or install browsers separately and
 point `PLAYWRIGHT_BROWSERS_PATH` at them. Both give up what the image was for.
 
 ::doc-note

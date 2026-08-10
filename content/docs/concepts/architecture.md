@@ -30,7 +30,7 @@ rows:
 ---
 ::
 
-### Without Node.js — the recommended start
+### Without Node.js — the fewest moving parts
 
 ```bash
 pip install robotframework-browser-batteries
@@ -51,7 +51,8 @@ rfbrowser install firefox    # just one
 
 The catch is coverage. Wheels exist for Linux x64 and arm64, Windows x64, and
 macOS x64 and arm64 — and they need **glibc 2.28 or newer** (Debian 10, RHEL 8,
-Ubuntu 20.04) and **macOS 13 or newer**. There is no musl wheel and none for
+Ubuntu 20.04) and **macOS 13.5 or newer** (the wheel tag can only say 13.0, so on 13.0–13.4
+pip installs it and the bundled Node.js will not start). There is no musl wheel and none for
 Windows on arm. On anything outside that, pip finds no wheel and you want the
 Node.js route. It also carries only what Browser itself needs, so extra Node
 dependencies are the other method's job.
@@ -69,7 +70,8 @@ normal Node toolchain — `npm` and `npx` — on the machine.
 
 Do not install extra Node packages into `Browser/wrapper` by hand: `rfbrowser
 init` runs `npm ci` there, which deletes `node_modules` and reinstalls exactly
-the shipped lockfile, so anything you added disappears on the next init or
+the production dependencies from the shipped lockfile, so anything you added
+disappears on the next init or
 upgrade.
 
 ## Where things end up
@@ -133,5 +135,6 @@ kind: warning
 ---
 `PLAYWRIGHT_BROWSERS_PATH` must be set for the `robot` command too, not only for
 the install step. If it is set during install and not during the run, Playwright
-looks in its default location and reports that no browser is installed.
+looks in the library's own `.local-browsers` directory, finds it empty, and
+reports that the browser executable does not exist.
 ::
