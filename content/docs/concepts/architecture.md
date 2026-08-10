@@ -2,7 +2,7 @@
 title: How Browser works
 description: Python, a Node process and Playwright — what runs where, and which installation to choose.
 section: concepts
-order: 4
+order: 5
 ---
 
 Browser is a Python library that drives [Playwright](https://playwright.dev/)

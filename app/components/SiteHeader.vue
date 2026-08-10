@@ -48,6 +48,7 @@ const nav = computed<NavItem[]>(() => [
       { to: '/docs/concepts/browser-context-page', label: 'Browser, context, page', note: 'The three layers, and which one to open' },
       { to: '/docs/concepts/selectors', label: 'Finding elements', note: 'Which selector to reach for, and why' },
       { to: '/docs/concepts/assertions', label: 'Assertions', note: 'Almost every getter can assert, and every assertion retries' },
+      { to: '/docs/concepts/waiting', label: 'Waiting and promises', note: 'Wait For Condition, and running keywords in parallel' },
       { to: '/docs/concepts/architecture', label: 'How Browser works', note: 'Python, Node and Playwright' },
       { to: '/docs/concepts/logging', label: 'Logging and debugging', note: 'Which of the four logs answers which question' },
       { to: '/docs/mobile/responsive', label: 'Mobile web', note: 'Responsiveness, devices, touch and permissions' },

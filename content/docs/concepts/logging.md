@@ -2,7 +2,7 @@
 title: Logging and debugging
 description: Four places Browser tells you what happened — log.html, the Playwright log, traces and coverage.
 section: concepts
-order: 5
+order: 6
 ---
 
 Browser writes to more than one place, because it *is* more than one process.
