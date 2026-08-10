@@ -7,7 +7,8 @@ section: operations
 
 Browser is two halves. The Python half is the Robot Framework library you import;
 the Node half drives Playwright. They talk over gRPC on a local port, and the
-Python half starts the Node half for you the first time you import the library.
+Python half starts the Node half for you the first time you call a Browser
+keyword.
 
 Most of the time you never think about this. It matters in two situations: when
 you run many suites in parallel, and when you need to debug the Node side itself.
@@ -60,8 +61,10 @@ suites should share and the rest should stay independent:
 Library    Browser    playwright_process_port=12345
 ```
 
-There is a matching `playwright_process_host` for the case where the Node process
-runs on another machine. If both are set the **import parameter wins**: the
+There is a matching `playwright_process_host`, which defaults to `127.0.0.1`.
+On its own it only changes the address the spawned process binds to; combined
+with a port it is the address the library connects to. If both port settings are
+set the **import parameter wins**: the
 port from `playwright_process_port` is checked first and the variable is only a
 fallback. There is no environment variable for the host — that is
 `playwright_process_host` only.
@@ -71,15 +74,14 @@ applies to everything in that shell — and the import parameter is the precise 
 
 ### What you give up
 
-The shared process is genuinely faster to start. It also means:
+Sharing genuinely removes that startup from every run but the first. It also means:
 
 - **One failure domain.** If the shared process dies, every run pointed at it
   fails, not just the one that killed it.
-- **Teardown is shared too.** When a run finishes it tells the process to close
-  *all* browsers and browser servers, not only its own — so under Pabot the
-  first suite to finish can pull the browsers out from under the others.
-  `auto_closing_level=KEEP` suppresses that, at the cost of leaving everything
-  running for you to clean up.
+- **Teardown is per connection, not global.** A finishing run closes the
+  browsers *it* opened. The Node side keeps separate state per client
+  connection, so other runs on the same process are untouched — runs only share
+  state if they deliberately call `Set Peer Id` with the same value.
 - **You own its lifecycle.** Nothing starts it for you and nothing cleans it up.
   In CI that means a start step, a wait, and a teardown that runs even when the
   suite fails.
