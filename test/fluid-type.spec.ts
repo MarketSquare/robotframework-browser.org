@@ -91,15 +91,31 @@ describe('long unbreakable words cannot push a page sideways', () => {
     expect(rule).toMatch(/overflow-x:\s*auto/)
   })
 
-  it('tables are laid out fixed, or a pre cell drags the page with it', () => {
+  it("libdoc's tables are laid out fixed, or a pre cell drags the page with it", () => {
     /*
      * An auto-laid table sizes to its widest cell, and a cell holding a
      * non-wrapping keyword call has no width to give back: selectors.md
      * overflowed by 192px until this was set. `display: block` would also fix
      * it and would cost the table its semantics for a screen reader.
      */
-    const rule = /\.doc table \{[^}]*\}/.exec(read('app/assets/css/doc.css'))?.[0] ?? ''
-    expect(rule).toMatch(/table-layout:\s*fixed/)
+    const doc = read('app/assets/css/doc.css')
+    expect(doc).toMatch(/\.doc table:not\(\.doc-table\) \{[^}]*table-layout:\s*fixed/)
+  })
+
+  it('but never <DocTable>, whose narrow columns it collapses', () => {
+    /*
+     * DocTable marks single-term columns `width: 1%`, which an auto-laid table
+     * reads as "shrink to content" and a fixed-laid one reads literally. Under
+     * `table-layout: fixed` the operator column on the assertions page became
+     * 8px wide and every row drew on top of the next -- shipped, and reported
+     * from the live site.
+     *
+     * The exclusion is the fix, so it is what this asserts.
+     */
+    const doc = read('app/assets/css/doc.css')
+    const bare = /\.doc table \{[^}]*\}/.exec(doc)?.[0] ?? ''
+    expect(bare, 'must not apply to every table').not.toMatch(/table-layout/)
+    expect(doc).toContain('.doc table:not(.doc-table)')
   })
 
   it('keyword pills wrap rather than overflow on a narrow screen', () => {

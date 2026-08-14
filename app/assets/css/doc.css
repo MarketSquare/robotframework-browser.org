@@ -118,21 +118,32 @@
  * scroll box, and our own <DocTable> restacks itself below 40rem instead.
  */
 .doc table {
-  /*
-   * `table-layout: fixed` is load-bearing since inline code stopped wrapping.
-   * An auto-laid table sizes itself to its widest cell, and a cell holding a
-   * `white-space: pre` keyword call has no width it can give back — so the
-   * table grew past `max-width` and took the page with it, 192px of sideways
-   * scroll at phone width. Fixed layout makes the columns share the width they
-   * are given; the cell's own overflow handles what does not fit, and the
-   * table stays a table for a screen reader, which `display: block` would not.
-   */
-  table-layout: fixed;
-  width: 100%;
   overflow-x: auto;
   max-width: 100%;
   border-collapse: collapse;
   font-size: 0.9em;
+}
+
+/*
+ * Libdoc's tables only — never our own <DocTable>.
+ *
+ * These arrive as raw HTML from a docstring, declare no column widths, and
+ * since inline code stopped wrapping they had no width left to give back: an
+ * auto-laid table sizes itself to its widest cell, so one grew past its
+ * `max-width` and took the page with it, 192px of sideways scroll at phone
+ * width. Fixed layout makes the columns share what they are given, and keeps
+ * the table a table for a screen reader — which `display: block` would not.
+ *
+ * <DocTable> must be excluded, and the exclusion is the whole point of this
+ * selector. It marks single-term columns with `width: 1%`, which an auto-laid
+ * table reads as "shrink to the content". A fixed-laid one reads it literally:
+ * the operator column collapsed to 8px and every row drew on top of the next.
+ * DocTable brings its own containment — a `.scroll-x` wrapper, and a restack
+ * below 40rem — so it never needed this.
+ */
+.doc table:not(.doc-table) {
+  table-layout: fixed;
+  width: 100%;
 }
 
 .doc th,
