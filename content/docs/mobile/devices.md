@@ -157,25 +157,36 @@ Library     Browser
 
 *** Variables ***
 ${PHONE}        iPhone 13
-${URL}          https://example.com/products
+${URL}          https://www.imbus.de/en/academy/rfcp-robot-framework-certified-professional
 
 *** Test Cases ***
-Filters Are Behind A Sheet On A Phone
+The Certification Page On A Phone
     ${device} =    Get Device    ${PHONE}
     New Browser    webkit    headless=True
     New Context    &{device}
     New Page    ${URL}
 
-    # On a phone the filter panel starts collapsed…
-    Get Element States    id=filters    contains    hidden
-    Tap    id=filter-toggle
-    Get Element States    id=filters    contains    visible
+    # A real cookie banner, in the way of everything until it is dealt with.
+    Tap                        text="allow all cookies"
+    Wait For Elements State    button.cc-allow-all    hidden
+
+    Get Text    h1    *=    Certified Professional
 
     # …and the page never scrolls sideways.
     ${overflow} =    Evaluate JavaScript    ${None}
     ...    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
     Should Not Be True    ${overflow}
 ```
+
+Two details in there are worth more than the example itself.
+
+`hidden`, not `detached`: that banner is still in the document after you accept
+it, sized to nothing. Reaching for `detached` — the obvious guess — waits out
+the full timeout and fails.
+
+And it is a page you can actually run this against, which is the point. An
+example that only works against an app you do not have teaches the syntax and
+hides every problem the syntax exists for.
 
 `Tap` rather than `Click` is deliberate, and it only works because the
 descriptor set `hasTouch`. That is the subject of

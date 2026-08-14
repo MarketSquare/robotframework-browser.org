@@ -111,18 +111,18 @@ sessions:
 ### Write a test
 
 One import, no setup keyword, no explicit waits. `Get Text` both reads the
-value and asserts it.
+value and asserts it — and it keeps re-reading until the search results arrive,
+which is why nothing here waits for them.
 
 ```robot [first.robot]
 *** Settings ***
 Library     Browser
 
 *** Test Cases ***
-Search Robot Framework
-    New Page      https://robotframework.org
-    Fill Text     css=input[type="search"]    browser
-    Keyboard Key  press    Enter
-    Get Text      body    *=    Browser
+Search The Syllabus
+    New Page      https://syllabus.robotframework.org
+    Fill Text     id=search_input_react    Argument Types
+    Get Text      body    *=    2.5.2.8
 ```
 
 ### Run it

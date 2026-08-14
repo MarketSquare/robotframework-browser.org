@@ -188,25 +188,42 @@ shipped broken, because the person who built the feature had the other setting.
 
 ## Putting it together
 
-```robot [store-finder.robot]
+```robot [locate-me.robot]
 *** Settings ***
 Library     Browser
 
+
+*** Variables ***
+# Robot Framework ry, Kampinkuja 2, 00100 Helsinki.
+${LAT}      ${60.16829}
+${LON}      ${24.93051}
+
+
 *** Test Cases ***
-Store Finder On A Phone, In Helsinki
+The Map Finds The Phone, In Helsinki
     ${device} =    Get Device    iPhone 13
     New Browser    webkit    headless=True
     New Context
     ...    &{device}
     ...    permissions=['geolocation']
-    ...    geolocation={'latitude': 60.17, 'longitude': 24.94}
+    ...    geolocation={'latitude': ${LAT}, 'longitude': ${LON}}
     ...    locale=fi-FI
     ...    timezoneId=Europe/Helsinki
-    New Page    ${URL}
+    New Page    https://www.openstreetmap.org
 
-    Tap    id=find-near-me
-    Get Text    css=.result:first-child    contains    Helsinki
+    Tap        role=button[name="Näytä oma sijaintini"]
+    Get Url    *=    60.168
 ```
+
+That runs against the real OpenStreetMap, and the coordinates it proves are the
+Foundation's own front door.
+
+The Finnish in that selector is not decoration, and it is the trap in this
+chapter: `locale` changes the page, including the accessible names that
+`role=…[name=…]` matches on. Set `locale=fi-FI` and "Show My Location" becomes
+"Näytä oma sijaintini". A suite that sets a locale and selects by visible name
+has to pick one — either select on something the translation does not touch, or
+accept that the selector belongs to that locale.
 
 One context, one device, no hardware. Everything a real phone would have told
 you about *behaviour* — and none of what it would have told you about how the

@@ -73,18 +73,24 @@ Library    Browser
 Open The Keyword Reference
     New Page     https://robotframework-browser.org
     Get Title    *=    Robot Framework Browser
-    Click        text="Keywords"
+    Click        nav[aria-label="Main"] >> text="Keywords"
     Get Title    *=    Keyword reference
 ```
 
 It drives this site, so you can run it right now without an application of your
 own — and the pages it touches are the ones you are reading.
 
-The quotes around `"Keywords"` are not decoration. Without them `text=Keywords`
-is a case-insensitive *substring* match, and this page has three elements whose
-text contains it. Playwright is strict: a selector that matches more than one
-element is an error, not a silent first-match. Quoting makes it an exact match on
-the link. See [selectors](/docs/concepts/selectors).
+Two things are doing work in that selector, and both are worth copying.
+
+`>>` chains: everything left of it narrows the search, so `text="Keywords"` is
+looked for only inside the main navigation. The page has a second link with that
+exact text — in the row of figures on the landing page — and Playwright is
+strict: a selector matching more than one element is an error, not a silent
+first-match.
+
+The quotes make it an *exact* match. Without them, `text=Keywords` is a
+case-insensitive substring, which would also find "keywords" inside a sentence.
+See [selectors](/docs/concepts/selectors).
 
 ## Run it
 
