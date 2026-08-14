@@ -32,11 +32,14 @@ speed, reliability and visibility.
 :::
 
 :::stat-row
-:stat{value="%%browser%%"}[Browser]
-:stat{value="%%playwrightBundled%%"}[Playwright]
-:stat{value="%%node%%"}[Node]
-:stat{value="151"}[keywords]
-:stat{value="0"}[sleeps]
+:stat{value="%%browser%%" to="https://github.com/MarketSquare/robotframework-browser/releases"}[Browser]
+:stat{value="%%playwrightBundled%%" to="https://playwright.dev/docs/release-notes"}[Playwright]
+:stat{value="%%node%%" to="https://nodejs.org/en/download"}[Node]
+:stat{value="%%keywords%%" to="/keywords"}[Keywords]
+:stat{value="%%stars%%" icon="⭐" to="https://github.com/MarketSquare/robotframework-browser"}[Stars]
+:stat{value="%%contributors%%" to="/community#hall"}[Contributors]
+:stat{value="%%releases%%" to="https://pypi.org/project/robotframework-browser/#history"}[Releases]
+:stat{value="0"}[Sleeps]
 :::
 ::::
 

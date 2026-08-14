@@ -85,12 +85,35 @@ describe('content quotes versions by token, not by hand', () => {
   })
 
   it('substitutes every token it is given', () => {
-    // A token the manifest does not know is a build error, not silent text.
-    const known = new Set(Object.keys(versions))
+    /*
+     * A token nothing knows is a build error, not silent text — and silent is
+     * exactly how it fails: the literal `%%stars%%` renders into the page.
+     *
+     * The three sources have to match app/utils/version-tokens.ts, which is
+     * what actually resolves them at render time: the library's own versions,
+     * the project figures fetched by `pnpm project`, and the keyword count
+     * taken from the reference index so it cannot drift from the reference.
+     */
+    const project = JSON.parse(read('content/project.json')) as Record<string, unknown>
+    const known = new Set([...Object.keys(versions), ...Object.keys(project), 'keywords'])
     for (const file of files) {
       for (const [, name] of readFileSync(file, 'utf8').matchAll(/%%(\w+)%%/g)) {
         expect(known.has(name!), `${file}: unknown token %%${name}%%`).toBe(true)
       }
+    }
+  })
+
+  it('resolves the project figures as strings, or they render as the raw token', () => {
+    /*
+     * `resolveTokenString` only substitutes when the table holds a string, and
+     * project.json holds numbers. Without the coercion the landing page shipped
+     * `Stars: %%stars%%` — built, tested and deployed without complaint.
+     */
+    const util = read('app/utils/version-tokens.ts')
+    for (const key of ['stars', 'releases', 'contributors']) {
+      expect(util, `${key} must be stringified into the token table`).toMatch(
+        new RegExp(`${key}: String\\(`),
+      )
     }
   })
 

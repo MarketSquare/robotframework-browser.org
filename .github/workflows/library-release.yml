@@ -148,6 +148,12 @@ jobs:
       - name: Version numbers
         run: node scripts/build-versions.ts ./library
 
+      # After the contributors step, not before: it reads the total this wrote.
+      - name: Stars, PyPI releases and the contributor count
+        run: node scripts/build-project.ts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Check the import is coherent
         run: |
           set -euo pipefail

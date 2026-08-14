@@ -1,4 +1,6 @@
+import LIBDOC from '~/generated/libdoc.json'
 import VERSIONS from '~/generated/versions.json'
+import PROJECT from '~/../content/project.json'
 
 /**
  * `%%browser%%` and friends, resolved when the page renders.
@@ -27,7 +29,27 @@ import VERSIONS from '~/generated/versions.json'
  */
 const TOKEN = /%%(\w+)%%/g
 
-const TABLE = VERSIONS as unknown as Record<string, unknown>
+/*
+ * Three sources, one table.
+ *
+ * versions.json is the library's own numbers; project.json the two that live on
+ * someone else's server, refreshed by hand with `pnpm project`; and the keyword
+ * count is simply the length of the index the reference page already ships, so
+ * it cannot drift from the reference itself. Nothing here adds to the client
+ * bundle that was not in it already.
+ */
+const TABLE: Record<string, unknown> = {
+  ...(VERSIONS as unknown as Record<string, unknown>),
+  /*
+   * Stringified on the way in. project.json holds these as numbers, and a
+   * lookup that only accepts strings silently leaves `%%stars%%` in the page —
+   * which is exactly what it did.
+   */
+  stars: String(PROJECT.stars),
+  releases: String(PROJECT.releases),
+  contributors: String(PROJECT.contributors),
+  keywords: String(LIBDOC.index.length),
+}
 
 /** Every `%%name%%` in `text` that names a version we hold. */
 export function resolveTokenString(text: string): string {

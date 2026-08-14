@@ -76,6 +76,44 @@
   overflow-wrap: anywhere;
 }
 
+/*
+ * "Generated from Libdoc, the original is here" — the first thing in the
+ * reference, because a reader who wants the canonical page should not have to
+ * discover that it still exists.
+ */
+.source-note {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  margin: 0 0 var(--sp-6);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--teal);
+  border-radius: var(--radius-sm);
+  background: var(--chrome);
+  color: var(--dim);
+  font-size: 0.9rem;
+}
+
+.source-note .rf-mark {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+  color: var(--teal);
+  align-self: center;
+}
+
+.source-note b {
+  font-weight: 400;
+  color: var(--ink);
+}
+
+@supports (corner-shape: bevel) {
+  .source-note {
+    corner-shape: bevel;
+  }
+}
+
 .intro-section {
   max-width: var(--measure);
   display: flex;

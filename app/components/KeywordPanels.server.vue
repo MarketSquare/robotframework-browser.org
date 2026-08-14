@@ -100,6 +100,28 @@ const KIND_BLURB: Record<string, string> = {
     <!-- ---------- library introduction ---------- -->
     <section id="introduction" class="intro-section">
       <h2>Introduction</h2>
+
+      <!--
+        Say where this came from, at the top.
+
+        Everything below is generated from the library's own Libdoc output, and
+        a reader who wants the original — to check a rendering, to link the
+        canonical page, or because they know that one — should not have to
+        guess that it still exists.
+      -->
+      <p class="source-note">
+        <RobotMark />
+        <!--
+          One span, not loose text: the note is a flex row, and in a flex row
+          every stretch of text becomes its own item — so the gap that spaces
+          the mark from the sentence also opened up before each full stop.
+        -->
+        <span>Generated from the library's Libdoc for <b>{{ data.version }}</b>. The original is at <a
+          href="https://marketsquare.github.io/robotframework-browser/Browser.html"
+          rel="noopener"
+        >Browser.html</a>.</span>
+      </p>
+
       <!-- eslint-disable-next-line vue/no-v-html -- sanitized at build in lib/libdoc.ts -->
       <div class="doc" v-html="data.intro" />
     </section>
