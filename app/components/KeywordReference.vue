@@ -239,29 +239,68 @@ useHead({
             the only chrome the panel has, and the picker belongs with the
             thing it changes.
           -->
+          <!--
+            One row on a phone: close, the search field, and a toggle for the
+            two filters that are not needed often. The panel opened with 314px
+            of chrome above the first keyword — in landscape that is more than
+            the panel is tall, so it showed no keywords at all.
+          -->
           <div class="rail-bar">
+            <div class="field grow">
+              <label class="sr" for="kw-filter">Filter keywords</label>
+              <!--
+                `enterkeyhint` and the blur on Enter: on iOS the on-screen
+                keyboard otherwise stays up after a search, and the only way
+                out is the keyboard's own dismiss key.
+              -->
+              <input
+                id="kw-filter"
+                v-model="query"
+                type="search"
+                placeholder="Search…"
+                autocomplete="off"
+                enterkeyhint="search"
+                @keyup.enter="($event.target as HTMLInputElement).blur()"
+              >
+              <button v-if="query" type="button" class="clear" aria-label="Clear search" @click="query = ''">×</button>
+            </div>
+
+            <!--
+              A checkbox, not JavaScript: the whole panel is `:target`-driven
+              and works with scripting off, and this has to keep that.
+            -->
+            <input :id="`${railId}-filters`" class="filters-toggle sr" type="checkbox">
+            <!--
+              It expands a panel, it does not apply a filter — "Filter" read as
+              an action. The chevron says which way it goes.
+            -->
+            <label class="filters-button" :for="`${railId}-filters`">
+              <span>Options</span><span class="chev" aria-hidden="true">▾</span>
+              <span class="sr"> — version and tag filters</span>
+            </label>
+
+            <!-- Last, so it sits in the top-right corner where a dismiss belongs. -->
             <a class="rail-close" href="#kw-top" aria-label="Close the keyword list">
-              <span aria-hidden="true">×</span> Close
+              <span aria-hidden="true">×</span><span class="rail-close-label"> Close</span>
             </a>
+          </div>
+
+          <div class="rail-filters">
             <VersionPicker :current="version" />
-          </div>
-          <div class="field">
-            <label class="sr" for="kw-filter">Filter keywords</label>
-            <input id="kw-filter" v-model="query" type="search" placeholder="Search…" autocomplete="off">
-            <button v-if="query" type="button" class="clear" aria-label="Clear search" @click="query = ''">×</button>
+
+            <div class="field">
+              <label class="sr" for="kw-tag">Filter by tag</label>
+              <select id="kw-tag" v-model="tag">
+                <option value="">— Show all tags —</option>
+                <option v-for="[t, n] in allTags" :key="t" :value="t">{{ t }} ({{ n }})</option>
+              </select>
+            </div>
           </div>
 
-          <div class="field">
-            <label class="sr" for="kw-tag">Filter by tag</label>
-            <select id="kw-tag" v-model="tag">
-              <option value="">— Show all tags —</option>
-              <option v-for="[t, n] in allTags" :key="t" :value="t">{{ t }} ({{ n }})</option>
-            </select>
-          </div>
-
-          <p class="counts">
-            <span :class="{ on: filtering }">{{ matches.length }}</span> of {{ index.length }} keywords
-          </p>
+          <!--
+            No separate "x of 151 keywords" line: the section heads already
+            carry both numbers, so it was a row spent restating them.
+          -->
         </div>
 
         <!--
@@ -287,7 +326,7 @@ useHead({
 
           <input :id="`${railId}-kw`" v-model="open" class="acc-radio" type="radio" value="kw" :name="`${railId}-rail`">
           <label class="acc-head" :for="`${railId}-kw`" @click="toggle('kw', $event)">
-            Keywords <i>{{ matches.length }}</i>
+            Keywords <i>{{ matches.length }}<template v-if="filtering"><span class="of">/</span>{{ index.length }}</template></i>
           </label>
           <div class="acc-body">
             <a
@@ -302,7 +341,7 @@ useHead({
 
           <input :id="`${railId}-types`" v-model="open" class="acc-radio" type="radio" value="types" :name="`${railId}-rail`">
           <label class="acc-head" :for="`${railId}-types`" @click="toggle('types', $event)">
-            Data types <i>{{ matchingTypes.length }}</i>
+            Data types <i>{{ matchingTypes.length }}<template v-if="filtering"><span class="of">/</span>{{ types.length }}</template></i>
           </label>
           <div class="acc-body">
             <a
@@ -403,6 +442,17 @@ useHead({
   display: flex;
 }
 
+/*
+ * The browser draws its own clear button on `type="search"`, and this field
+ * already has one — they overlapped as two × on top of each other. Ours stays,
+ * because it is the one that is styled and keyboard-reachable.
+ */
+.field input[type='search']::-webkit-search-cancel-button,
+.field input[type='search']::-webkit-search-decoration {
+  appearance: none;
+  display: none;
+}
+
 .field input,
 .field select {
   width: 100%;
@@ -433,17 +483,27 @@ useHead({
   color: var(--ink);
 }
 
-.counts {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 0.625rem;
-  letter-spacing: 0.1em;
-  color: var(--faint);
-  text-transform: uppercase;
+/* Desktop keeps both filters open; the toggle is a phone affordance. */
+.rail-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
 }
 
-.counts .on {
-  color: var(--red-text);
+.filters-toggle,
+.filters-button {
+  display: none;
+}
+
+.field.grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The slash in "12/151": quieter than the numbers it separates. */
+.acc-head .of {
+  color: var(--faint);
+  margin: 0 0.1em;
 }
 
 /* ---------- accordion ---------- */
@@ -806,11 +866,24 @@ useHead({
    */
   .rail {
     position: fixed;
-    top: var(--header-h);
+    /*
+     * Over the header, not below it.
+     *
+     * While the list is open nobody needs "BROWSER · Menu · AUTO", and in
+     * landscape that bar is 61 of 390px — 16% of the screen spent on chrome
+     * for a panel that had no room to begin with.
+     */
+    top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 15;
+    z-index: 25;
+    /*
+     * The desktop rule sets `height: calc(100dvh - var(--header-h))`, and a
+     * used height wins over stretching between top and bottom — so the panel
+     * stayed 61px short of the screen even sitting at top: 0.
+     */
+    height: auto;
     max-height: none;
     padding-top: 0;
     overflow-y: auto;
@@ -828,31 +901,169 @@ useHead({
     opacity: 1;
   }
 
+  /*
+   * One row, and it stays put while the list scrolls under it.
+   *
+   * Measured before this: 314px from the top of the panel to the first
+   * keyword, the same in both orientations, because close, version, search,
+   * tags, the counter and two accordion heads all stacked. In landscape the
+   * panel is 329px tall — so it opened on zero of its 151 keywords.
+   */
   .rail-bar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--sp-3);
-    flex-wrap: wrap;
+    gap: var(--sp-2);
+    flex-wrap: nowrap;
+    /*
+     * Out to both edges. The bar lives inside `.rail-top`'s padding, so its
+     * background stopped short of the panel edge and left a strip of the
+     * surrounding colour either side — a band that ended for no visible
+     * reason. Cancel the parent padding, then put it back inside.
+     */
+    margin-inline: calc(-1 * var(--sp-3));
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
   }
 
-  /* Sticks with the filter block it lives in; needs no offset of its own. */
-  .rail-close {
+  /*
+   * One height for all three controls.
+   *
+   * They were three different heights: the input sized itself from its font,
+   * the buttons from their own min-height. Next to each other that reads as
+   * carelessness before it reads as anything else.
+   */
+  .rail-bar .field input,
+  .rail-bar .filters-button,
+  .rail-bar .rail-close {
+    height: 2.75rem;
+    min-height: 2.75rem;
+    box-sizing: border-box;
+  }
+
+  .rail-bar .field input {
+    /*
+     * 1rem is not a preference. Below 16px, iOS zooms the page to the field on
+     * focus and does not zoom back out afterwards — the reader is left on a
+     * magnified page and has to pinch out by hand.
+     */
+    font-size: 1rem;
+    padding-inline: var(--sp-3);
+  }
+
+  .filters-button .chev {
+    margin-left: var(--sp-2);
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: transform 0.12s;
+  }
+
+  .filters-toggle:checked ~ .filters-button .chev {
+    transform: rotate(180deg);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filters-button .chev {
+      transition: none;
+    }
+  }
+
+  /* The word costs a line's width next to the search field; the × does not. */
+  .rail-close-label {
+    display: none;
+  }
+
+  .filters-button {
     display: inline-flex;
     align-items: center;
-    gap: var(--sp-2);
-    align-self: start;
-    margin: 0;
-    padding: var(--sp-2) var(--sp-3);
-    background: var(--panel);
+    min-height: 2.75rem;
+    padding: 0 var(--sp-3);
     border: 1px solid var(--line-strong);
     border-radius: var(--radius-sm);
+    background: var(--panel);
+    color: var(--dim);
     font-family: var(--font-display);
     font-size: 0.7rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .filters-toggle:checked ~ .filters-button {
+    background: var(--chrome);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  /* Version and tag: two controls worth 90px, needed once a session. */
+  .rail-filters {
+    display: none;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .rail-bar:has(.filters-toggle:checked) + .rail-filters {
+    display: flex;
+  }
+
+  /* Three stacked heads with a count and an arrow cost 129px. */
+  .acc-head {
+    min-height: 2.5rem;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /*
+   * Landscape: wide and short. Two columns doubles what is reachable without
+   * scrolling, and 844px is more width than a keyword name needs.
+   */
+  @media (orientation: landscape) {
+    /*
+     * Grid, not `columns`.
+     *
+     * Multicol was the obvious answer and the wrong one: inside a fixed-height
+     * box that scrolls vertically, the columns flow sideways, so the list
+     * stopped after six entries with empty space under them and the remaining
+     * 145 unreachable. A two-track grid fills rows and keeps scrolling down.
+     */
+    .acc-radio:checked + .acc-head + .acc-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--sp-5);
+      align-content: start;
+    }
+
+    .rail-kw {
+      break-inside: avoid;
+    }
+  }
+
+  /*
+   * Last in the bar, so it lands in the top-right corner where a dismiss is
+   * looked for, and larger than the Filter button beside it: it is the one
+   * control that undoes opening the panel, and at the same size it read as
+   * just another option.
+   */
+  .rail-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    margin: 0;
+    padding: 0;
+    min-width: 2.75rem;
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-display);
+    /* Same ink as the label beside it; it was the only white thing in the row. */
     color: var(--dim);
-    align-self: start;
+    font-size: 1.5rem;
+    line-height: 1;
+    letter-spacing: 0;
   }
 
   @supports (corner-shape: bevel) {

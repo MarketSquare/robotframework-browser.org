@@ -40,6 +40,28 @@ const versions = computed(() => manifest.documented as string[])
 
 /** The current release lives at /keywords, the rest under their version. */
 const href = (v: string) => (v === LATEST_VERSION ? '/keywords' : `/keywords/${v}`)
+
+/*
+ * Which version is being fetched, if any.
+ *
+ * A version page carries its whole rendered reference — the largest is 866 KB —
+ * so switching takes a few seconds on a normal connection. Nothing moved in
+ * that time: the menu stayed open, the row stayed as it was, and the only
+ * available conclusion was that the click had missed.
+ *
+ * The row says so itself rather than a bar at the top of the window, because
+ * the question being answered is "did *that* click register".
+ */
+const pending = ref<string | null>(null)
+const router = useRouter()
+
+/*
+ * Cleared on arrival *and* on failure. A navigation that errors or is
+ * cancelled would otherwise leave the row spinning for good — and this
+ * component survives the switch, since it is mounted on both pages.
+ */
+router.afterEach(() => { pending.value = null })
+router.onError(() => { pending.value = null })
 </script>
 
 <template>
@@ -59,11 +81,20 @@ const href = (v: string) => (v === LATEST_VERSION ? '/keywords' : `/keywords/${v
       <div class="panel-scroll">
         <ul class="list">
         <li v-for="v in versions" :key="v" :class="{ on: v === props.current }">
-          <NuxtLink class="doc" :to="href(v)" :prefetch="false">
+          <NuxtLink
+            class="doc"
+            :to="href(v)"
+            :prefetch="false"
+            :aria-busy="pending === v || undefined"
+            @click="pending = v"
+          >
             <span class="v">{{ v }}</span>
             <!-- One tag, not two: on the common case both applied and the row
                  grew to three lines in a narrow panel. -->
-            <span v-if="v === props.current" class="tag reading">reading</span>
+            <span v-if="pending === v" class="tag loading">
+              <span class="spinner" aria-hidden="true" />loading
+            </span>
+            <span v-else-if="v === props.current" class="tag reading">reading</span>
             <span v-else-if="v === LATEST_VERSION" class="tag">latest</span>
           </NuxtLink>
           <NuxtLink class="notes" :to="`/releases/${v}`" :prefetch="false">Notes</NuxtLink>
@@ -177,6 +208,45 @@ summary:hover {
 
 .tag.reading {
   color: var(--red);
+}
+
+.tag.loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--teal);
+}
+
+.spinner {
+  width: 0.7em;
+  height: 0.7em;
+  border: 1.5px solid currentcolor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/*
+ * Without motion the ring would be a static broken circle, which reads as a
+ * rendering fault. Pulse the whole tag instead.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+    border-top-color: currentcolor;
+  }
+
+  .tag.loading {
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    50% { opacity: 0.45; }
+  }
 }
 
 .list {
