@@ -23,7 +23,7 @@ const read = (p: string) => readFileSync(join(ROOT, p), 'utf8')
 const pkg = JSON.parse(read('package.json')) as { scripts: Record<string, string> }
 
 /** Scripts that read the library checkout or the network. */
-const NEEDS_OUTSIDE = ['versions', 'releases', 'contributors']
+const NEEDS_OUTSIDE = ['versions', 'releases', 'contributors', 'project', 'devices']
 
 describe('the build is self-contained', () => {
   it.each(['build', 'generate'])('`pnpm %s` runs nothing that needs the library', script => {
@@ -56,6 +56,9 @@ describe('the build is self-contained', () => {
 
     for (const path of [
       'app/generated/versions.json',
+      // `pnpm devices` downloads playwright-core to read the descriptors, so
+      // it cannot run during a build. DeviceRows.server.vue imports this.
+      'app/generated/devices.json',
       'content/libdoc/LATEST',
       'content/contributors.json',
       'public/CNAME',

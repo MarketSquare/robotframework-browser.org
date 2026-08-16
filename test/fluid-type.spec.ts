@@ -99,7 +99,7 @@ describe('long unbreakable words cannot push a page sideways', () => {
      * it and would cost the table its semantics for a screen reader.
      */
     const doc = read('app/assets/css/doc.css')
-    expect(doc).toMatch(/\.doc table:not\(\.doc-table\) \{[^}]*table-layout:\s*fixed/)
+    expect(doc).toMatch(/\.doc table:not\(\.doc-table, \.device-table\) \{[^}]*table-layout:\s*fixed/)
   })
 
   it('but never <DocTable>, whose narrow columns it collapses', () => {
@@ -110,12 +110,17 @@ describe('long unbreakable words cannot push a page sideways', () => {
      * 8px wide and every row drew on top of the next -- shipped, and reported
      * from the live site.
      *
+     * The device table is excluded for the same reason and showed the same
+     * symptom: laid out fixed, the name column was sized without regard to the
+     * device names in it and `iPhone 11 Pro` drew across the figures beside it.
+     * Both bring their own `.scroll-x`, which is what makes the exclusion safe.
+     *
      * The exclusion is the fix, so it is what this asserts.
      */
     const doc = read('app/assets/css/doc.css')
     const bare = /\.doc table \{[^}]*\}/.exec(doc)?.[0] ?? ''
     expect(bare, 'must not apply to every table').not.toMatch(/table-layout/)
-    expect(doc).toContain('.doc table:not(.doc-table)')
+    expect(doc).toContain('.doc table:not(.doc-table, .device-table)')
   })
 
   it('keyword pills wrap rather than overflow on a narrow screen', () => {

@@ -10,9 +10,20 @@ coverage
 .playwright-mcp
 # Regenerated from committed sources by `pnpm libdoc` — 8 MB of rendered
 # keyword bodies, derived from content/libdoc/*.json.
-app/generated
+#
+# `app/generated/*` and not `app/generated`: git does not descend into an
+# excluded directory, so a negation below it never matches. The rule read
+# `app/generated` and the `!` line under it did nothing — versions.json was
+# only in the repository because it had been added before the rule existed.
+app/generated/*
 
 # …except the version manifest. nuxt.config.ts reads it while loading the
 # config, which happens during `pnpm install`'s prepare step — before any
 # script could regenerate it. Ignoring it made a clean clone fail to install.
 !app/generated/versions.json
+
+# …and the device descriptors, for the same shape of reason. `pnpm devices`
+# downloads playwright-core to read them, so it cannot run during a build:
+# `pnpm generate` must work from a clean clone with no network. Ignoring this
+# file would leave DeviceRows.server.vue importing something that is not there.
+!app/generated/devices.json

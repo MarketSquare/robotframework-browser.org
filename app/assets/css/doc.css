@@ -140,8 +140,13 @@
  * the operator column collapsed to 8px and every row drew on top of the next.
  * DocTable brings its own containment — a `.scroll-x` wrapper, and a restack
  * below 40rem — so it never needed this.
+ *
+ * The device table is excluded for the same reason and showed the same
+ * symptom: laid out fixed, the device-name column was sized without regard to
+ * the names in it, and `iPhone 11 Pro` was drawn across the viewport figures
+ * beside it. It has its own `.scroll-x` too.
  */
-.doc table:not(.doc-table) {
+.doc table:not(.doc-table, .device-table) {
   table-layout: fixed;
   width: 100%;
 }

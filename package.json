@@ -14,14 +14,15 @@
     "check:bundle": "node scripts/check-bundle.mjs",
     "verify": "pnpm content:clean && pnpm generate && pnpm test && pnpm check:bundle",
     "content:clean": "node -e \"require('node:fs').rmSync('.data', {recursive: true, force: true})\"",
-    "refresh": "pnpm versions && pnpm releases && pnpm contributors && pnpm project && pnpm libdoc",
+    "refresh": "pnpm versions && pnpm releases && pnpm contributors && pnpm project && pnpm devices && pnpm libdoc",
     "logo": "node scripts/build-logo.mjs",
     "sitemap": "node scripts/build-sitemap.ts",
     "libdoc": "node scripts/build-libdoc.ts",
     "contributors": "node scripts/build-contributors.ts",
     "project": "node scripts/build-project.ts",
     "releases": "node scripts/build-releases.ts",
-    "versions": "node scripts/build-versions.ts"
+    "versions": "node scripts/build-versions.ts",
+    "devices": "node scripts/build-devices.ts"
   },
   "dependencies": {
     "@nuxt/content": "^3.15.2",
