@@ -69,6 +69,9 @@ const nav = computed<NavItem[]>(() => [
 
 const uid = useId()
 
+/** A tap on the entry for the page you are already on. See the composable. */
+const onSamePage = useSamePageNav()
+
 /*
  * Publish the header's height as --header-h.
  *
@@ -116,13 +119,19 @@ onMounted(() => {
 
     <nav class="nav" aria-label="Main">
       <div v-for="item in nav" :key="item.to" class="item" :class="{ 'has-menu': item.children }">
-        <NuxtLink class="top" :to="item.to">
+        <NuxtLink class="top" :to="item.to" @click="onSamePage($event, item.to)">
           {{ item.label }}
           <span v-if="item.children" class="caret" aria-hidden="true">▾</span>
         </NuxtLink>
 
         <div v-if="item.children" class="menu">
-          <NuxtLink v-for="child in item.children" :key="child.to" class="menu-link" :to="child.to">
+          <NuxtLink
+            v-for="child in item.children"
+            :key="child.to"
+            class="menu-link"
+            :to="child.to"
+            @click="onSamePage($event, child.to)"
+          >
             <span class="menu-label">{{ child.label }}</span>
             <span v-if="child.note" class="menu-note">{{ child.note }}</span>
           </NuxtLink>

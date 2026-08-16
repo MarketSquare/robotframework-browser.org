@@ -60,3 +60,57 @@ describe('the styleguide is published but unlisted', () => {
     expect(readFileSync(`${process.cwd()}/CONTRIBUTING.md`, 'utf8')).toContain('/styleguide')
   })
 })
+
+/**
+ * The docs rail moves above the article below 900px, and there it shows only
+ * the chapter being read.
+ *
+ * It used to show all five in an 18rem scrolling box that opened at the top of
+ * the list. On /docs/mobile/responsive that meant nineteen links above the
+ * article, none of them the current page, and the highlight that says where you
+ * are was scrolled out of sight three chapters down.
+ */
+const docs = readFileSync(`${process.cwd()}/app/pages/docs/[...slug].vue`, 'utf8')
+const docsSmall = docs.slice(docs.indexOf('@media (max-width: 900px)'))
+
+describe('the docs rail on a small screen', () => {
+  it('shows only the chapter being read', () => {
+    expect(docsSmall).toMatch(/\.chapter:not\(\.here\)[\s\S]{0,60}display:\s*none/)
+  })
+
+  it('marks the current page for a screen reader too, not only in colour', () => {
+    expect(docs).toContain("aria-current")
+  })
+
+  it('drops the scroll box, so the short list is not trapped in one', () => {
+    // `max-height: 18rem` is what put the current page out of view.
+    expect(docsSmall).toMatch(/\.rail \{[^}]*max-height:\s*none/)
+  })
+})
+
+/**
+ * A link to the page you are already on is a no-op in the router, which reads
+ * as a broken menu: nothing moves and the menu stays open over the article.
+ */
+const header = readFileSync(`${process.cwd()}/app/components/SiteHeader.vue`, 'utf8')
+
+describe('a link to the current page', () => {
+  it.each([
+    ['the docs rail', () => docs],
+    ['the site header', () => header],
+  ])('is handled in %s', (_where, read) => {
+    expect(read()).toContain('onSamePage($event')
+  })
+
+  it('closes the menu and returns to the top', () => {
+    const composable = readFileSync(`${process.cwd()}/app/composables/useSamePageNav.ts`, 'utf8')
+    expect(composable).toContain('.menu-toggle')
+    expect(composable).toMatch(/checked\s*=\s*false/)
+    expect(composable).toMatch(/scrollTo\(\{[\s\S]*top:\s*0/)
+  })
+
+  it('honours a request for reduced motion', () => {
+    const composable = readFileSync(`${process.cwd()}/app/composables/useSamePageNav.ts`, 'utf8')
+    expect(composable).toContain('prefers-reduced-motion')
+  })
+})

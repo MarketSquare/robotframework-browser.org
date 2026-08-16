@@ -71,6 +71,9 @@ const neighbours = computed(() => {
   return { prev: flat.value[i - 1], next: flat.value[i + 1] }
 })
 
+/** A tap on the entry for the page you are already on. */
+const onSamePage = useSamePageNav()
+
 /** On-this-page, from the headings themselves. See app/utils/toc.ts. */
 const toc = computed(() => tocFromBody(doc.value?.body?.value as MarkNode[] | undefined))
 
@@ -100,7 +103,19 @@ const rendered = computed(() => resolveTokens(doc.value))
 
     <div class="layout">
       <nav class="rail" aria-label="Documentation">
-        <div v-for="chapter in chapters" :key="chapter.id" class="chapter">
+        <!--
+          Every chapter is rendered at every width. Above 900px the rail is the
+          full map down the side; below it, the media query at the end of this
+          file leaves only the chapter you are reading. Doing it in CSS rather
+          than by trimming the list keeps one prerendered page correct at both
+          widths, and every chapter is a tap away in the header menu regardless.
+        -->
+        <div
+          v-for="chapter in chapters"
+          :key="chapter.id"
+          class="chapter"
+          :class="{ here: chapter.id === doc.section }"
+        >
           <p class="chapter-name">{{ chapter.name }}</p>
           <NuxtLink
             v-for="p in chapter.pages"
@@ -108,6 +123,8 @@ const rendered = computed(() => resolveTokens(doc.value))
             class="rail-link"
             :class="{ on: p.path === path }"
             :to="p.path"
+            :aria-current="p.path === path ? 'page' : undefined"
+            @click="onSamePage($event, p.path)"
           >{{ p.title }}</NuxtLink>
         </div>
       </nav>
@@ -295,11 +312,39 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  /*
+   * On top, the rail shows the chapter you are in and nothing else.
+   *
+   * It used to show the whole map in an 18rem scrolling box, which opened at
+   * the top of the list: on /docs/mobile/responsive the visible entries were
+   * "Getting started" and "Core concepts", the current page was three
+   * chapters further down, and its highlight — the thing that says where you
+   * are — was out of view. Nineteen links above the article, none of them the
+   * one you were reading.
+   *
+   * The other chapters are all in the header menu, which is where a jump
+   * between chapters belongs anyway.
+   */
   .rail {
     position: static;
-    max-height: 18rem;
+    max-height: none;
     border-right: 0;
     border-bottom: 1px solid var(--line);
+    padding-bottom: var(--sp-3);
+  }
+
+  .chapter:not(.here) {
+    display: none;
+  }
+
+  /*
+   * The article's eyebrow repeats the chapter name, and with the rail directly
+   * above it the two sat one line apart: "MOBILE WEB" twice, in the same green,
+   * in the same typeface. The rail says it here; the eyebrow says it on a wide
+   * screen, where the rail is off to the side.
+   */
+  .head .label {
+    display: none;
   }
 }
 </style>
