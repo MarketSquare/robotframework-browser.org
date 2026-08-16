@@ -145,60 +145,21 @@ function cellText(cell: unknown, row: number, col: number): string {
 }
 
 /*
- * Below 40rem a table stops being a table.
+ * Narrow screens scroll; they do not restack.
  *
- * A three-column comparison cannot fit a phone: the columns' min-content adds
- * up to more than the screen, so the last column ended up past the edge of a
- * wrapper that had nothing to scroll — 200px of unreachable content, measured
- * at 390px. Every alternative that keeps the grid either scrolls sideways,
- * which hides half of a comparison, or squashes prose into 100px columns.
+ * This used to break each row into a stack of labelled cells below 40rem. It
+ * fitted, but it stopped being a table: rows could no longer be compared down a
+ * column, which is the only reason these tables exist. A comparison table read
+ * as a list of unrelated paragraphs.
  *
- * So each row becomes a block and each cell carries its column heading as a
- * label. Nothing is hidden, nothing scrolls, and a row reads as what it is: a
- * property, and what each tool does about it.
+ * So the table keeps its shape at every width and the wrapper scrolls instead.
+ * `min-width` is what forces that scroll — without it the columns squeeze to
+ * one word per line and the table technically fits while being unreadable.
  */
 @media (max-width: 40rem) {
-  .doc-table,
-  .doc-table tbody,
-  .doc-table tr,
-  .doc-table td {
-    display: block;
-    width: auto;
-  }
-
-  .doc-table thead {
-    display: none;
-  }
-
-  .doc-table tr {
-    padding: var(--sp-3) 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .doc-table td {
-    border: 0;
-    padding: 0 0 var(--sp-2);
-  }
-
-  /* A cell whose column has no heading — a rank — needs no label. */
-  .doc-table td[data-label]::before {
-    content: attr(data-label);
-    display: block;
-    font-family: var(--font-display);
-    font-size: var(--step--2);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--faint);
-  }
-
-  /* The first cell is the row's subject, so it leads. */
-  .doc-table td:first-child {
-    font-family: var(--font-display);
-  }
-
-  .doc-table td.tight {
-    width: auto;
-    white-space: normal;
+  .doc-table {
+    min-width: 34rem;
   }
 }
+
 </style>
