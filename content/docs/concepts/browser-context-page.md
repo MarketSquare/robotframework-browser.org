@@ -123,6 +123,88 @@ New Context    tracing=True
 New Context    recordVideo={'dir': '${OUTPUT_DIR}/video'}
 ```
 
+### Logging in once, and reusing it
+
+A context starts empty: no cookies, no `localStorage`, nobody logged in. Doing
+the login again in every test is the slowest thing most suites do, and the least
+interesting to debug when it breaks.
+
+`Save Storage State` takes what the *active context* has accumulated and writes
+it to a file; `New Context` takes that file back:
+
+```robot
+*** Test Cases ***
+Log In Once
+    New Context
+    New Page       ${LOGIN_URL}
+    Fill Secret    id=username    $USERNAME
+    Fill Secret    id=password    $PASSWORD
+    Click          id=submit
+    Get Text       id=header    ==    Signed in
+
+    ${state} =    Save Storage State
+
+    # A second session, already authenticated.
+    New Context    storageState=${state}
+    New Page       ${APP_URL}
+    Get Text       id=header    ==    Signed in
+```
+
+#### What actually travels
+
+Less than you might expect, and this is the part worth knowing before you rely
+on it. Playwright's snapshot *can* carry cookies, `localStorage`, IndexedDB and
+virtual WebAuthn credentials — but the last two only when asked for, and Browser
+does not ask. It calls `storageState` with a path and nothing else, so you get
+the defaults:
+
+::doc-table
+---
+head: [State, Restored, ""]
+nowrap: [0, 1]
+rows:
+  - - Cookies
+    - "**yes**"
+    - Session cookies included, subject to their own expiry
+  - - "`localStorage`"
+    - "**yes**"
+    - Per origin, exactly as saved
+  - - "`sessionStorage`"
+    - "no"
+    - By definition tied to one tab; it is not in the file at all
+  - - IndexedDB
+    - "no"
+    - Playwright offers it as an option; Browser does not pass it
+  - - WebAuthn credentials
+    - "no"
+    - Same reason
+---
+::
+
+So a login that keeps its token in a cookie or in `localStorage` restores
+cleanly. One that keeps it in `sessionStorage` does not, and no amount of saving
+will change that — you have to log in per context.
+
+#### Three things that catch people
+
+**The file does not survive the run.** It is written to
+`${OUTPUT_DIR}/browser/state/`, and that whole directory is deleted at the start
+of every execution. Reuse within a run is what this is for; to carry a session
+between runs, copy the file somewhere the next run will not wipe.
+
+**The path must exist.** Anything else fails immediately and by name:
+
+```
+ValueError: storageState argument value 'does-not-exist.json' is not file,
+but it should be.
+```
+
+It is checked before the context is created, so a typo costs no browser time.
+
+**The file is a credential.** It contains live session cookies and whatever the
+app put in `localStorage`. Anyone holding it is logged in as that user. Keep it
+out of version control and out of build artefacts you publish.
+
 ### Persistent contexts
 
 `New Persistent Context` is the exception to the shape: it takes a user data
@@ -174,27 +256,34 @@ Every browser, context and page has an id, and `Get Browser Catalog` returns the
 whole tree:
 
 ```text
-Browser  chromium  browser=94c1…   activeBrowser: true
-                             activeContext: context=7f2a…
-├── Context  context=7f2a…   activePage: page=3dce…
-│   ├── Page  page=3dce…  /login
-│   └── Page  page=8b17…  /cart
-└── Context  context=b3d9…   activePage: page=1f60…
-    └── Page  page=1f60…  /admin
+chromium  browser=94c1…
+├── context=7f2a…
+│   ├── page=3dce…  /login
+│   └── page=8b17…  /cart
+└── context=b3d9…
+    └── page=1f60…  /admin
 
-Browser  firefox  browser=1ae8…
-└── Context  context=5c04…   activePage: page=42aa…
-    └── Page  page=42aa…  about:blank
+firefox  browser=1ae8…
+└── context=5c04…
+    └── page=42aa…  about:blank
 ```
 
 Drawn as a tree here for readability; the keyword returns a list of
 dictionaries, one per browser, each carrying its contexts and their pages.
 
-The `active*` fields are the part worth reading, and they are not all the same
-shape: `activeBrowser` is a boolean on the browser, while `activeContext` and
-`activePage` hold *ids* — and every browser and context carries one, whether or
-not it is the active branch. So `activeBrowser` is what picks the branch the
-next keyword will act on.
+What the tree does not show is which branch the next keyword will act on. That
+lives in three fields, and they are not the same kind of thing.
+
+`activeBrowser` is a **boolean**, one per browser, and exactly one is true —
+here it is `chromium`. `activeContext` and `activePage` hold **ids**, and
+*every* browser and context carries them whether or not it is the active
+branch: `context=b3d9…` above is idle, and still names the page it would use if
+you switched to it.
+
+So in this catalog the next `Click` lands on `page=3dce…` at `/login`: chromium
+is the true `activeBrowser`, its `activeContext` is `context=7f2a…`, and that
+context's `activePage` is `page=3dce…`. Read the three in that order and you
+always know where you are.
 
 This is the fastest way to answer "what does the library think is running" when
 a suite has drifted from what you expected. `Get Browser Ids`, `Get Context Ids`

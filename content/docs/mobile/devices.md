@@ -38,6 +38,9 @@ The list is Playwright's, so it grows when Playwright updates. Names are exact
 and case-sensitive: `iPhone 13`, `iPhone 13 Pro Max`, `Pixel 7`, `Galaxy S9+`,
 `iPad Mini`, and the `landscape` variants such as `iPhone 13 landscape`.
 
+Rather than log all of them to find one, [every device descriptor](/docs/mobile/device-list)
+lists them with their viewport, pixel ratio and engine, filterable by name.
+
 ::doc-note
 Pin the descriptor name in a variable rather than scattering it through a suite.
 Pin the name in a variable rather than scattering it through a suite — the list
@@ -173,9 +176,8 @@ The Certification Page On A Phone
     Get Text    h1    *=    Certified Professional
 
     # …and the page never scrolls sideways.
-    ${overflow} =    Evaluate JavaScript    ${None}
-    ...    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
-    Should Not Be True    ${overflow}
+    ${client} =    Get Client Size    key=width
+    Get Scroll Size    ${None}    width    ==    ${client}
 ```
 
 Two details in there are worth more than the example itself.

@@ -145,10 +145,26 @@ the whole page scroll sideways:
 ```robot
 *** Keywords ***
 Page Should Not Scroll Sideways
-    ${overflow} =    Evaluate JavaScript    ${None}
-    ...    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
-    Should Not Be True    ${overflow}    Page scrolls horizontally
+    ${client} =    Get Client Size    key=width
+    Get Scroll Size    ${None}    width    ==    ${client}
 ```
+
+Two keywords, no JavaScript. `Get Client Size` is how much room the page has,
+`Get Scroll Size` is how much it wants; when the second is larger, the page
+scrolls sideways. Neither needs a selector — left out, both measure the page
+itself — and the `${None}` is there only because `selector` comes first in the
+signature and the assertion arguments follow it.
+
+Letting the assertion compare, rather than `Should Not Be True`, buys two
+things. The failure names the numbers:
+
+```
+Scroll width is '1400' (int) should be '390.0' (float)
+```
+
+which is the difference between "something is too wide" and "there is a 1400px
+block on this page". And an assertion retries, so a layout still settling — a
+webfont, a late image — is not reported as a defect it is not.
 
 Call it after loading each page at your narrowest layout. It costs nothing and
 it catches the long unbreakable string, the fixed-width table and the image
