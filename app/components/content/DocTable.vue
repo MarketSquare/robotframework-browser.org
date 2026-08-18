@@ -66,6 +66,20 @@ function cellText(cell: unknown, row: number, col: number): string {
             so the whole table reads as unlabelled. Those columns are the row's
             subject anyway — a rank, a property — so they become row headers.
           -->
+          <!--
+            `:innerHTML`, not `v-html`, and the difference is not cosmetic.
+
+            Vue's SSR compiler drops `v-html` on a dynamic `<component :is>`:
+            the element renders, its content does not. The site is prerendered,
+            so every cell in every table shipped as `<td></td>` — headers
+            interpolated fine, and the tables looked deliberately empty rather
+            than broken. It reached production. `:innerHTML` is the same
+            operation as a plain prop and survives both renderers.
+
+            Keep it a dynamic component: the `th`/`td` choice below carries the
+            table's accessibility semantics, and splitting it into two branches
+            duplicates every attribute on the row-header path.
+          -->
           <component
             :is="props.head[j] === '' ? 'th' : 'td'"
             v-for="(cell, j) in row"
@@ -73,7 +87,7 @@ function cellText(cell: unknown, row: number, col: number): string {
             :scope="props.head[j] === '' ? 'row' : undefined"
             :class="{ tight: tight(j) }"
             :data-label="props.head[j] || null"
-            v-html="inlineMarkdown(cellText(cell, i, j))"
+            :innerHTML="inlineMarkdown(cellText(cell, i, j))"
           />
         </tr>
       </tbody>
