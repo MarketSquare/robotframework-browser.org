@@ -29,6 +29,18 @@ function contentFiles(dir = join(ROOT, 'content')): string[] {
   })
 }
 
+/**
+ * `:since{version="20.4.0"}` — the release a behaviour arrived in.
+ *
+ * See the exemption test below for why this one number is written by hand. Both
+ * colon forms are matched so that `::since{}` is stripped too: it is the wrong
+ * form and the test below says so by name, which beats failing the hardcoded
+ * release check with a message about a token.
+ */
+const SINCE = /(:{1,2})since\{[^}]*version="([^"]*)"[^}]*\}/g
+
+const withoutSince = (src: string) => src.replaceAll(SINCE, '')
+
 describe('the version manifest', () => {
   it('documents the version whose Libdoc we render', () => {
     expect(versions.browser).toBe(LATEST)
@@ -79,9 +91,44 @@ describe('content quotes versions by token, not by hand', () => {
 
   it.each(files.map(f => [f.slice(ROOT.length + 1), f]))('%s has no hardcoded release', (name, file) => {
     // `files` holds absolute paths; read() prepends the root.
-    const src = readFileSync(file, 'utf8')
+    const src = withoutSince(readFileSync(file, 'utf8'))
     // The current version, typed out, is the mistake this guards against.
     expect(src, `${name} hardcodes ${LATEST}; use %%browser%%`).not.toContain(LATEST)
+  })
+
+  it('writes every :since{} inline, naming a full release', () => {
+    /*
+     * The one documented exception, and the reason it is narrow.
+     *
+     * "New in Browser 20.4.0" is a historical fact: it stays true forever and
+     * a token would destroy it, because %%browser%% means *the release this
+     * site documents* and reads 21.x a year from now. Everything else naming a
+     * version — an install transcript, a `docker pull`, a "tested against" —
+     * has to track the library instead, and is what the check above defends.
+     *
+     * So the exemption is the component, not the file: the check above still
+     * runs over the rest of the file, and the current release typed out
+     * anywhere else in it still fails.
+     */
+    const used = files.flatMap(f => [...readFileSync(f, 'utf8').matchAll(SINCE)].map(m => ({
+      file: f.slice(ROOT.length + 1),
+      colons: m[1]!,
+      version: m[2]!,
+    })))
+
+    // Vacuity guard, as everywhere else in this suite: the exemption above
+    // strips whatever this matches, so a regex that silently stops matching
+    // would take this check down with it and stay green.
+    expect(used.length, 'no :since{} found — has the component been renamed?').toBeGreaterThan(0)
+
+    for (const { file, colons, version } of used) {
+      // Since.vue renders a span, so it is an inline component. `::since{}`
+      // renders it as a block and reads as a section heading it is not.
+      expect(colons, `${file}: write :since{} inline, not ${colons}since{}`).toBe(':')
+      expect(version, `${file}: :since{version="${version}"} is not a full release`).toMatch(
+        /^\d+\.\d+\.\d+$/,
+      )
+    }
   })
 
   it('substitutes every token it is given', () => {

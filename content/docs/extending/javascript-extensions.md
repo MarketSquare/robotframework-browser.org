@@ -217,6 +217,11 @@ fires: without it the extension has already run by the time you attach.
 
 ## Which extension point?
 
+Three shapes, not two. A Python plugin and a JavaScript module both extend the
+Browser instance Robot Framework loaded, from the inside. The third is not an
+extension point at all: **your own Robot Framework library**, which either sits
+alongside Browser or owns the instance itself.
+
 ::doc-table
 ---
 head: [You want, Use]
@@ -226,6 +231,8 @@ rows:
   - ['To replace an existing keyword', 'Python plugin']
   - ['A custom selector engine', 'JavaScript module']
   - ['Both Python and page-side logic in one keyword', 'Python plugin calling a JS module']
+  - ['Business logic in Python — `IF`, `TRY`, parsing — with Browser unchanged', '[Your own Python library](/docs/extending/python-libraries)']
+  - ['Your own keywords and your own failure handling, with Browser underneath', '[Browser as a base](/docs/extending/browser-as-a-base)']
 ---
 ::
 
