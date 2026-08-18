@@ -253,9 +253,13 @@ kills the run with a signal and `atexit` never runs.
 
 ## Where these examples come from
 
-Every block on this page is copied from the library's acceptance tests, in
-[`atest/test/13_Python_Extension/`](https://github.com/MarketSquare/robotframework-browser/tree/main/atest/test/13_Python_Extension).
-`MyLibraryB.py` is a complete worked library for this page and
-`context_b.robot` is the suite that runs it. `MyLibraryB_no_listener.py` is the
-same library without that registration — the difference between those two runs
-is the table above.
+Every labelled block on this page is quoted from a real file, committed in this
+repository under `examples/python-extension/`, and a test fails the build if a
+quote stops matching it. `MyLibraryB.py` is a complete worked library for this
+page and `context_b.robot` is the suite that exercises it.
+`MyLibraryB_no_listener.py` is the same library without that registration, and
+the difference between those two runs is the table above.
+
+Those files are a copy. They run as acceptance tests in the library itself, in
+[`atest/test/13_Python_Extension/`](https://github.com/MarketSquare/robotframework-browser/tree/main/atest/test/13_Python_Extension),
+which is where a change to them belongs.

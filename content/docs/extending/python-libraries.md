@@ -183,8 +183,12 @@ that matter to a reader of the report, because the automatic detail is gone.
 
 ## Where these examples come from
 
-Every block on this page is copied from the library's acceptance tests, in
-[`atest/test/13_Python_Extension/`](https://github.com/MarketSquare/robotframework-browser/tree/main/atest/test/13_Python_Extension).
-`MyLibraryA.py` is a complete worked library for this page, and `context_a.robot`
-is the suite that runs it — including the two failing tests above, which are
-expected to fail and are the demonstration.
+Every labelled block on this page is quoted from a real file, committed in this
+repository under `examples/python-extension/`, and a test fails the build if a
+quote stops matching it. `MyLibraryA.py` is a complete worked library for this
+page and `context_a.robot` is the suite that exercises it — including the two
+failing tests above, which are expected to fail and are the demonstration.
+
+Those files are a copy. They run as acceptance tests in the library itself, in
+[`atest/test/13_Python_Extension/`](https://github.com/MarketSquare/robotframework-browser/tree/main/atest/test/13_Python_Extension),
+which is where a change to them belongs.

@@ -159,6 +159,8 @@ happens again.
 | `app/components/content/` | MDC components — thin wrappers |
 | `app/components/` | Their implementations |
 | `app/assets/css/tokens.css` | Every colour and size. A test fails on a colour literal anywhere else. |
+| `examples/` | Real sources the site renders. Never pasted — read from disk, or checked against the paste |
 | `scripts/` | The generators in the table above |
 | `.github/workflows/` | Deploy, PR preview, release import |
 | `docs/superpowers/` | The design spec and the plans, including why things are as they are |
+| `docs/research/` | Vendored evidence for claims the prose makes, so checking one needs no other repository |

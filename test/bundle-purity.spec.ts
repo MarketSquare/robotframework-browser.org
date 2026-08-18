@@ -12,6 +12,20 @@ const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
  * files into every client bundle. These are the source-level invariants that
  * stop it happening again; scripts/check-bundle.mjs verifies the built output.
  */
+describe('the examples glob stays scoped', () => {
+  it('inlines only what a component renders', () => {
+    /*
+     * import.meta.glob with eager + ?raw puts every matched file in the client
+     * bundle. `examples/**` did, and vendoring the Python extension sources —
+     * quoted in Markdown, never rendered by a component — took the bundle over
+     * its ceiling. Only comparison/ is read by <Comparison>.
+     */
+    const src = read('app/composables/useExamples.ts')
+    expect(src, 'a bare examples/** glob ships every vendored file to the browser')
+      .toContain("import.meta.glob('~/../examples/comparison/**")
+  })
+})
+
 describe('grammar imports stay server-side', () => {
   /** Comments legitimately discuss the grammars; only real code counts. */
   const code = (p: string) =>
