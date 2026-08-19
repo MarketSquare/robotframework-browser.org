@@ -148,6 +148,14 @@ jobs:
       - name: Version numbers
         run: node scripts/build-versions.ts ./library
 
+      # After the version numbers, not before: it reads `playwrightBundled`
+      # from what that step just wrote, and downloads that exact
+      # playwright-core to read its device descriptors. `pnpm verify` asserts
+      # the two agree, so without this step the first release that moves
+      # Playwright fails the build and opens no pull request at all.
+      - name: Device descriptors
+        run: node scripts/build-devices.ts
+
       # After the contributors step, not before: it reads the total this wrote.
       - name: Stars, PyPI releases and the contributor count
         run: node scripts/build-project.ts
@@ -186,7 +194,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
 
           git checkout -B "$BRANCH"
-          git add content public/avatars app/generated/versions.json
+          git add content public/avatars app/generated/versions.json app/generated/devices.json
 
           # A forced re-run of a version already on the site changes nothing
           # but libdoc's `generated` timestamp — and `git commit` exits 1 with
