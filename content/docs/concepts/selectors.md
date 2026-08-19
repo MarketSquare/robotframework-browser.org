@@ -110,10 +110,10 @@ because the element has no proper role or no accessible name, **you have found
 an accessibility bug**. A screen-reader user cannot identify that control
 either. That is worth an issue, not a workaround.
 
-When accessible names are long and complex, `role=` selectors can be brittle, if the name changes in a redesign.
-In that case, a matching by substring or regex is a good compromise, e.g. `role=button[name="colour theme"]` matches the aria-label as a substring.
+When accessible names are long and complex, `role=` selectors can be brittle if the name changes in a redesign.
+In that case, matching by substring or regex is a good compromise, e.g. `role=button[name*="colour theme"]` matches the aria-label by substring.
 
-the following operators are available for matching the name:
+The following operators are available for matching the name:
 
 | Operator | Meaning | Example |
 | -------- | ------- | ------- |
