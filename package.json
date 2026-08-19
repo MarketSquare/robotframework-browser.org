@@ -2,7 +2,7 @@
   "name": "robotframework-browser-org",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.30.3",
+  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
   "scripts": {
     "dev": "nuxt dev",
     "build": "pnpm libdoc && nuxt build",
@@ -43,11 +43,5 @@
     "sanitize-html": "^2.17.6",
     "vitest": "^4.1.10",
     "yaml": "^2.9.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "better-sqlite3"
-    ]
   }
 }

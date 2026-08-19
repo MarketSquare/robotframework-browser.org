@@ -52,10 +52,41 @@ rows:
 ---
 ::
 
+
+### Example: Our Landing Page
+
+On our landing page, we have some buttons and links.
+
+One of them is a colour theme toggle, which is a button with a visible label and aria-label. It is the only button with that aria-label, so it is a perfect candidate for a `role=` selector. However, it also has a `data-testid` attribute, which is a good candidate for a `data-testid=` selector. The visible text is "DARK", which is a good candidate for a `text=` selector.
+
+::doc-figure{src="/images/color-toggle.png" alt="A toggle button labelled DARK in the top-right corner"}
+Color toggle at top right
+::
+
+See the following HTML DOM snippet for the button:
+
+```html [Color Theme Toggle]
+<button 
+  type="button"
+  class="toggle"
+  data-testid="theme-toggle"
+  aria-label="DARK-Mode colour theme. Activate to change."
+>
+  <span class="dot" aria-hidden="true" />
+  DARK
+</button>
+```
+
 ### 1. `role=` — how the user finds it
 
 ```robot-repl
-Click    role=button[name="Save"]
+Click    role=button[name="DARK-Mode colour theme. Activate to change."]
+# ^ matches the aria-label as exact match
+
+Click    role=button[name*="colour theme"]
+# ^ matches the aria-label which contains (*=) the substring "colour theme"
+
+# other examples:
 Click    role=link[name="Get started"]
 Fill Text    role=textbox[name="Email"]    admin@example.com
 ```
@@ -79,10 +110,28 @@ because the element has no proper role or no accessible name, **you have found
 an accessibility bug**. A screen-reader user cannot identify that control
 either. That is worth an issue, not a workaround.
 
+When accessible names are long and complex, `role=` selectors can be brittle, if the name changes in a redesign.
+In that case, a matching by substring or regex is a good compromise, e.g. `role=button[name="colour theme"]` matches the aria-label as a substring.
+
+the following operators are available for matching the name:
+
+| Operator | Meaning | Example |
+| -------- | ------- | ------- |
+| `=` | exact match | `role=button[name="DARK-Mode colour theme. Activate to change."]` |
+| `*=` | contains substring | `role=button[name*="Activ"]` |
+| `^=` | starts with string | `role=button[name^="DARK"]` |
+| `$=` | ends with string | `role=button[name$="Activate to change."]` |
+| `~=` | contains one whole word | `role=button[name~="Activate"]` |
+| `|=` | contains hyphenated word | `role=button[name|="DARK"]` |
+
+Regex is also supported when the expected text is surrounded by slashes,
+e.g. `role=button[name=/^(DARK|LIGHT|CONTRAST|AUTO)-Mode colour theme/]` matches the aria-label as a regex, case-sensitively.
+Regex flags can be added after the closing slash, e.g. `i` for case-insensitive matching.
+
 ### 2. `data-testid=` — the one attribute that belongs to us
 
 ```robot-repl
-Click    [data-testid="checkout-submit"]
+Click   data-testid=theme-toggle
 ```
 
 Every other attribute on the page belongs to someone else. Classes belong to the
@@ -101,9 +150,11 @@ just make it deliberately rather than by default.
 ### 3. `text=` — what is written on it
 
 ```robot-repl
-Click    text=Sign in
-Click    "Sign in"
-Click    text=/^Sign in$/i
+Click    text=DARK            # contains match
+Click    "DARK"               # exact match
+
+# if the aria-label would be the text:
+Click    text=/^(DARK|LIGHT|CONTRAST|AUTO)-Mode colour theme/i    # regex match
 ```
 
 Text selectors use a user-facing property, like `role=`, which is why they rank
@@ -139,6 +190,9 @@ escaped as `\#submit-button`, or written as `id=submit-button`.
 ### 5. `css=` — acceptable, not preferable
 
 ```robot-repl
+Click    button.toggle:has-text("DARK")   #button with the class "toggle" that contains the text "DARK"
+
+# other examples:
 Click    css=button.primary
 Click    .checkout > button
 ```
@@ -152,11 +206,18 @@ exactly the things a redesign changes. A class name is a styling decision, typic
 
 CSS is the implicit default: a selector that is not obviously something else is treated as CSS.
 
+::doc-note{kind="aside"}
+CSS is way more powerful than many realise. It can select by attribute, by position, by relationship, and even by text content. See [CSS Basics and Advanced](#css-basics-and-advanced) for a full reference.
+::
+
 ### 6. `xpath=` — the last resort
 
 ```robot-repl
-Click    xpath=//button[@type="submit"]
-Click    //div[@class="row"]//button
+Click    xpath=//button[contains(@class, "toggle") and contains(text(), 'DARK')]
+# ^ the literal same as the CSS above, but in XPath
+
+Click    xpath=//header//button[contains(text(),'DARK')]    # text contains, preceding whitespace ignored
+Click    //header//button[text()=' DARK']    # exact match, whitespace matters!
 ```
 
 XPath is CSS's powerful, unpleasant relative. It is more verbose for the same
@@ -164,15 +225,16 @@ result, many web developers do not read it fluently, it is not web-native, and
 it invites selecting by document position rather than function — which is the
 most brittle thing you can possibly do.
 
-It is genuinely more powerful, and occasionally something is unselectable
+It is partially more powerful, and occasionally something is unselectable
 without it. Use it then, and only then. It is the last resort, not a
-general-purpose tool.
+general-purpose tool. One of the very rare occasions where it is appropriate
+to use XPath is when you need to navigate relative to a reliably identified element
 
 And if you are about to paste something like this out of your browser's
 devtools:
 
 ```robot-repl
-Click    /html/body/div[3]/div/div[2]/button
+Click    //body/div[1]/div/header/span/button
 ```
 
 **DON'T!** That selector describes where the button sits today, not what it is.
