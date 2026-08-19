@@ -121,10 +121,15 @@ const docker = dockerBase()
 /*
  * Every version with a keyword reference on this site. Small enough for the
  * client — it is a list of strings — where the indexes themselves are not.
+ *
+ * Read from content/libdoc, which is committed, and not from the
+ * app/generated/index payloads build-libdoc.ts renders one-for-one out of it:
+ * those are gitignored, so on a clean clone — a CI checkout, most of all —
+ * this crashed with ENOENT unless `pnpm libdoc` happened to have run first.
  */
-const documented = readdirSync(join(ROOT, 'app/generated/index'))
-  .filter(f => f.endsWith('.json'))
-  .map(f => f.replace(/\.json$/, ''))
+const documented = readdirSync(join(ROOT, 'content/libdoc'))
+  .filter(f => /^Browser-.+\.json$/.test(f))
+  .map(f => f.slice('Browser-'.length, -'.json'.length))
   .sort((a, b) => {
     const x = a.split('.').map(Number)
     const y = b.split('.').map(Number)
