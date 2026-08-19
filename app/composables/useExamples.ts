@@ -7,7 +7,20 @@
  * the old site had: a runnable `.robot` file and a Pygments-generated `.html`
  * snippet that were edited independently.
  */
-const SOURCES = import.meta.glob('~/../examples/**/*.{robot,py,ts,js}', {
+/*
+ * Scoped to comparison/ deliberately, and not to all of examples/.
+ *
+ * This glob is eager and reachable from the client, so every file it matches is
+ * inlined into the browser bundle whether or not a page renders it. It was
+ * `examples/**` once; vendoring the Python extension sources put 23 KB of
+ * library code the site never renders over the bundle ceiling, and
+ * `pnpm check:bundle` failed the build.
+ *
+ * Widen it only for files a component actually reads. Sources that exist to be
+ * quoted in Markdown belong outside it — the fences are checked against them by
+ * test/example-provenance.spec.ts, which runs at build time and ships nothing.
+ */
+const SOURCES = import.meta.glob('~/../examples/comparison/**/*.{robot,py,ts,js}', {
   query: '?raw',
   import: 'default',
   eager: true,

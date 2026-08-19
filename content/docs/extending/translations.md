@@ -1,7 +1,7 @@
 ---
 title: Translating keywords
 description: Using a translation package to get keyword names and documentation in your language, and writing one for a language nobody has covered yet.
-order: 4
+order: 6
 section: extending
 ---
 

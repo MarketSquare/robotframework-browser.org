@@ -79,6 +79,14 @@ not resolve.
 Release notes are the exception — a note for 20.1.0 says 20.1.0, and the test
 skips `content/releases/`.
 
+**Which release a behaviour arrived in** is the other exception, and it has a
+component: `:since{version="20.4.0"}` renders *New in Browser 20.4.0*. That
+number is written by hand on purpose. A token means *the release this site
+documents* and reads 21.x a year from now, which would turn a true statement
+into a false one; a landed-in version is history and never moves. The exemption
+is the component and not the file: the check that fails the build on the current
+release, typed out, still runs over the rest of the page.
+
 ## Publishing
 
 ```
@@ -151,6 +159,8 @@ happens again.
 | `app/components/content/` | MDC components — thin wrappers |
 | `app/components/` | Their implementations |
 | `app/assets/css/tokens.css` | Every colour and size. A test fails on a colour literal anywhere else. |
+| `examples/` | Real sources the site renders. Never pasted — read from disk, or checked against the paste |
 | `scripts/` | The generators in the table above |
 | `.github/workflows/` | Deploy, PR preview, release import |
 | `docs/superpowers/` | The design spec and the plans, including why things are as they are |
+| `docs/research/` | Vendored evidence for claims the prose makes, so checking one needs no other repository |
