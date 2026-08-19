@@ -105,8 +105,16 @@ describe('transform over the real spec', () => {
   })
 
   it('resolves every keyword', () => {
-    expect(result.keywords).toHaveLength(151)
-    expect(result.index).toHaveLength(151)
+    /*
+     * Counted from the spec, not written down here. The library adds keywords:
+     * 20.4.0 brought `Set Storage State` and this read 151, so the release
+     * import failed on a number that was only ever a description of one
+     * version. What the assertion is for is that nothing is *lost* in the
+     * transform, and the spec is what says how many there should be.
+     */
+    expect(SPEC.keywords.length).toBeGreaterThan(100)
+    expect(result.keywords).toHaveLength(SPEC.keywords.length)
+    expect(result.index).toHaveLength(SPEC.keywords.length)
   })
 
   it('maps every module, so no group falls back', () => {
@@ -115,7 +123,8 @@ describe('transform over the real spec', () => {
   })
 
   it('group counts add up to the keyword total', () => {
-    expect(result.groups.reduce((n, g) => n + g.count, 0)).toBe(151)
+    /* The total, again from the spec rather than from a number typed here. */
+    expect(result.groups.reduce((n, g) => n + g.count, 0)).toBe(SPEC.keywords.length)
   })
 
   it('orders groups by the mapping, not alphabetically', () => {
@@ -280,10 +289,28 @@ describe('single-page anchors', () => {
   })
 
   it('de-duplicates repeated heading titles', async () => {
-    const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
-    // The introduction has two "Examples" sections.
+    /*
+     * Against a spec written here, not against the library's own introduction.
+     *
+     * This used to look for the two "Examples" sections that Browser's
+     * introduction happened to contain. 20.4.0 rewrote that introduction —
+     * 33 headings down to 18, both "Examples" among the ones that went — and
+     * the test failed with "expected 0 to be greater than 1", which says
+     * nothing about de-duplication. The behaviour under test is ours; the
+     * prose it was reading belongs to another repository and is free to
+     * change.
+     */
+    const spec = {
+      ...SPEC,
+      doc: '<h2>Examples</h2>\n<p>one</p>\n<h2>Examples</h2>\n<p>two</p>',
+    }
+    const result = await transform(spec, { highlight: async c => c, groups: GROUPS })
+
     const examples = result.introSections.filter(s => s.title === 'Examples')
-    expect(examples.length).toBeGreaterThan(1)
+    expect(examples).toHaveLength(2)
     expect(examples.map(s => s.slug)).toEqual(['examples', 'examples-2'])
+    /* Both ids have to exist in the rendered intro, or the anchors go nowhere. */
+    expect(result.intro).toContain('id="examples"')
+    expect(result.intro).toContain('id="examples-2"')
   })
 })
