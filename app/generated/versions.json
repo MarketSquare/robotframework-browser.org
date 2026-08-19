@@ -1,6 +1,7 @@
 {
-  "browser": "20.3.0",
+  "browser": "20.4.0",
   "documented": [
+    "20.4.0",
     "20.3.0",
     "20.2.0",
     "20.1.0",
@@ -14,7 +15,7 @@
     "19.12.5",
     "19.12.4"
   ],
-  "browserMinor": "20.3",
+  "browserMinor": "20.4",
   "browserMajor": "20",
   "playwright": "1.62.1",
   "node": "24.19.0",
