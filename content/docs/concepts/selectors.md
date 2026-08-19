@@ -122,7 +122,7 @@ The following operators are available for matching the name:
 | `^=` | starts with string | `role=button[name^="DARK"]` |
 | `$=` | ends with string | `role=button[name$="Activate to change."]` |
 | `~=` | contains one whole word | `role=button[name~="Activate"]` |
-| `|=` | contains hyphenated word | `role=button[name|="DARK"]` |
+| `\|=` | contains hyphenated word | `role=button[name\|="DARK"]` |
 
 Regex is also supported when the expected text is surrounded by slashes,
 e.g. `role=button[name=/^(DARK|LIGHT|CONTRAST|AUTO)-Mode colour theme/]` matches the aria-label as a regex, case-sensitively.
@@ -463,6 +463,14 @@ you something false.
 | `:has(...)`      | Has matching descendant/relative | `.field:has(input[name="email"])` |
 
 One useful distinction to xpath: CSS can select **following** siblings with `+` and `~`, but it has no simple equivalent of XPath's `..` for selecting a parent directly.
+
+### Attribute selection with comparison operators
+
+CSS supports a few comparison operators for attributes similar to the ones used in `role=` selectors.
+
+So the same operators are available: `=`, `*=`, `^=`, `$=`, `~=`, and `|=`.
+[See role table above](#_1-role-how-the-user-finds-it) for explanation.
+However RegEx selection is not possible.
 
 ### Filtering inside a CSS selector
 
