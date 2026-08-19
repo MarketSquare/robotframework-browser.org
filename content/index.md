@@ -108,6 +108,7 @@ sessions:
 ---
 :::
 
+
 ### Write a test
 
 One import, no setup keyword, no explicit waits. `Get Text` both reads the
