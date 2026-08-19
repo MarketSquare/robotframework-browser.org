@@ -1,7 +1,7 @@
 {
   "source": ".all-contributorsrc, maintained by the all-contributors bot",
-  "generated": "2026-08-09",
-  "total": 206,
+  "generated": "2026-08-19",
+  "total": 207,
   "core": [
     {
       "login": "aaltat",
@@ -2626,6 +2626,18 @@
       ],
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "Alpha-Centauri-00",
+      "name": "M.Kherki",
+      "avatar": "/avatars/Alpha-Centauri-00.jpg",
+      "profile": "https://github.com/Alpha-Centauri-00",
+      "ways": [
+        "report"
+      ],
+      "contributions": [
+        "bug"
       ]
     }
   ]
