@@ -153,3 +153,56 @@ describe('fenced code goes through the Editor', () => {
     expect(tabs).toMatch(/slots\.default/)
   })
 })
+
+/**
+ * A Markdown table row is split on its unescaped pipes, before anything else is
+ * parsed — including code spans. So a pipe inside backticks still ends the
+ * cell, and a row that contains one silently comes apart: the CSS operator row
+ * on the selectors page,
+ *
+ *     | `|=` | contains hyphenated word | `role=button[name|="DARK"]` |
+ *
+ * parsed as five cells in a three-column table, and rendered as a cell reading
+ * "`" beside one reading "=`". Nothing failed. The build was green and the page
+ * shipped a wrong table.
+ *
+ * The fix is `\|`, which is the only one that works: the backslash escape is
+ * consumed by the table parser and does not reach the page, whereas `&#124;`
+ * is left standing as literal text inside a code span. Both were parsed with
+ * @nuxtjs/mdc to check, rather than assumed.
+ *
+ * Counting cells catches it. A row that disagrees with its own header is
+ * broken, whatever the cause.
+ */
+describe('Markdown tables', () => {
+  /** Cells in a row, splitting on pipes that are not backslash-escaped. */
+  const cells = (line: string) => line.trim().split(/(?<!\\)\|/).length - 2
+
+  it.each(files.map(f => [f.slice(ROOT.length + 1), f]))('%s keeps its rows square', (_name, file) => {
+    /* The `|---|---|` rule between head and body is not a row. */
+    const isRule = (t: string) => /^\|[\s:|-]+\|$/.test(t)
+    const wrong: string[] = []
+    let head: { n: number; width: number } | null = null
+
+    for (const { text, n } of proseLines(readFileSync(file, 'utf8'))) {
+      const t = text.trim()
+      if (!t.startsWith('|')) {
+        head = null
+        continue
+      }
+      if (isRule(t)) continue
+      if (!head) {
+        head = { n, width: cells(t) }
+        continue
+      }
+      if (cells(t) !== head.width) {
+        wrong.push(
+          `line ${n}: ${cells(t)} cells, but the header on line ${head.n} has ${head.width}`
+          + ` — an unescaped pipe? write it \\|`,
+        )
+      }
+    }
+
+    expect(wrong, 'rows that do not match their header').toEqual([])
+  })
+})

@@ -105,24 +105,61 @@ describe('transform over the real spec', () => {
   })
 
   it('resolves every keyword', () => {
-    expect(result.keywords).toHaveLength(151)
-    expect(result.index).toHaveLength(151)
+    /*
+     * Counted from the spec, not written down here. The library adds keywords:
+     * 20.4.0 brought `Set Storage State` and this read 151, so the release
+     * import failed on a number that was only ever a description of one
+     * version. What the assertion is for is that nothing is *lost* in the
+     * transform, and the spec is what says how many there should be.
+     */
+    expect(SPEC.keywords.length).toBeGreaterThan(100)
+    expect(result.keywords).toHaveLength(SPEC.keywords.length)
+    expect(result.index).toHaveLength(SPEC.keywords.length)
   })
 
   it('maps every module, so no group falls back', () => {
+    /*
+     * The warning list is the assertion; the count was a second one that only
+     * looked like it. `transform` omits a group no keyword landed in — the
+     * same mapping over 19.12.4 yields 19 groups, over 20.3.0 twenty — so a
+     * fixed number here says "this is the version I was written against"
+     * rather than anything about fallbacks.
+     *
+     * What must hold at every version: nothing fell back, and every group
+     * that came out is one we mapped.
+     */
     expect(result.warnings).toEqual([])
-    expect(result.groups).toHaveLength(20)
+
+    const mapped = new Set((GROUPS as { name: string }[]).map(g => g.name))
+    expect(result.groups.map(g => g.name).filter(n => !mapped.has(n))).toEqual([])
+    expect(result.groups.length).toBeLessThanOrEqual(mapped.size)
+    expect(result.groups.length).toBeGreaterThan(0)
   })
 
   it('group counts add up to the keyword total', () => {
-    expect(result.groups.reduce((n, g) => n + g.count, 0)).toBe(151)
+    /* The total, again from the spec rather than from a number typed here. */
+    expect(result.groups.reduce((n, g) => n + g.count, 0)).toBe(SPEC.keywords.length)
   })
 
   it('orders groups by the mapping, not alphabetically', () => {
-    expect(result.groups[0]!.name).toBe('Interaction')
-    expect(result.groups[0]!.count).toBe(32)
-    expect(result.groups[1]!.name).toBe('Getters & Assertions')
-    expect(result.groups[1]!.count).toBe(28)
+    /*
+     * The whole order against the mapping's own order, rather than the first
+     * two names with a keyword count beside each. Those counts — 32 and 28 —
+     * held for twelve releases, which is why they read as safe; they still
+     * belong to the library, and the ordering they sat next to does not need
+     * them. Comparing the full sequence is the stronger claim anyway: it
+     * catches a group moving into the middle, which naming two never would.
+     */
+    const order = (GROUPS as { name: string }[]).map(g => g.name)
+    const produced = result.groups.map(g => g.name)
+
+    expect(produced).toEqual(order.filter(n => produced.includes(n)))
+
+    /* And that it is genuinely the mapping's order, not the alphabet's. */
+    expect(produced).not.toEqual([...produced].sort())
+
+    /* An empty group is dropped, so anything present has keywords in it. */
+    expect(result.groups.filter(g => !g.count)).toEqual([])
   })
 
   it('never emits a nameless argument', () => {
@@ -269,21 +306,45 @@ describe('single-page anchors', () => {
 
   it('gives the introduction headings ids, so doc links into them resolve', async () => {
     const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
-    // 618 links in the keyword docs point into the introduction. Libdoc's own
-    // HTML gives these headings no id at all.
-    // "Finding elements" is an <h2>: libdoc uses h2 for the introduction's
-    // major sections, and those were being stripped by the sanitizer entirely.
-    expect(result.intro).toMatch(/<h2 id="finding-elements"/)
+    // Hundreds of links in the keyword docs point into the introduction, and
+    // libdoc's own HTML gives those headings no id at all.
+    //
+    // The h2 check is about the sanitizer, which was stripping the
+    // introduction's major headings outright. It used to name one —
+    // "Finding elements" — and that is the library's prose: 20.4.0 rewrote
+    // the introduction and took twenty-two of its headings away, including
+    // both that a neighbouring test was reading. So it asserts the shape
+    // instead, which is what the sanitizer can break.
+    expect(result.introSections.length).toBeGreaterThan(0)
+    expect(result.intro).toMatch(/<h2 id="[^"]+"/)
     for (const s of result.introSections) {
       expect(result.intro, s.slug).toContain(` id="${s.slug}"`)
     }
   })
 
   it('de-duplicates repeated heading titles', async () => {
-    const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
-    // The introduction has two "Examples" sections.
+    /*
+     * Against a spec written here, not against the library's own introduction.
+     *
+     * This used to look for the two "Examples" sections that Browser's
+     * introduction happened to contain. 20.4.0 rewrote that introduction —
+     * 33 headings down to 18, both "Examples" among the ones that went — and
+     * the test failed with "expected 0 to be greater than 1", which says
+     * nothing about de-duplication. The behaviour under test is ours; the
+     * prose it was reading belongs to another repository and is free to
+     * change.
+     */
+    const spec = {
+      ...SPEC,
+      doc: '<h2>Examples</h2>\n<p>one</p>\n<h2>Examples</h2>\n<p>two</p>',
+    }
+    const result = await transform(spec, { highlight: async c => c, groups: GROUPS })
+
     const examples = result.introSections.filter(s => s.title === 'Examples')
-    expect(examples.length).toBeGreaterThan(1)
+    expect(examples).toHaveLength(2)
     expect(examples.map(s => s.slug)).toEqual(['examples', 'examples-2'])
+    /* Both ids have to exist in the rendered intro, or the anchors go nowhere. */
+    expect(result.intro).toContain('id="examples"')
+    expect(result.intro).toContain('id="examples-2"')
   })
 })
