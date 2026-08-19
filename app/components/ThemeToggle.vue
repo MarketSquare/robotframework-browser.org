@@ -55,9 +55,10 @@ const LABEL: Record<Theme, string> = {
   <button
     type="button"
     class="toggle"
-    :aria-label="`${LABEL[theme]} colour theme. Activate to change.`"
+    data-testid="theme-toggle"
+    :aria-label="`${LABEL[theme]}-Mode colour theme. Activate to change.`"
     @click="cycle"
-  >
+  > 
     <span class="dot" aria-hidden="true" />
     {{ LABEL[theme] }}
   </button>

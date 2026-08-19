@@ -28,7 +28,7 @@ import { type Lang, ROBOT, ROBOT_REPL, THEME } from './lang'
  */
 
 /** Languages the comparison and guides need, beyond Robot Framework. */
-const BUNDLED: BundledLanguage[] = ['python', 'typescript', 'javascript', 'bash', 'json', 'yaml', 'dockerfile']
+const BUNDLED: BundledLanguage[] = ['python', 'typescript', 'javascript', 'bash', 'json', 'yaml', 'dockerfile', 'html']
 
 const robot = {
   ...(rfGrammar as unknown as LanguageRegistration),
