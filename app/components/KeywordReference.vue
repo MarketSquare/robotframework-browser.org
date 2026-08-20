@@ -126,24 +126,58 @@ const isLatest = version === LATEST_VERSION
  * unknowable from the target. This adds one: a close button that goes back in
  * history, which restores the scroll position rather than dumping you at the
  * top of the Data types section.
+ *
+ * Which is only half the story for a reader who arrived at the dialog by
+ * link — there is no same-page entry behind that one. type-dialog.ts holds
+ * the rule and the reasoning; the two things it can ask for are here.
  */
 const route = useRoute()
 const router = useRouter()
 
-const openType = computed(() => route.hash.startsWith('#type--'))
+const openType = computed(() => isTypeHash(route.hash))
+
+/*
+ * Fed from hashchange, and seeded at mount from the location rather than from
+ * the route.
+ *
+ * Both halves matter. The server never sees a fragment, so the route starts
+ * hydration without one and only picks the real hash up as the router readies
+ * itself — watching the route would read that catch-up as the reader opening
+ * the dialog, and a deep link would go back to a page it never came from.
+ * hashchange fires for what the reader actually does and for nothing else:
+ * a type link is a plain anchor, so the browser navigates the fragment itself,
+ * and Back and Forward are traversals.
+ */
+let dialog = createTypeDialog('')
 
 function closeType() {
-  if (window.history.length > 1) router.back()
-  // Nothing to go back to — drop the hash rather than leaving it open.
-  else router.replace({ hash: '' })
+  const exit = dialog.exit()
+
+  if (exit.via === 'back') return router.back()
+
+  /*
+   * Not `router.replace({ hash })`: that is history.replaceState, which
+   * changes the URL without moving the target element, and the panel would
+   * stay lifted out of the page with nothing left to dismiss it. `replace`
+   * rather than assigning `location.hash` so closing spends no history entry
+   * — the dialog and the view behind it are one step, in both directions.
+   */
+  window.location.replace(exit.hash)
 }
 
 onMounted(() => {
+  dialog = createTypeDialog(window.location.hash)
+
+  const onHash = () => dialog.moveTo(window.location.hash)
   const onKey = (e: KeyboardEvent) => {
     if (e.key === 'Escape' && openType.value) closeType()
   }
+  window.addEventListener('hashchange', onHash)
   window.addEventListener('keydown', onKey)
-  onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
+  onBeforeUnmount(() => {
+    window.removeEventListener('hashchange', onHash)
+    window.removeEventListener('keydown', onKey)
+  })
 })
 
 /*
