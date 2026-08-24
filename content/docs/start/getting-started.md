@@ -1,7 +1,7 @@
 ---
 title: Getting started
 description: Install Browser, write a first test, and run it.
-order: 1
+order: 2
 section: start
 ---
 
@@ -9,18 +9,8 @@ Install the library and its browser binaries, write one test, run it.
 
 ## Before you start
 
-You need **Python 3.10 or newer** and **Node.js with npm on your PATH** —
-`rfbrowser init` runs `npm ci --omit=dev` and `npx playwright install`
-underneath, and if npm is not on the PATH it stops with *Couldn't execute npm.
-Please ensure you have node.js and npm installed and in PATH.*
-
-Do this in a virtual environment — `uv`, `venv` or `pyenv`, whichever your team
-uses. **Never install into the system Python:** the install writes into
-`site-packages`, so it needs root there and is painful to unpick afterwards.
-
-There is a second route that needs no Node.js at all, and it is the simpler one
-if you have no particular reason to want Node on the machine — see
-[how Browser works](/docs/concepts/architecture) once you are running.
+You need **Python 3.10 or newer**, and a virtual environment to put this in —
+`uv`, `venv` or `pyenv`, whichever your team uses.
 
 ## Install
 
@@ -29,29 +19,39 @@ if you have no particular reason to want Node on the machine — see
 sessions:
   - shell: bash
     steps:
-      - command: pip install robotframework-browser
+      - command: pip install "robotframework-browser[bb]"
         output:
-          - Successfully installed robotframework-browser-%%browser%%
-      - command: rfbrowser init
-        output:
-          - Installing node dependencies...
-          - Installing browser binaries to 0
-          - rfbrowser init completed
+          - Successfully installed robotframework-browser-%%browser%% robotframework-browser-batteries-%%browser%%
+      - command: rfbrowser install
+        output: [Installing Playwright browser binaries…]
+        status:
+          - { ok: true, text: chromium   downloaded }
+          - { ok: true, text: firefox    downloaded }
+          - { ok: true, text: webkit     downloaded }
   - shell: powershell
     steps:
-      - command: py -m pip install robotframework-browser
+      - command: py -m pip install "robotframework-browser[bb]"
         output:
-          - Successfully installed robotframework-browser-%%browser%%
-      - command: rfbrowser init
-        output:
-          - Installing node dependencies...
-          - Installing browser binaries to 0
-          - rfbrowser init completed
+          - Successfully installed robotframework-browser-%%browser%% robotframework-browser-batteries-%%browser%%
+      - command: py -m Browser.entry install
+        output: [Installing Playwright browser binaries…]
+        status:
+          - { ok: true, text: chromium   downloaded }
+          - { ok: true, text: firefox    downloaded }
+          - { ok: true, text: webkit     downloaded }
 ---
 :::
 
-`rfbrowser init` downloads three browser engines, so it is the slow part and it
-needs a few hundred megabytes. You only do it once per environment.
+That is the route that needs no Node.js: the `[bb]` extra brings a Node.js
+runtime along in the wheel. `rfbrowser install` then downloads three browser
+engines, so it is the slow part and it needs a few hundred megabytes — once per
+environment.
+
+If you would rather provide Node.js yourself — because your platform has no
+wheel, or because a JavaScript extension needs npm packages Browser does not
+ship — the commands are `pip install robotframework-browser` and `rfbrowser
+init` instead. Both routes, in full, are on
+[Installation](/docs/start/installation).
 
 ## Your first test
 

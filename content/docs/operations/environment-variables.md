@@ -79,7 +79,8 @@ parameter themselves.
 
 These variables behave identically whether the Node process comes from a Node.js
 you installed yourself or from the one bundled in
-[robotframework-browser-batteries](https://pypi.org/project/robotframework-browser-batteries/).
+[robotframework-browser-batteries](https://pypi.org/project/robotframework-browser-batteries/)
+— the two [installation routes](/docs/start/installation).
 
 ::doc-note
 That was not always true. In older releases these two were silently ignored when

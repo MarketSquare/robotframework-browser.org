@@ -79,7 +79,8 @@ configure in between.
 
 ### Install the library and the browsers
 
-`rfbrowser init` downloads the browser binaries Playwright drives. The tabs
+No Node.js needed — the `[bb]` extra brings one along in the wheel.
+`rfbrowser install` downloads the browser binaries Playwright drives. The tabs
 below pick your shell automatically.
 
 :::terminal-block
@@ -87,9 +88,9 @@ below pick your shell automatically.
 sessions:
   - shell: bash
     steps:
-      - command: pip install robotframework-browser
-        output: [Successfully installed robotframework-browser-%%browser%%]
-      - command: rfbrowser init
+      - command: pip install "robotframework-browser[bb]"
+        output: [Successfully installed robotframework-browser-%%browser%% robotframework-browser-batteries-%%browser%%]
+      - command: rfbrowser install
         output: [Installing Playwright browser binaries…]
         status:
           - { ok: true, text: chromium   downloaded }
@@ -97,9 +98,9 @@ sessions:
           - { ok: true, text: webkit     downloaded }
   - shell: powershell
     steps:
-      - command: py -m pip install robotframework-browser
-        output: [Successfully installed robotframework-browser-%%browser%%]
-      - command: py -m Browser.entry init
+      - command: py -m pip install "robotframework-browser[bb]"
+        output: [Successfully installed robotframework-browser-%%browser%% robotframework-browser-batteries-%%browser%%]
+      - command: py -m Browser.entry install
         output: [Installing Playwright browser binaries…]
         status:
           - { ok: true, text: chromium   downloaded }
@@ -107,6 +108,10 @@ sessions:
           - { ok: true, text: webkit     downloaded }
 ---
 :::
+
+Want a Node toolchain of your own instead, or on a platform with no wheel? That
+route is two different commands and [Installation](/docs/start/installation) has
+both.
 
 
 ### Write a test

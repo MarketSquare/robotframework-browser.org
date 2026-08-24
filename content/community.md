@@ -112,6 +112,12 @@ half and a Node half that were never built together, and any failure tells you
 nothing.
 ::
 
+On the [route without Node.js](/docs/start/installation), take the matching
+`robotframework_browser_batteries` wheel for your platform from the same run and
+install the two together — they are built as a pair and only a pair is
+supported. The last command is then `rfbrowser install` rather than
+`rfbrowser init`.
+
 Tell us either way. "Ran our 400 tests against main, nothing broke" is genuinely
 useful information, and it is the report we get least often.
 

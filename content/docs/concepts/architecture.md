@@ -1,6 +1,6 @@
 ---
 title: How Browser works
-description: Python, a Node process and Playwright — what runs where, and which installation to choose.
+description: Python, a Node process and Playwright — what runs where, and where the files land.
 section: concepts
 order: 5
 ---
@@ -19,60 +19,17 @@ Robot Framework  →  Browser (Python)  →  gRPC  →  Node.js + Playwright  �
 One Node process drives Chromium, Firefox and WebKit. There is no driver binary
 per browser and no driver version to keep in step with a browser update.
 
-## Two ways to install
+## Where the Node.js comes from
 
-::doc-table
----
-head: [Method, Node.js needed, Choose it when]
-rows:
-  - ['`robotframework-browser-batteries`', 'No', 'Fewest moving parts — but you still install browser binaries unless you already have a Chromium-based browser.']
-  - ['`robotframework-browser` + `rfbrowser init`', 'Yes', 'Your OS or CPU is not covered, or you need extra Node dependencies.']
----
-::
+The *Node.js + Playwright* box is the one you make a decision about at install
+time, and there are two ways to fill it. Either a wheel supplies the Node.js —
+`pip install robotframework-browser[bb]`, then `rfbrowser install` — or you
+install Node.js yourself and `rfbrowser init` builds against it.
 
-### Without Node.js — the fewest moving parts
-
-```bash
-pip install robotframework-browser-batteries
-```
-
-`robotframework-browser-batteries` is a platform-specific Python wheel carrying
-an unmodified official Node.js runtime, the gRPC wrapper and its production Node
-dependencies, installed into `site-packages/BrowserBatteries/bin/`. It is not a
-single binary — it is a real `node` plus a `node_modules`.
-
-Then, if you need browser binaries — you may not, if you already have a
-Chromium-based browser and only intend to use that:
-
-```bash
-rfbrowser install            # all three engines
-rfbrowser install firefox    # just one
-```
-
-The catch is coverage. Wheels exist for Linux x64 and arm64, Windows x64, and
-macOS x64 and arm64 — and they need **glibc 2.28 or newer** (Debian 10, RHEL 8,
-Ubuntu 20.04) and **macOS 13.5 or newer** (the wheel tag can only say 13.0, so on 13.0–13.4
-pip installs it and the bundled Node.js will not start). There is no musl wheel and none for
-Windows on arm. On anything outside that, pip finds no wheel and you want the
-Node.js route. It also carries only what Browser itself needs, so extra Node
-dependencies are the other method's job.
-
-### With Node.js
-
-```bash
-pip install robotframework-browser
-rfbrowser init               # mandatory — the library does not work without it
-rfbrowser init chromium      # or just one engine
-```
-
-Slower to set up, but works anywhere Python and Node.js do, and leaves you a
-normal Node toolchain — `npm` and `npx` — on the machine.
-
-Do not install extra Node packages into `Browser/wrapper` by hand: `rfbrowser
-init` runs `npm ci` there, which deletes `node_modules` and reinstalls exactly
-the production dependencies from the shipped lockfile, so anything you added
-disappears on the next init or
-upgrade.
+Which to pick, what each needs and how to upgrade either is
+[Installation](/docs/start/installation). What follows here is what the choice
+changes afterwards, which is less than you might expect: the same wrapper, the
+same Playwright, the same keywords. It changes where the files sit.
 
 ## Where things end up
 
@@ -90,18 +47,6 @@ variable yourself moves them.
 Installation logs to the console and to `site-packages/Browser/rfbrowser.log`,
 which rotates at about 2 MB and keeps ten previous files. If that directory is
 not writable, the log goes to the working directory instead.
-
-## Managing environments
-
-::doc-note
-The single rule worth stating: **never install into the system Python.** You
-will need to test against more than one Python version sooner than you expect,
-and an unpicked system install is painful to undo.
-::
-
-Use `uv`, `pyenv` or plain `venv` — all are fine, and which suits you depends on
-your organisation more than on Browser. For Node.js, use a version manager too:
-`n` or `nvm` on Linux and macOS, `nvm-windows` or `nodist` on Windows.
 
 ## Browser binaries in CI
 
