@@ -1,8 +1,8 @@
 ---
 title: Python plugins
 description: Add or replace keywords from Python, with access to the library's own API and to the Node side.
-section: extending
 order: 1
+section: extending
 ---
 
 The Python plugin API adds keywords to Browser, or replaces existing ones,
@@ -69,6 +69,22 @@ Read A Cookie
 Two routes are shown above deliberately. `self.library` is the supported public
 API and should be your default. Dropping to gRPC gets you at anything the Node
 side can do, at the cost of coupling to internals that may change.
+
+::doc-note{kind="aside"}
+When `self.library.new_page(...)` fails, the **failed page** stays open and
+active until your plugin keyword returns, so the failure screenshot shows the
+page that failed. Let the error propagate and there is nothing more to do. If
+you catch it and carry on, the rest of the keyword runs against the failed page
+unless you switch back yourself:
+
+```python
+previous = self.library.switch_page("CURRENT")  # id of the active page
+try:
+    self.library.new_page(url)
+except Exception:
+    self.library.switch_page(previous)
+```
+::
 
 Several plugins can be loaded at once — `plugins=` takes one name, a
 comma-separated list, or a real list. Arguments go after the class, separated by
@@ -145,10 +161,7 @@ class PythonPlugin(LibraryComponent):
         return self.call_js_keyword("myMouseWheel", x=x, y=y)
 ```
 
-::doc-note
----
-kind: warning
----
+::doc-note{kind="warning"}
 Every argument to `call_js_keyword` must be **named** and JSON serialisable —
 passing one positionally raises `TypeError`. The names `page`, `context`,
 `browser`, `logger` and `playwright` are reserved: the Node side injects those
