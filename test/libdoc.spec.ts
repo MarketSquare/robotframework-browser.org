@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import {
   type LibdocSpec,
-  SPEC_VERSION,
+  SPEC_VERSIONS,
   moduleToName,
   normaliseTag,
   rewriteHref,
@@ -99,9 +99,9 @@ describe('transform over the real spec', () => {
 
   it('rejects an unexpected specversion rather than guessing', async () => {
     await expect(
-      transform({ ...SPEC, specversion: 4 }, { highlight: async c => c, groups: GROUPS }),
-    ).rejects.toThrow(/specversion 4 is not 3/)
-    expect(SPEC.specversion).toBe(SPEC_VERSION)
+      transform({ ...SPEC, specversion: 5 }, { highlight: async c => c, groups: GROUPS }),
+    ).rejects.toThrow(/specversion 5 is not one of 3, 4/)
+    expect(SPEC_VERSIONS).toContain(SPEC.specversion)
   })
 
   it('resolves every keyword', () => {
@@ -240,6 +240,79 @@ describe('transform over the real spec', () => {
   it('marks external links safe', () => {
     const withExternal = result.keywords.find(k => k.doc.includes('href="http'))!
     expect(withExternal.doc).toContain('rel="noopener noreferrer"')
+  })
+})
+
+/*
+ * RF 7.5 writes specversion 4. Its one change that matters here: the
+ * `Arguments:` list a docstring opens with is lifted out of `doc` and into
+ * each argument's own `doc`, and the return section into `returnDoc`. A
+ * transform that only bumped the version would render pages with every
+ * argument description gone, and nothing would fail.
+ *
+ * Built from the committed spec with spec-4 fields written in, so this holds
+ * whichever version LATEST names.
+ */
+describe('specversion 4', () => {
+  function spec4(): LibdocSpec {
+    const spec: LibdocSpec = structuredClone(SPEC)
+    spec.specversion = 4
+    for (const kw of spec.keywords) {
+      kw.returnDoc = ''
+      kw.raises = []
+      for (const a of kw.args) a.doc = ''
+    }
+    const click = spec.keywords.find(k => k.name === 'Click')!
+    click.args.find(a => a.name === 'button')!.doc =
+      '<p>Defaults to <code>left</code>. See <a href="#Mouse%20Button">Mouse Button</a>.</p>'
+    click.returnDoc = '<p>Nothing <b>useful</b>.<script>bad()</script></p>'
+    return spec
+  }
+
+  let result: Awaited<ReturnType<typeof transform>>
+  beforeAll(async () => {
+    result = await transform(spec4(), { highlight: async c => c, groups: GROUPS })
+  })
+
+  it('carries each argument its own documentation, sanitized and link-rewritten', () => {
+    const button = result.keywords.find(k => k.name === 'Click')!.args.find(a => a.name === 'button')!
+    expect(button.doc).toBe('<p>Defaults to <code>left</code>. See <a href="#mouse-button">Mouse Button</a>.</p>')
+  })
+
+  it('carries the return documentation, sanitized', () => {
+    const click = result.keywords.find(k => k.name === 'Click')!
+    expect(click.returnDoc).toBe('<p>Nothing <b>useful</b>.</p>')
+  })
+
+  it('leaves undocumented arguments empty rather than absent', () => {
+    const selector = result.keywords.find(k => k.name === 'Click')!.args.find(a => a.name === 'selector')!
+    expect(selector.doc).toBe('')
+  })
+
+  it('treats an explicit None return as no return value', () => {
+    // Spec 3 wrote `returnType: null` for these; spec 4 writes a `None` node.
+    // Shown as is, every such keyword would grow a "Returns None" block.
+    const spec = spec4()
+    spec.keywords[0]!.returnType = { name: 'None', typedoc: 'None', nested: [], union: false, alias: null }
+    return transform(spec, { highlight: async c => c, groups: GROUPS }).then(r => {
+      expect(r.keywords[0]!.returnTypeName).toBeNull()
+      expect(r.keywords[0]!.returnTypeHref).toBeNull()
+    })
+  })
+})
+
+describe('specversion 3', () => {
+  it('gives arguments and returns empty documentation, which spec 3 keeps in the body', async () => {
+    // Stripped rather than assumed absent: LATEST may already be a spec-4 file.
+    const spec: LibdocSpec = structuredClone(SPEC)
+    spec.specversion = 3
+    for (const kw of spec.keywords) {
+      delete kw.returnDoc
+      delete kw.raises
+      for (const a of kw.args) delete a.doc
+    }
+    const r = await transform(spec, { highlight: async c => c, groups: GROUPS })
+    expect(r.keywords.every(k => k.returnDoc === '' && k.args.every(a => a.doc === ''))).toBe(true)
   })
 })
 

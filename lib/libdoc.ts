@@ -4,8 +4,8 @@
  * BUILD ONLY. Lives outside app/ so it can never be pulled into a client
  * bundle. Pages consume the JSON this emits, never this module.
  *
- * Verified against a real generated file (RF 7.4.2, Browser 20.2.0,
- * specversion 3, 151 keywords, 81 typedocs, 0.83 MB).
+ * Verified against real generated files: RF 7.4.2 / Browser 20.2.0
+ * (specversion 3) and RF 7.5 / Browser 20.6.0 (specversion 4).
  */
 import { basename } from 'node:path'
 import sanitizeHtml from 'sanitize-html'
@@ -16,6 +16,8 @@ export interface LibdocType {
   typedoc: string | null
   nested: LibdocType[]
   union: boolean
+  /** Spec 4. Always null in Browser so far, and not rendered. */
+  alias?: string | null
 }
 
 export interface LibdocArg {
@@ -25,6 +27,8 @@ export interface LibdocArg {
   kind: 'POSITIONAL_OR_NAMED' | 'NAMED_ONLY' | 'VAR_POSITIONAL' | 'VAR_NAMED' | 'NAMED_ONLY_MARKER'
   required: boolean
   repr: string
+  /** Spec 4: lifted out of the keyword's `Arguments:` list. Rendered HTML. */
+  doc?: string
 }
 
 export interface LibdocKeyword {
@@ -36,6 +40,10 @@ export interface LibdocKeyword {
   tags: string[]
   source: string | null
   lineno: number
+  /** Spec 4: the docstring's return section, lifted out of `doc`. */
+  returnDoc?: string
+  /** Spec 4. Empty in every Browser keyword so far, and not rendered. */
+  raises?: unknown[]
 }
 
 export interface LibdocTypedoc {
@@ -71,6 +79,8 @@ export interface ResolvedArg {
   /** `*args`, `**kwargs` or a named-only marker are not ordinary arguments. */
   variadic: 'positional' | 'named' | null
   namedOnly: boolean
+  /** Sanitized HTML. Empty for spec 3, which keeps it in the keyword's doc. */
+  doc: string
 }
 
 export interface ResolvedKeyword {
@@ -88,6 +98,8 @@ export interface ResolvedKeyword {
   args: ResolvedArg[]
   returnTypeName: string | null
   returnTypeHref: string | null
+  /** Sanitized HTML. Empty for spec 3, which keeps it in the keyword's doc. */
+  returnDoc: string
   sourceUrl: string | null
   lineno: number
 }
@@ -137,7 +149,12 @@ export interface TransformResult {
   warnings: string[]
 }
 
-export const SPEC_VERSION = 3
+/**
+ * Spec 4 (RF 7.5) moved the `Arguments:` list out of each keyword's `doc` and
+ * into the arguments themselves, and the return section into `returnDoc`.
+ * Committed versions are a mix of both, so both are read.
+ */
+export const SPEC_VERSIONS: readonly number[] = [3, 4]
 
 export function slug(name: string): string {
   return name
@@ -271,9 +288,9 @@ export async function transform(
   spec: LibdocSpec,
   options: TransformOptions,
 ): Promise<TransformResult> {
-  if (spec.specversion !== SPEC_VERSION) {
+  if (!SPEC_VERSIONS.includes(spec.specversion)) {
     throw new Error(
-      `Libdoc specversion ${spec.specversion} is not ${SPEC_VERSION}. The shape ` +
+      `Libdoc specversion ${spec.specversion} is not one of ${SPEC_VERSIONS.join(', ')}. The shape ` +
         `this transform relies on may have changed — re-read the generated JSON ` +
         `before bumping this.`,
     )
@@ -337,10 +354,17 @@ export async function transform(
         variadic:
           arg.kind === 'VAR_POSITIONAL' ? 'positional' : arg.kind === 'VAR_NAMED' ? 'named' : null,
         namedOnly: arg.kind === 'NAMED_ONLY',
+        doc: await renderDoc(arg.doc ?? '', ctx, options.highlight),
       })
     }
 
-    const returnTypedoc = kw.returnType?.typedoc ?? null
+    /*
+     * Spec 3 wrote `returnType: null` for a keyword annotated `-> None`; spec 4
+     * writes a `None` node. Both mean nothing comes back, and shown as a type
+     * every such keyword would grow a "Returns None" block.
+     */
+    const returnType = kw.returnType?.name === 'None' ? null : kw.returnType
+    const returnTypedoc = returnType?.typedoc ?? null
     const returnHasPage = returnTypedoc !== null && typeNames.has(returnTypedoc)
 
     keywords.push({
@@ -353,8 +377,9 @@ export async function transform(
       group,
       groupSlug: slug(group),
       args,
-      returnTypeName: kw.returnType?.name ?? null,
+      returnTypeName: returnType?.name ?? null,
       returnTypeHref: returnHasPage ? `#${typeAnchor(returnTypedoc)}` : null,
+      returnDoc: await renderDoc(kw.returnDoc ?? '', ctx, options.highlight),
       sourceUrl:
         options.sourceBase && kw.source
           ? `${options.sourceBase}/Browser/keywords/${basename(kw.source)}#L${kw.lineno}`

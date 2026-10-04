@@ -84,6 +84,15 @@ describe('the keyword API diff', () => {
     expect(out).toContain('**Click**: `str` → `int`')
   })
 
+  it('does not mistake spec 4 writing None for a changed return type', () => {
+    // Spec 3 wrote `returnType: null`; spec 4 writes a `None` node. The first
+    // import across that boundary reported `None → None` for every such keyword.
+    const before = { ...click, returnType: null }
+    const after = { ...click, returnType: { name: 'None' } }
+    const out = diff(spec('1.0.0', [before]), spec('1.1.0', [after]))
+    expect(out).not.toContain('**Click**')
+  })
+
   it('reports documented types appearing and disappearing', () => {
     /*
      * Not cosmetic: a type page vanishing is how we learned that generating
