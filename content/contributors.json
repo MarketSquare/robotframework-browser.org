@@ -1,7 +1,7 @@
 {
   "source": ".all-contributorsrc, maintained by the all-contributors bot",
-  "generated": "2026-08-19",
-  "total": 207,
+  "generated": "2026-10-04",
+  "total": 208,
   "core": [
     {
       "login": "aaltat",
@@ -2633,6 +2633,18 @@
       "name": "M.Kherki",
       "avatar": "/avatars/Alpha-Centauri-00.jpg",
       "profile": "https://github.com/Alpha-Centauri-00",
+      "ways": [
+        "report"
+      ],
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "msbt-saab",
+      "name": "msbt-saab",
+      "avatar": "/avatars/msbt-saab.png",
+      "profile": "https://github.com/msbt-saab",
       "ways": [
         "report"
       ],
