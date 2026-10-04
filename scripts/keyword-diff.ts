@@ -41,6 +41,12 @@ function load(version: string): Spec {
   }
 }
 
+/**
+ * Spec 3 wrote `returnType: null` for `-> None`; spec 4 writes a `None` node.
+ * Compared raw, the first diff across that boundary reports `None → None`.
+ */
+const returns = (kw: Keyword) => (kw.returnType?.name === 'None' ? null : kw.returnType?.name ?? null)
+
 /** The signature as a reader would write it: `Click    selector, button=left`. */
 const signature = (kw: Keyword) => kw.args.map(a => a.repr).join(', ')
 
@@ -57,7 +63,7 @@ export function diff(before: Spec, after: Spec): string {
 
   const retyped = [...now.values()]
     .map(kw => ({ kw, was: old.get(kw.name)! }))
-    .filter(({ kw, was }) => was && (was.returnType?.name ?? null) !== (kw.returnType?.name ?? null))
+    .filter(({ kw, was }) => was && returns(was) !== returns(kw))
 
   const oldTypes = new Set(before.typedocs.map(t => t.name))
   const newTypes = new Set(after.typedocs.map(t => t.name))

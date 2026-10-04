@@ -74,4 +74,6 @@ export interface ResolvedArg {
   required: boolean
   variadic: 'positional' | 'named' | null
   namedOnly: boolean
+  /** Sanitized HTML; empty when the spec keeps it in the keyword's doc. */
+  doc: string
 }

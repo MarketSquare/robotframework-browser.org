@@ -272,6 +272,25 @@ table.args tr:last-child td {
   padding-bottom: 0;
 }
 
+/* The argument and its description read as one entry: one rule, under both. */
+table.args tr.has-doc td {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+table.args td.a-doc {
+  padding-top: var(--sp-1);
+  color: var(--dim);
+}
+
+table.args td.a-doc .doc > :first-child {
+  margin-top: 0;
+}
+
+table.args td.a-doc .doc > :last-child {
+  margin-bottom: 0;
+}
+
 .a-name {
   display: flex;
   flex-wrap: wrap;

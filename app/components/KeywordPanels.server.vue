@@ -50,6 +50,7 @@ interface Arg {
   required: boolean
   variadic: 'positional' | 'named' | null
   namedOnly: boolean
+  doc: string
 }
 
 const data = full as unknown as {
@@ -64,6 +65,7 @@ const data = full as unknown as {
     args: Arg[]
     returnTypeName: string | null
     returnTypeHref: string | null
+    returnDoc: string
     sourceUrl: string | null
     lineno: number
   }[]
@@ -156,31 +158,53 @@ const KIND_BLURB: Record<string, string> = {
               <tr><th>Name</th><th>Default</th><th>Type</th></tr>
             </thead>
             <tbody>
-              <tr v-for="arg in kw.args" :key="arg.name">
-                <td class="a-name">
-                  <span class="ident">{{ display(arg) }}</span>
-                  <span v-if="arg.required" class="req">required</span>
-                  <span v-else-if="arg.namedOnly" class="named">named only</span>
-                </td>
-                <td class="a-default">
-                  <span v-if="arg.defaultValue !== null" class="eq">=</span>
-                  <code v-if="arg.defaultValue !== null">{{ arg.defaultValue }}</code>
-                </td>
-                <td class="a-type">
-                  <a v-if="arg.typeHref" :href="arg.typeHref">{{ arg.typeName }}</a>
-                  <span v-else-if="arg.typeName">{{ arg.typeName }}</span>
-                </td>
-              </tr>
+              <!--
+                From specversion 4 an argument carries its own description,
+                lifted out of the docstring's `Arguments:` list. It gets a row
+                of its own under the argument rather than a fourth column: the
+                descriptions run to paragraphs, and a column would squeeze the
+                name, default and type into a sliver on a phone.
+              -->
+              <template v-for="arg in kw.args" :key="arg.name">
+                <tr :class="{ 'has-doc': arg.doc }">
+                  <td class="a-name">
+                    <span class="ident">{{ display(arg) }}</span>
+                    <span v-if="arg.required" class="req">required</span>
+                    <span v-else-if="arg.namedOnly" class="named">named only</span>
+                  </td>
+                  <td class="a-default">
+                    <span v-if="arg.defaultValue !== null" class="eq">=</span>
+                    <code v-if="arg.defaultValue !== null">{{ arg.defaultValue }}</code>
+                  </td>
+                  <td class="a-type">
+                    <a v-if="arg.typeHref" :href="arg.typeHref">{{ arg.typeName }}</a>
+                    <span v-else-if="arg.typeName">{{ arg.typeName }}</span>
+                  </td>
+                </tr>
+                <tr v-if="arg.doc" class="a-doc-row">
+                  <!--
+                    The wrapper carries .doc, not the cell: .doc sets its own
+                    display, and a <td> that is not a table-cell drops out of
+                    the colspan and takes the row's rule with it.
+                  -->
+                  <td colspan="3" class="a-doc">
+                    <!-- eslint-disable-next-line vue/no-v-html -- sanitized at build in lib/libdoc.ts -->
+                    <div class="doc" v-html="arg.doc" />
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
       </div>
       <p v-else class="block none">Takes no arguments.</p>
 
-      <div v-if="kw.returnTypeName" class="block inline-block">
+      <div v-if="kw.returnTypeName || kw.returnDoc" class="block" :class="{ 'inline-block': !kw.returnDoc }">
         <h4>Returns</h4>
         <a v-if="kw.returnTypeHref" class="mono" :href="kw.returnTypeHref">{{ kw.returnTypeName }}</a>
-        <span v-else class="mono">{{ kw.returnTypeName }}</span>
+        <span v-else-if="kw.returnTypeName" class="mono">{{ kw.returnTypeName }}</span>
+        <!-- eslint-disable-next-line vue/no-v-html -- sanitized at build in lib/libdoc.ts -->
+        <div v-if="kw.returnDoc" class="doc" v-html="kw.returnDoc" />
       </div>
 
       <div v-if="kw.tags.length" class="block">

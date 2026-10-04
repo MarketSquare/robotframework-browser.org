@@ -67,10 +67,16 @@ for (const file of specFiles) {
    * Guard against a sanitizer that quietly eats content: libdoc's HTML is the
    * only copy of the documentation, so a rule that strips too much would show
    * up as blank keyword pages rather than an error.
+   *
+   * Argument and return documentation count too: from specversion 4 they are
+   * no longer part of `doc`, and a sanitizer eating them would be as silent.
    */
+  const text = (doc: string, args: { doc?: string }[], returnDoc?: string) =>
+    doc + args.map(a => a.doc ?? '').join('') + (returnDoc ?? '')
   const shrunk = result.keywords.filter(k => {
-    const source = spec.keywords.find(s => s.name === k.name)!.doc
-    return source.length > 200 && k.doc.length < source.length * 0.4
+    const s = spec.keywords.find(s => s.name === k.name)!
+    const source = text(s.doc, s.args, s.returnDoc)
+    return source.length > 200 && text(k.doc, k.args, k.returnDoc).length < source.length * 0.4
   })
   if (shrunk.length) {
     throw new Error(
