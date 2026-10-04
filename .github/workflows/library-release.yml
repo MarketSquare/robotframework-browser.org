@@ -125,12 +125,12 @@ jobs:
           ref: ${{ needs.check.outputs.tag }}
           path: library
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v7
 
       - run: pnpm install --frozen-lockfile
 
