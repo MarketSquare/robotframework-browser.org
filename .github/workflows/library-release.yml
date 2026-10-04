@@ -54,7 +54,7 @@ jobs:
       previous: ${{ steps.decide.outputs.previous }}
       needed: ${{ steps.decide.outputs.needed }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Is there anything to do?
         id: decide
@@ -113,20 +113,20 @@ jobs:
       TAG: ${{ needs.check.outputs.tag }}
       PREVIOUS: ${{ needs.check.outputs.previous }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # The release note, the contributor list and the version pins are read
       # from the library's own tree at the tag — not from its main branch,
       # which has already moved on.
       - name: Check out the library at ${{ needs.check.outputs.version }}
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: MarketSquare/robotframework-browser
           ref: ${{ needs.check.outputs.tag }}
           path: library
 
       - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
