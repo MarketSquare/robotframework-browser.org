@@ -175,9 +175,9 @@ the active one, the same way Browser keeps a persistent context:
   indexed and the first one becomes the active page, so `Click`, `Get Text` and
   the other keywords work on it right away. Pages it opens later can be selected
   with `Switch Page`.
-- **It returns the ids** of the new browser, context and page, as an object with
-  `browserId`, `contextId` and `pageId`. Return it from your function and the
-  keyword returns it to Robot Framework.
+- **It returns the ids** of the new browser and context, as an object with
+  `browserId` and `contextId`, plus `pageId` if the context has a page. Return
+  it from your function and the keyword returns it to Robot Framework.
 - **Closing the browser closes the context.** `Close Browser` and automatic
   closing treat it like any other browser.
 - **`onClose` releases the rest.** The optional async `onClose` runs once after
