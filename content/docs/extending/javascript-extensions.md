@@ -50,9 +50,9 @@ Three conventions carry the whole API:
 - **`fn.rfdoc` becomes the keyword documentation**, so your keyword shows up in
   Libdoc and in editor tooltips like any other.
 
-### The six names Browser fills in
+### The seven names Browser fills in
 
-Name a parameter one of these and the library passes the object in. Everything
+Name a parameter one of these and the library passes the value in. Everything
 else in your signature becomes an ordinary keyword argument.
 
 | Name | You get |
@@ -63,6 +63,7 @@ else in your signature becomes an ordinary keyword argument.
 | `logger` | A function that writes to the Robot Framework log |
 | `playwright` | The [`playwright` module](https://playwright.dev/docs/api/class-playwright) itself |
 | `adoptContext` | A function that hands a context you created to Browser — see [Handing over a context you created](#handing-over-a-context-you-created) |
+| `defaultTimeout` | The library timeout in milliseconds, as `Set Browser Timeout` sets it |
 
 **They are matched by name, not by position.** Browser reads your parameter
 names and fills in the ones it recognises, so `mouseWheel(x, y, logger, page)`
@@ -148,9 +149,10 @@ that Browser does not launch, such as an Electron application, without Browser
 knowing about it:
 
 ```javascript
-async function launchElectronApplication(executablePath, playwright, adoptContext) {
+async function launchElectronApplication(executablePath, playwright, adoptContext, defaultTimeout) {
   const app = await playwright._electron.launch({ executablePath });
   await app.firstWindow();
+  app.context().setDefaultTimeout(defaultTimeout);
   return adoptContext(app.context(), { name: 'electron' });
 }
 exports.__esModule = true;
@@ -175,9 +177,10 @@ the active one, the same way Browser keeps a persistent context:
   indexed and the first one becomes the active page, so `Click`, `Get Text` and
   the other keywords work on it right away. Pages it opens later can be selected
   with `Switch Page`.
-- **It gets Browser's timeout.** Like the contexts Browser creates, its default
-  timeout is the library timeout at that moment. For another one, call
-  `context.setDefaultTimeout()` after adopting it.
+- **It keeps its own timeout.** Browser does not change the context's default
+  timeout. To give it the library timeout, as the contexts Browser creates have,
+  take `defaultTimeout` and call `context.setDefaultTimeout(defaultTimeout)`, as
+  the example does.
 - **`options` describe the browser.** All of them are optional. `name` is what
   `Get Browser Catalog` reports as its type, `adopted` by default, and `headless`
   says whether it runs headless, `false` by default.
