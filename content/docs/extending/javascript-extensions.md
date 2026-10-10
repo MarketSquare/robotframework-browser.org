@@ -46,11 +46,11 @@ Three conventions carry the whole API:
 - **Exported names become keywords** — the *export key*, not the function's own
   name. `exports.getLinks = getLinks` gives `Get Links`; the
   `exports.myMouseWheel = mouseWheel` below gives `My Mouse Wheel`.
-- **Five argument names are filled in for you**, by name — see below.
+- **Six argument names are filled in for you**, by name — see below.
 - **`fn.rfdoc` becomes the keyword documentation**, so your keyword shows up in
   Libdoc and in editor tooltips like any other.
 
-### The five names Browser fills in
+### The six names Browser fills in
 
 Name a parameter one of these and the library passes the object in. Everything
 else in your signature becomes an ordinary keyword argument.
@@ -62,6 +62,7 @@ else in your signature becomes an ordinary keyword argument.
 | `browser` | The active [Browser](https://playwright.dev/docs/api/class-browser) |
 | `logger` | A function that writes to the Robot Framework log |
 | `playwright` | The [`playwright` module](https://playwright.dev/docs/api/class-playwright) itself |
+| `adoptContext` | A function that hands a context you created to Browser — see [Handing over a context you created](#handing-over-a-context-you-created) |
 
 **They are matched by name, not by position.** Browser reads your parameter
 names and fills in the ones it recognises, so `mouseWheel(x, y, logger, page)`
@@ -71,6 +72,12 @@ best.
 
 These names are reserved: a keyword cannot take an argument called `page` from
 Robot Framework, because that name is spoken for. `self` is not usable either.
+
+:since{version="20.4.0"} **Only `page`, `context` and `browser` need an open
+browser.** A keyword that takes one of them fails with `No Browser is open but
+needed for this operation.` when none is open. A keyword that takes none of them
+runs without one, which is what lets a module
+[create the first browser itself](#handing-over-a-context-you-created).
 
 One further name is special without being filled in. A parameter called `args`
 makes the keyword variadic — it receives Robot Framework's `*args`, so it
@@ -119,7 +126,7 @@ exports.registerMySelector = registerMySelector;
 *** Test Cases ***
 Use A Custom Engine
     New Browser           chromium
-    Register My Selector      # a browser must already be open
+    Register My Selector
     New Page              ${URL}
     Click                 myselector=Some Title
 ```
@@ -128,15 +135,79 @@ Use A Custom Engine
 ---
 kind: warning
 ---
-Two things this example depends on.
-
-**A browser must already be open.** Every JavaScript-extension keyword resolves
-the active browser before it runs, even one whose only argument is `playwright`,
-so calling this first fails with `Browser has been closed.`
-
 **Register once per run.** `selectors.register` rejects a name that is already
 registered, and because the registration is awaited that rejection fails the
 keyword — unawaited, it takes the whole Node process down instead.
+::
+
+## Handing over a context you created
+
+:since{version="20.7.0"} A module can create a browser context itself and hand
+it to Browser with `adoptContext`. That is how a library supports a platform
+that Browser does not launch, such as an Electron application, without Browser
+knowing about it:
+
+```javascript
+async function launchElectronApplication(executablePath, playwright, adoptContext) {
+  const app = await playwright._electron.launch({ executablePath });
+  await app.firstWindow();
+  return adoptContext(app.context(), { name: 'electron' });
+}
+exports.__esModule = true;
+exports.launchElectronApplication = launchElectronApplication;
+```
+
+```robot
+*** Settings ***
+Library    Browser    jsextension=${CURDIR}/electron.js
+
+*** Test Cases ***
+Read The Title Of An Electron Application
+    Launch Electron Application    /path/to/app
+    Get Title    ==    My App
+    Close Browser
+```
+
+`adoptContext(context, options)` adds the context as a new browser and makes it
+the active one, the same way Browser keeps a persistent context:
+
+- **Its pages become Browser's pages.** The pages the context already has are
+  indexed and the first one becomes the active page, so `Click`, `Get Text` and
+  the other keywords work on it right away. Pages it opens later can be selected
+  with `Switch Page`.
+- **It gets Browser's timeout.** Like the contexts Browser creates, its default
+  timeout is the library timeout at that moment. For another one, call
+  `context.setDefaultTimeout()` after adopting it.
+- **`options` describe the browser.** All of them are optional. `name` is what
+  `Get Browser Catalog` reports as its type, `adopted` by default, and `headless`
+  says whether it runs headless, `false` by default.
+- **`tracing` records a trace.** Pass the path of a trace file or a folder, and
+  Browser starts tracing the context and saves the trace before it closes the
+  context, as with `tracing` of `New Context`.
+- **`contextOptions` say how the context was created.** Pass the options you
+  created it with, in the form of Playwright's browser context options. Browser
+  keywords that depend on them then work on it: `Download` needs
+  `acceptDownloads`, which an Electron application has by default, so pass
+  `{ acceptDownloads: true }` for one.
+- **It returns the ids** of the new browser and context, as an object with
+  `browserId` and `contextId`, plus `pageId` if the context has a page. Return
+  it from your function and the keyword returns it to Robot Framework.
+- **Closing the browser closes the context.** `Close Browser` and automatic
+  closing treat it like any other browser.
+- **`onClose` releases the rest.** The async option `onClose` runs once after the
+  context is closed, even when closing it failed. Pass it for what the context
+  does not own. An Electron application quits with its context and needs none; a
+  connection to an Android device does not close by itself:
+  `adoptContext(context, { onClose: () => device.close() })`.
+
+::doc-note
+---
+kind: aside
+---
+Browser does not support Electron or Android itself, and `_electron` and
+`_android` are experimental in Playwright. The module, and keeping it working
+with the platform, are yours. A module that does more than launch belongs in a
+library of its own, built on Browser.
 ::
 
 ## Debugging
@@ -230,6 +301,7 @@ rows:
   - ['Assertion arguments like the built-in getters', 'Python plugin with AssertionEngine']
   - ['To replace an existing keyword', 'Python plugin']
   - ['A custom selector engine', 'JavaScript module']
+  - ['A platform Browser does not launch, such as Electron', 'JavaScript module that [hands over its context](#handing-over-a-context-you-created), usually in a library of its own']
   - ['Both Python and page-side logic in one keyword', 'Python plugin calling a JS module']
   - ['Business logic in Python — `IF`, `TRY`, parsing — with Browser unchanged', '[Your own Python library](/docs/extending/python-libraries)']
   - ['Your own keywords and your own failure handling, with Browser underneath', '[Browser as a base](/docs/extending/browser-as-a-base)']
