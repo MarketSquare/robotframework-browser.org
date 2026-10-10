@@ -151,7 +151,7 @@ knowing about it:
 async function launchElectronApplication(executablePath, playwright, adoptContext) {
   const app = await playwright._electron.launch({ executablePath });
   await app.firstWindow();
-  return adoptContext(app.context());
+  return adoptContext(app.context(), { name: 'electron' });
 }
 exports.__esModule = true;
 exports.launchElectronApplication = launchElectronApplication;
@@ -168,23 +168,29 @@ Read The Title Of An Electron Application
     Close Browser
 ```
 
-`adoptContext(context, onClose)` adds the context as a new browser and makes it
+`adoptContext(context, options)` adds the context as a new browser and makes it
 the active one, the same way Browser keeps a persistent context:
 
 - **Its pages become Browser's pages.** The pages the context already has are
   indexed and the first one becomes the active page, so `Click`, `Get Text` and
   the other keywords work on it right away. Pages it opens later can be selected
   with `Switch Page`.
+- **It gets Browser's timeout.** Like the contexts Browser creates, its default
+  timeout is the library timeout at that moment. For another one, call
+  `context.setDefaultTimeout()` after adopting it.
+- **`options` describe the browser.** All of them are optional. `name` is what
+  `Get Browser Catalog` reports as its type, `adopted` by default, and `headless`
+  says whether it runs headless, `false` by default.
 - **It returns the ids** of the new browser and context, as an object with
   `browserId` and `contextId`, plus `pageId` if the context has a page. Return
   it from your function and the keyword returns it to Robot Framework.
 - **Closing the browser closes the context.** `Close Browser` and automatic
   closing treat it like any other browser.
-- **`onClose` releases the rest.** The optional async `onClose` runs once after
-  the context is closed, even when closing it failed. Pass it for what the
-  context does not own. An Electron application quits with its context and needs
-  none; a connection to an Android device does not close by itself:
-  `adoptContext(context, () => device.close())`.
+- **`onClose` releases the rest.** The async option `onClose` runs once after the
+  context is closed, even when closing it failed. Pass it for what the context
+  does not own. An Electron application quits with its context and needs none; a
+  connection to an Android device does not close by itself:
+  `adoptContext(context, { onClose: () => device.close() })`.
 
 ::doc-note
 ---

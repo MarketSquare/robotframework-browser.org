@@ -297,8 +297,10 @@ and `Switch Browser`, `Switch Context` and `Switch Page` move that pointer.
 By default, the **contexts and pages** a test opened are closed when the test
 ends. Browsers are not: no auto-closing level closes a browser per test or per
 suite, so a browser lives until execution ends or you call `Close Browser`. The
-one exception is a browser opened by `New Persistent Context` — it is closed
-together with its context.
+exceptions are a browser opened by `New Persistent Context` and one that a
+JavaScript extension
+[handed over with `adoptContext`](/docs/extending/javascript-extensions#handing-over-a-context-you-created)
+— each is closed together with its context.
 
 That setting is `auto_closing_level`, and it has four values:
 
