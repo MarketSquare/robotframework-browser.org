@@ -181,6 +181,14 @@ the active one, the same way Browser keeps a persistent context:
 - **`options` describe the browser.** All of them are optional. `name` is what
   `Get Browser Catalog` reports as its type, `adopted` by default, and `headless`
   says whether it runs headless, `false` by default.
+- **`tracing` records a trace.** Pass the path of a trace file or a folder, and
+  Browser starts tracing the context and saves the trace before it closes the
+  context, as with `tracing` of `New Context`.
+- **`contextOptions` say how the context was created.** Pass the options you
+  created it with, in the form of Playwright's browser context options. Browser
+  keywords that depend on them then work on it: `Download` needs
+  `acceptDownloads`, which an Electron application has by default, so pass
+  `{ acceptDownloads: true }` for one.
 - **It returns the ids** of the new browser and context, as an object with
   `browserId` and `contextId`, plus `pageId` if the context has a page. Return
   it from your function and the keyword returns it to Robot Framework.
