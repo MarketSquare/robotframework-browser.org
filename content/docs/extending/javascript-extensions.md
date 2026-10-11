@@ -46,7 +46,7 @@ Three conventions carry the whole API:
 - **Exported names become keywords** — the *export key*, not the function's own
   name. `exports.getLinks = getLinks` gives `Get Links`; the
   `exports.myMouseWheel = mouseWheel` below gives `My Mouse Wheel`.
-- **Six argument names are filled in for you**, by name — see below.
+- **Seven argument names are filled in for you**, by name — see below.
 - **`fn.rfdoc` becomes the keyword documentation**, so your keyword shows up in
   Libdoc and in editor tooltips like any other.
 
@@ -214,9 +214,11 @@ as for `New Context`:
 
 ```python
 from Browser import Browser
+from robotlibcore import keyword
 
 
 class ElectronLibrary(Browser):
+    @keyword
     def launch_electron_application(self, executable_path, tracing=None, record_video=None, record_har=None):
         options = self.adopted_context_options(tracing=tracing, recordVideo=record_video, recordHar=record_har)
         adopted = self.call_js_keyword(
@@ -240,6 +242,8 @@ async function launchElectronApplication(executablePath, tracing, recordVideo, r
   const adopted = await adoptContext(app.context(), { name: 'electron', tracing: tracing || undefined, contextOptions });
   return { ...adopted, videoPath: recordVideo ? await window.video()?.path() : null };
 }
+exports.__esModule = true;
+exports.launchElectronApplication = launchElectronApplication;
 ```
 
 - **`adopted_context_options`** returns an `AdoptedContextOptions`, a typed
