@@ -184,9 +184,11 @@ the active one, the same way Browser keeps a persistent context:
 - **`options` describe the browser.** All of them are optional. `name` is what
   `Get Browser Catalog` reports as its type, `adopted` by default, and `headless`
   says whether it runs headless, `false` by default.
-- **`tracing` records a trace.** Pass the path of a trace file or a folder, and
-  Browser starts tracing the context and saves the trace before it closes the
-  context, as with `tracing` of `New Context`.
+- **`tracing` records a trace.** Pass the absolute path of a `.zip` trace file
+  or of a folder, which gets `trace_<context id>.zip`, and Browser starts tracing
+  the context and saves the trace before it closes the context, as with `tracing`
+  of `New Context`. A relative path would be relative to Browser's Node process,
+  not to the output directory.
 - **`contextOptions` say how the context was created.** Pass the options you
   created it with, in the form of Playwright's browser context options. Browser
   keywords that depend on them then work on it: `Download` needs
