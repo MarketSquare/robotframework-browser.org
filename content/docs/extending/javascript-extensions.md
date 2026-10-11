@@ -188,7 +188,8 @@ the active one, the same way Browser keeps a persistent context:
   or of a folder, which gets `trace_<context id>.zip`, and Browser starts tracing
   the context and saves the trace before it closes the context, as with `tracing`
   of `New Context`. A relative path would be relative to Browser's Node process,
-  not to the output directory.
+  not to the output directory. A library written in Python gets the path from
+  Browser, see [From a library written in Python](#from-a-library-written-in-python).
 - **`contextOptions` say how the context was created.** Pass the options you
   created it with, in the form of Playwright's browser context options. Browser
   keywords that depend on them then work on it: `Download` needs
@@ -204,6 +205,54 @@ the active one, the same way Browser keeps a persistent context:
   does not own. An Electron application quits with its context and needs none; a
   connection to an Android device does not close by itself:
   `adoptContext(context, { onClose: () => device.close() })`.
+
+### From a library written in Python
+
+A library built on Browser in Python calls the module with `call_js_keyword`
+and lets Browser decide where traces, videos and HAR files go, by the same rules
+as for `New Context`:
+
+```python
+from Browser import Browser
+
+
+class ElectronLibrary(Browser):
+    def launch_electron_application(self, executable_path, tracing=None, record_video=None, record_har=None):
+        options = self.adopted_context_options(tracing=tracing, recordVideo=record_video, recordHar=record_har)
+        adopted = self.call_js_keyword(
+            "launchElectronApplication",
+            executablePath=executable_path,
+            defaultTimeout=int(self.timeout),
+            **options,
+        )
+        self.register_adopted_context(adopted["contextId"], options, adopted.get("videoPath"))
+        return adopted
+```
+
+```javascript
+async function launchElectronApplication(executablePath, tracing, recordVideo, recordHar, defaultTimeout, playwright, adoptContext) {
+  const contextOptions = { acceptDownloads: true };
+  if (recordVideo) contextOptions.recordVideo = recordVideo;
+  if (recordHar) contextOptions.recordHar = recordHar;
+  const app = await playwright._electron.launch({ executablePath, ...contextOptions });
+  const window = await app.firstWindow();
+  app.context().setDefaultTimeout(defaultTimeout);
+  const adopted = await adoptContext(app.context(), { name: 'electron', tracing: tracing || undefined, contextOptions });
+  return { ...adopted, videoPath: recordVideo ? await window.video()?.path() : null };
+}
+```
+
+- **`adopted_context_options`** returns an `AdoptedContextOptions`, a typed
+  dictionary with `tracing`, `recordVideo` and `recordHar` as `New Context`
+  would use them, `None` when off: `tracing=True` and
+  `ROBOT_FRAMEWORK_BROWSER_TRACING` give Browser's trace folder, a video goes to
+  Browser's video folder, 1280×720 by default, and relative paths are resolved
+  as for `New Context`. Name the function's parameters like its keys and
+  `**options` passes them on. Give `tracing` to `adoptContext` and the others to
+  Playwright when you create the context.
+- **`register_adopted_context`** registers the context after the call, so that
+  the keyword calls become groups in the trace and the log embeds the video.
+  It returns the video path, or an empty string without a video.
 
 ::doc-note
 ---
