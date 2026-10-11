@@ -170,6 +170,11 @@ Read The Title Of An Electron Application
     Close Browser
 ```
 
+The examples on this page are kept short. A real module closes the application
+when anything after the launch fails, for example with `try`/`catch` around
+`firstWindow` and `adoptContext`, because Browser cannot close a process it has
+not taken over.
+
 `adoptContext(context, options)` adds the context as a new browser and makes it
 the active one, the same way Browser keeps a persistent context:
 
@@ -210,16 +215,27 @@ the active one, the same way Browser keeps a persistent context:
 
 A library built on Browser in Python calls the module with `call_js_keyword`
 and lets Browser decide where traces, videos and HAR files go, by the same rules
-as for `New Context`:
+as for `New Context`. Type the keyword's arguments with Browser's types, as the
+example does, so that Robot Framework converts `False` or a dictionary as it does
+for `New Context`:
 
 ```python
+from pathlib import Path
+
 from Browser import Browser
+from Browser.utils import RecordHar, RecordVideo
 from robotlibcore import keyword
 
 
 class ElectronLibrary(Browser):
     @keyword
-    def launch_electron_application(self, executable_path, tracing=None, record_video=None, record_har=None):
+    def launch_electron_application(
+        self,
+        executable_path: str,
+        tracing: bool | Path | None = None,
+        record_video: RecordVideo | None = None,
+        record_har: RecordHar | None = None,
+    ):
         options = self.adopted_context_options(tracing=tracing, recordVideo=record_video, recordHar=record_har)
         adopted = self.call_js_keyword(
             "launchElectronApplication",
