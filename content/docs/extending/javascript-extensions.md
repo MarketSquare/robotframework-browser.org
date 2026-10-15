@@ -248,11 +248,11 @@ class ElectronLibrary(Browser):
 ```
 
 ```javascript
-async function launchElectronApplication(executablePath, tracing, recordVideo, recordHar, defaultTimeout, playwright, adoptContext) {
+async function launchElectronApplication(executablePath, tracing, recordVideo, recordHar, tracesDir, defaultTimeout, playwright, adoptContext) {
   const contextOptions = { acceptDownloads: true };
   if (recordVideo) contextOptions.recordVideo = recordVideo;
   if (recordHar) contextOptions.recordHar = recordHar;
-  const app = await playwright._electron.launch({ executablePath, ...contextOptions });
+  const app = await playwright._electron.launch({ executablePath, tracesDir, ...contextOptions });
   const window = await app.firstWindow();
   app.context().setDefaultTimeout(defaultTimeout);
   const adopted = await adoptContext(app.context(), { name: 'electron', tracing: tracing || undefined, contextOptions });
@@ -266,10 +266,14 @@ exports.launchElectronApplication = launchElectronApplication;
   dictionary with `tracing`, `recordVideo` and `recordHar` as `New Context`
   would use them, `None` when off: `tracing=True` and
   `ROBOT_FRAMEWORK_BROWSER_TRACING` give Browser's trace folder, a video goes to
-  Browser's video folder, 1280×720 by default, and relative paths are resolved
-  as for `New Context`. Name the function's parameters like its keys and
-  `**options` passes them on. Give `tracing` to `adoptContext` and the others to
-  Playwright when you create the context.
+  Browser's video folder, and relative paths are resolved as for `New Context`.
+  An empty `recordVideo` records with these defaults. Without a `size`, the video
+  has the size of the `viewport` argument, the viewport you create the context
+  with, or 1280×720. `tracesDir` is a new folder for Playwright's temporary trace
+  files, as Browser gives one to each browser it launches. Name the function's
+  parameters like the keys and `**options` passes them on. Give `tracing` to
+  `adoptContext`, `tracesDir` to the launch, and the others to Playwright when
+  you create the context.
 - **`register_adopted_context`** registers the context after the call, so that
   the keyword calls become groups in the trace and the log embeds the video.
   It returns the video path, or an empty string without a video.
