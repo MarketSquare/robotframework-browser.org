@@ -240,7 +240,6 @@ class ElectronLibrary(Browser):
         adopted = self.call_js_keyword(
             "launchElectronApplication",
             executablePath=executable_path,
-            defaultTimeout=int(self.timeout),
             **options,
         )
         self.register_adopted_context(adopted["contextId"], options, adopted.get("videoPath"))
@@ -277,6 +276,9 @@ exports.launchElectronApplication = launchElectronApplication;
 - **`register_adopted_context`** registers the context after the call, so that
   the keyword calls become groups in the trace and the log embeds the video.
   It returns the video path, or an empty string without a video.
+- **`defaultTimeout`** is filled in by `call_js_keyword` too, with the library
+  timeout. Pass your own only when your library keeps a timeout of its own; it
+  is the one filled-in name you can override.
 
 ::doc-note
 ---

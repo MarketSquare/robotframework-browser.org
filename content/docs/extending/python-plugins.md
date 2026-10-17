@@ -163,9 +163,10 @@ class PythonPlugin(LibraryComponent):
 
 ::doc-note{kind="warning"}
 Every argument to `call_js_keyword` must be **named** and JSON serialisable —
-passing one positionally raises `TypeError`. The names `page`, `context`,
-`browser`, `logger` and `playwright` are reserved: the Node side injects those
-itself, so you cannot pass your own.
+passing one positionally raises `TypeError`. The Node side fills in `page`,
+`context`, `browser`, `logger`, `playwright` and `adoptContext` itself, so a
+value you pass for them is ignored. `defaultTimeout` is the library timeout in
+milliseconds unless you pass your own.
 ::
 
 This combination is usually the one you want: the keyword signature, type
