@@ -149,10 +149,9 @@ that Browser does not launch, such as an Electron application, without Browser
 knowing about it:
 
 ```javascript
-async function launchElectronApplication(executablePath, playwright, adoptContext, defaultTimeout) {
+async function launchElectronApplication(executablePath, playwright, adoptContext) {
   const app = await playwright._electron.launch({ executablePath });
   await app.firstWindow();
-  app.context().setDefaultTimeout(defaultTimeout);
   return adoptContext(app.context(), { name: 'electron' });
 }
 exports.__esModule = true;
@@ -182,10 +181,12 @@ the active one, the same way Browser keeps a persistent context:
   indexed and the first one becomes the active page, so `Click`, `Get Text` and
   the other keywords work on it right away. Pages it opens later can be selected
   with `Switch Page`.
-- **It keeps its own timeout.** Browser does not change the context's default
-  timeout. To give it the library timeout, as the contexts Browser creates have,
-  take `defaultTimeout` and call `context.setDefaultTimeout(defaultTimeout)`, as
-  the example does.
+- **`activePage` picks another page.** Pass a page of the context to make it the
+  active page instead of the first one, for example the window of an Electron
+  application when Playwright saw one of its views first. A page of another
+  context makes `adoptContext` fail without adopting anything.
+- **It gets the library timeout,** as the contexts Browser creates have, so the
+  function does not call `setDefaultTimeout` itself.
 - **`options` describe the browser.** All of them are optional. `name` is what
   `Get Browser Catalog` reports as its type, `adopted` by default, and `headless`
   says whether it runs headless, `false` by default.
@@ -200,9 +201,15 @@ the active one, the same way Browser keeps a persistent context:
   keywords that depend on them then work on it: `Download` needs
   `acceptDownloads`, which an Electron application has by default, so pass
   `{ acceptDownloads: true }` for one.
+- **Browser registers it like a context of `New Context`.** As soon as
+  `adoptContext` resolves, the keyword calls become groups in the trace, if it is
+  traced, and the log embeds the video of the active page, if it records one, in
+  the `size` of `recordVideo` in `contextOptions`, else of their `viewport`, else
+  1280×720.
 - **It returns the ids** of the new browser and context, as an object with
-  `browserId` and `contextId`, plus `pageId` if the context has a page. Return
-  it from your function and the keyword returns it to Robot Framework.
+  `browserId` and `contextId`, plus `pageId` if the context has a page, and
+  `videoPath`, the video of the active page or `null`. Return it from your
+  function and the keyword returns it to Robot Framework.
 - **Closing the browser closes the context.** `Close Browser` and automatic
   closing treat it like any other browser.
 - **`onClose` releases the rest.** The async option `onClose` runs once after the
@@ -237,25 +244,21 @@ class ElectronLibrary(Browser):
         record_har: RecordHar | None = None,
     ):
         options = self.adopted_context_options(tracing=tracing, recordVideo=record_video, recordHar=record_har)
-        adopted = self.call_js_keyword(
+        return self.call_js_keyword(
             "launchElectronApplication",
             executablePath=executable_path,
             **options,
         )
-        self.register_adopted_context(adopted["contextId"], options, adopted.get("videoPath"))
-        return adopted
 ```
 
 ```javascript
-async function launchElectronApplication(executablePath, tracing, recordVideo, recordHar, tracesDir, defaultTimeout, playwright, adoptContext) {
+async function launchElectronApplication(executablePath, tracing, recordVideo, recordHar, tracesDir, playwright, adoptContext) {
   const contextOptions = { acceptDownloads: true };
   if (recordVideo) contextOptions.recordVideo = recordVideo;
   if (recordHar) contextOptions.recordHar = recordHar;
   const app = await playwright._electron.launch({ executablePath, tracesDir, ...contextOptions });
-  const window = await app.firstWindow();
-  app.context().setDefaultTimeout(defaultTimeout);
-  const adopted = await adoptContext(app.context(), { name: 'electron', tracing: tracing || undefined, contextOptions });
-  return { ...adopted, videoPath: recordVideo ? await window.video()?.path() : null };
+  await app.firstWindow();
+  return adoptContext(app.context(), { name: 'electron', tracing: tracing || undefined, contextOptions });
 }
 exports.__esModule = true;
 exports.launchElectronApplication = launchElectronApplication;
@@ -266,19 +269,22 @@ exports.launchElectronApplication = launchElectronApplication;
   would use them, `None` when off: `tracing=True` and
   `ROBOT_FRAMEWORK_BROWSER_TRACING` give Browser's trace folder, a video goes to
   Browser's video folder, and relative paths are resolved as for `New Context`.
-  An empty `recordVideo` records with these defaults. Without a `size`, the video
-  has the size of the `viewport` argument, the viewport you create the context
-  with, or 1280×720. `tracesDir` is a new folder for Playwright's temporary trace
-  files, as Browser gives one to each browser it launches. Name the function's
-  parameters like the keys and `**options` passes them on. Give `tracing` to
-  `adoptContext`, `tracesDir` to the launch, and the others to Playwright when
-  you create the context.
-- **`register_adopted_context`** registers the context after the call, so that
-  the keyword calls become groups in the trace and the log embeds the video.
-  It returns the video path, or an empty string without a video.
+  Its arguments are converted like those of `New Context`, so an unknown key
+  fails. An empty `recordVideo` records with these defaults. Without a `size`,
+  the video has the size of the `viewport` argument, the viewport you create the
+  context with, or 1280×720. `tracesDir` is a new folder for Playwright's
+  temporary trace files, as Browser gives one to each browser it launches. Name
+  the function's parameters like the keys and `**options` passes them on. Give
+  `tracing` to `adoptContext`, `tracesDir` to the launch, and the others to
+  Playwright when you create the context.
+- **Nothing to register afterwards.** `call_js_keyword` registers the context
+  while the call runs, as soon as `adoptContext` resolves, so the keyword calls
+  become groups in the trace and the log embeds the video, as described above.
+  The keyword returns what the function returned, here the ids and `videoPath`.
 - **`defaultTimeout`** is filled in by `call_js_keyword` too, with the library
-  timeout. Pass your own only when your library keeps a timeout of its own; it
-  is the one filled-in name you can override.
+  timeout, and `adoptContext` gives it to the context. Pass your own only when
+  your library keeps a timeout of its own; it is the one filled-in name you can
+  override.
 
 ::doc-note
 ---
