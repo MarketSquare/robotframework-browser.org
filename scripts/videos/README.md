@@ -26,7 +26,7 @@ What each suite makes:
 |-------|--------|
 | `01`, `02`, `04`, `05` | Walkthrough videos with controls, on robotframework-browser.org |
 | `03` | A short silent loop on `pages/create-account.html`, the example of the Keyword Arguments page; `09` shoots its argument dialog and replace offer on the same page |
-| `06`, `08` | Short silent loops on the login page of car.keyword-driven.de (HTTP; the HTTPS certificate has expired). `render.sh` crops them to the form and the toolbar beside it and drops the first 1.2 s, so a loop does not flash white |
+| `06`, `08`, `10` | Short silent loops on the login page of car.keyword-driven.de; `10` needs the Browser library with the rebuilt Record Selector (HTTP; the HTTPS certificate has expired). `render.sh` crops them to the form and the toolbar beside it and drops the first 1.2 s, so a loop does not flash white |
 | `09-screenshots.robot` | Stills of the toolbar in `public/images/recorder/`, at twice the pixel density, without the drawn pointer and with the recording dot fully lit |
 
 A loop ends by closing its page, which ends the session cleanly with the toolbar still in

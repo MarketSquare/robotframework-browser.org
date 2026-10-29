@@ -2,7 +2,7 @@
 title: Good practice and limits
 description: How to record keywords worth keeping, what to check before you commit one, what the recorder cannot do, and what to do when it goes wrong.
 section: recording
-order: 6
+order: 7
 ---
 
 The recorder gives you a first draft in seconds. Whether it becomes a keyword

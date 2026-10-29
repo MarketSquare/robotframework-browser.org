@@ -61,6 +61,15 @@ Paused
     Shoot Toolbar    toolbar-paused
     Stop    ${recording}
 
+Selector Picked
+    ${selector} =    Promise To    Record Selector    Login button    idle_timeout=1 minute
+    Wait For Function    () => window.__rfbToolbarState && window.__rfbToolbarState.phase === 'picking'
+    Click    id=button_login
+    Wait For Function    () => window.__rfbToolbarState.phase === 'picked' && !!window.__rfbToolbarState.count
+    Shoot Toolbar    selector-picked
+    Evaluate JavaScript    ${None}    () => window.__rfbCommand({cmd: 'stop'})
+    Run Keyword And Expect Error    *cancelled*    Wait For    ${selector}
+
 Idle And Minimized
     ${session} =    Promise To    Record Keywords    ${None}    idle_timeout=1 minute
     Wait For Toolbar
