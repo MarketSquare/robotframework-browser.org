@@ -151,11 +151,15 @@ still finds it tomorrow depends on the page: a name with a counter in it, like
 selector, or make the changing part an [argument](/docs/recording/arguments#selectors).
 
 ::doc-note
-One form has no public equivalent: an element without a role, found by its
-`aria-label` or `aria-labelledby` — a `<div aria-label="Map">` widget, say. It is
-recorded as `internal:label="Map"i`, which works, and the toolbar says so:
-Playwright-internal syntax may change with a Playwright upgrade, so prefer a test
-id there if you can add one.
+Two forms have no public equivalent yet, so they stay in Playwright-internal
+syntax. They work, and the toolbar says so — but such syntax may change with a
+Playwright upgrade:
+
+- An element without a role, found by its `aria-label` or `aria-labelledby` — a
+  `<div aria-label="Map">` widget, say — is recorded as `internal:label="Map"i`.
+  Prefer a test id there if you can add one.
+- An element two or more frames deep may start with `internal:control=any-frame`:
+  Playwright shortens the frame path to the innermost frames it needs.
 ::
 
 ## Values are written exactly
