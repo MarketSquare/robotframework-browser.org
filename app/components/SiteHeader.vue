@@ -51,6 +51,7 @@ const nav = computed<NavItem[]>(() => [
       { to: '/docs/concepts/waiting', label: 'Waiting and promises', note: 'Wait For Condition, and running keywords in parallel' },
       { to: '/docs/concepts/architecture', label: 'How Browser works', note: 'Python, Node and Playwright' },
       { to: '/docs/concepts/logging', label: 'Logging and debugging', note: 'Which of the four logs answers which question' },
+      { to: '/docs/recording/record-keywords', label: 'Recording keywords', note: 'Click through a page, get a reusable keyword' },
       { to: '/docs/mobile/responsive', label: 'Mobile web', note: 'Responsiveness, devices, touch and permissions' },
       { to: '/docs/extending/python-plugins', label: 'Extending Browser', note: 'Plugins, JavaScript, and using Browser from your own library' },
       { to: '/docs/operations/node-process', label: 'Running it', note: 'The Node process and its environment' },

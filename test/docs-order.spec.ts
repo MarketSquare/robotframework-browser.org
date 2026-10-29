@@ -41,7 +41,7 @@ const pages = readdirSync(DOCS, { withFileTypes: true })
   )
 
 /** The sections, in the order app/pages/docs/[...slug].vue declares them. */
-const SECTIONS = ['start', 'concepts', 'mobile', 'extending', 'operations']
+const SECTIONS = ['start', 'concepts', 'recording', 'mobile', 'extending', 'operations']
 
 describe('every docs page is placed', () => {
   it('found the pages', () => expect(pages.length).toBeGreaterThan(10))
