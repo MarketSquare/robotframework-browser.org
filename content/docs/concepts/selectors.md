@@ -41,12 +41,16 @@ rows:
     - The visible text is the thing you actually mean, and the app is
       single-language.
   - - "4"
+    - label=
+    - A form field, or a widget with an `aria-label`, has no role and name to
+      reach it by, but a label the user reads.
+  - - "5"
     - id=
     - You know the id is contractual, not incidental.
-  - - "5"
+  - - "6"
     - css=
     - None of the above identify the element.
-  - - "6"
+  - - "7"
     - xpath=
     - Genuinely nothing else can select it.
 ---
@@ -169,7 +173,58 @@ whitespace**: edges trimmed and internal runs collapsed, so `"Sign in"` still
 matches `<p> Sign in </p>`. The regex form is the exception — it runs
 against the raw text, so `text=/^Sign in$/i` will not match a padded node.
 
-### 4. `id=` — less stable than it looks
+### 4. `label=` — the label a user reads
+
+Form fields are usually found by their label, and so can a selector be. `label=`
+does what Playwright's `getByLabel` does: it finds the element a label belongs
+to.
+
+```robot-repl
+Fill Text    label=Email address    jane@example.com
+Fill Text    label=Customer's name    Jane
+Check Checkbox    label="I agree"
+```
+
+An element counts as labelled by:
+
+- a `<label for="…">` pointing at it, or a `<label>` wrapping it;
+- the elements named in its `aria-labelledby`;
+- its `aria-label`, which also labels elements that are no form field, such as
+  a `<div aria-label="Map">` widget.
+
+The value is matched like `text=`:
+
+::doc-table
+---
+head:
+  - Selector
+  - Matches a label
+nowrap:
+  - 0
+rows:
+  - - "`label=Email`"
+    - containing `email`, in any case
+  - - "`label=\"Email\"i`"
+    - the same, written quoted
+  - - "`label=\"Email\"`"
+    - exactly `Email`, case and all
+  - - "`label=/^e-?mail/i`"
+    - matching the regular expression
+---
+::
+
+Whitespace is normalised in every form but the regular expression. An unquoted
+value may contain quotes — `label=Customer's name` — just like an unquoted
+`text=`. `label=` is a step of its own in a chain, `css=form >> label=Email`;
+it is not understood inside Playwright's nested selectors such as
+`internal:has="…"`.
+
+`label=` ranks right after `text=`: like it, it is what the user reads, and like
+it, it is a translation away from failing once the app is localised. Where an
+element has both a role and a label, `role=textbox[name="Email"]` says more about
+what it is; where it has no role, `label=` is the readable way to reach it.
+
+### 5. `id=` — less stable than it looks
 
 ```robot-repl
 Click    id=submit-button
@@ -187,7 +242,7 @@ these particular ids are contractual.
 escaped as `\#submit-button`, or written as `id=submit-button`.
 ::
 
-### 5. `css=` — acceptable, not preferable
+### 6. `css=` — acceptable, not preferable
 
 ```robot-repl
 Click    button.toggle:has-text("DARK")   #button with the class "toggle" that contains the text "DARK"
@@ -210,7 +265,7 @@ CSS is the implicit default: a selector that is not obviously something else is 
 CSS is way more powerful than many realise. It can select by attribute, by position, by relationship, and even by text content. See [CSS Basics and Advanced](#css-basics-and-advanced) for a full reference.
 ::
 
-### 6. `xpath=` — the last resort
+### 7. `xpath=` — the last resort
 
 ```robot-repl
 Click    xpath=//button[contains(@class, "toggle") and contains(text(), 'DARK')]
@@ -306,61 +361,11 @@ rows:
 All three behave identically. Pick the one your application emits and stay with
 it.
 
-### Also available: `label=` — the label a user reads
-
-Form fields are usually found by their label, and so can a selector be. `label=`
-does what Playwright's `getByLabel` does: it finds the element a label belongs
-to.
-
-```robot-repl
-Fill Text    label=Email address    jane@example.com
-Fill Text    label=Customer's name    Jane
-Check Checkbox    label="I agree"
-```
-
-An element counts as labelled by:
-
-- a `<label for="…">` pointing at it, or a `<label>` wrapping it;
-- the elements named in its `aria-labelledby`;
-- its `aria-label`, which also labels elements that are no form field, such as
-  a `<div aria-label="Map">` widget.
-
-The value is matched like `text=`:
-
-::doc-table
----
-head:
-  - Selector
-  - Matches a label
-nowrap:
-  - 0
-rows:
-  - - "`label=Email`"
-    - containing `email`, in any case
-  - - "`label=\"Email\"i`"
-    - the same, written quoted
-  - - "`label=\"Email\"`"
-    - exactly `Email`, case and all
-  - - "`label=/^e-?mail/i`"
-    - matching the regular expression
----
-::
-
-Whitespace is normalised in every form but the regular expression. An unquoted
-value may contain quotes — `label=Customer's name` — just like an unquoted
-`text=`. `label=` is a step of its own in a chain, `css=form >> label=Email`;
-it is not understood inside Playwright's nested selectors such as
-`internal:has="…"`.
-
-`label=` ranks with `role=` and `text=`: it is what the user reads. Where an
-element has both a role and a label, `role=textbox[name="Email"]` says more about
-what it is; where it has no role, `label=` is the readable way to reach it.
-
 ## How a strategy is used
 
 You can always be explicit with a `strategy=value` prefix. Spaces around the
-separator are ignored by `css=`, `xpath=` and `text=`, so `css=foo`, `css= foo`
-and `css = foo` are equivalent. They are **not** ignored by `id=` or the
+separator are ignored by `css=`, `xpath=`, `text=` and `label=`, so `css=foo`,
+`css= foo` and `css = foo` are equivalent. They are **not** ignored by `id=` or the
 test-id engines: the space becomes part of the value, so `id = save` silently
 matches nothing.
 
