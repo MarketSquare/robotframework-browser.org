@@ -141,6 +141,8 @@ rows:
   - ['Text without a role', '`text=/^\s*Plain\s+text\s*$/` — the whole text, exactly']
   - ['One of several similar elements', '`… >> nth=1`, or `div:has-text("Card one")`']
   - ['Inside an iframe', '`#frame >>> role=button[name*="Pay"i]`']
+  - ['Two or more frames deep', '`>>> #inner >>> role=button[name*="Pay"i]` — in whichever frame it is']
+  - ['A widget known only by its label', '`label="Map"i` — from `aria-label`, `aria-labelledby` or a `<label>`']
 ---
 ::
 
@@ -151,15 +153,9 @@ still finds it tomorrow depends on the page: a name with a counter in it, like
 selector, or make the changing part an [argument](/docs/recording/arguments#selectors).
 
 ::doc-note
-Two forms have no public equivalent yet, so they stay in Playwright-internal
-syntax. They work, and the toolbar says so — but such syntax may change with a
-Playwright upgrade:
-
-- An element without a role, found by its `aria-label` or `aria-labelledby` — a
-  `<div aria-label="Map">` widget, say — is recorded as `internal:label="Map"i`.
-  Prefer a test id there if you can add one.
-- An element two or more frames deep may start with `internal:control=any-frame`:
-  Playwright shortens the frame path to the innermost frames it needs.
+Rarely, a selector has no public form — an attribute with an empty value, say. It
+stays in Playwright-internal syntax, which works but may change with a Playwright
+upgrade, and the toolbar says so.
 ::
 
 ## Values are written exactly
