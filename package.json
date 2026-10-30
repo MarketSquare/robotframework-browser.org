@@ -2,7 +2,7 @@
   "name": "robotframework-browser-org",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.22.0+sha512.1ff870c4c6133dfd88fb2afc46dd13d47f09c9794b438c6fdb47ca98caf3bc16381ee0be93a091b8e3824cf01f889f46d7d9e20910fb0be1ab0fb5baa80dd621",
+  "packageManager": "pnpm@12.16.1+sha512.091d1dee7927575661b25dab3c2ae31cafc1c54d6b71ed6a6600cf0c1cb10434a447eae14015f1b23e2e6bedeed79df94a932e2164d2832280dce3fb32f656d1",
   "scripts": {
     "dev": "nuxt dev",
     "build": "pnpm libdoc && nuxt build",
@@ -25,23 +25,23 @@
     "devices": "node scripts/build-devices.ts"
   },
   "dependencies": {
-    "@nuxt/content": "^3.15.2",
-    "nuxt": "^4.5.2",
-    "shiki": "^4.4.2",
-    "vue": "^3.5.41",
-    "vue-router": "^5.2.0"
+    "@nuxt/content": "^3.16.2",
+    "nuxt": "^4.6.3",
+    "shiki": "^4.5.0",
+    "vue": "^3.5.44",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "^4.1.0",
-    "@types/sanitize-html": "^2.16.1",
-    "@vitejs/plugin-vue": "^6.0.8",
-    "@vue/test-utils": "^2.4.11",
+    "@nuxt/test-utils": "^4.3.4",
+    "@types/sanitize-html": "^2.16.2",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/test-utils": "^2.5.1",
     "better-sqlite3": "^13.0.3",
-    "happy-dom": "^20.11.2",
-    "nuxt-studio": "^1.7.0",
-    "playwright-core": "^1.62.1",
-    "sanitize-html": "^2.17.6",
-    "vitest": "^4.1.10",
-    "yaml": "^2.9.0"
+    "happy-dom": "^21.0.4",
+    "nuxt-studio": "^1.8.0",
+    "playwright-core": "^1.64.1",
+    "sanitize-html": "^2.18.1",
+    "vitest": "^5.0.5",
+    "yaml": "^2.9.1"
   }
 }
