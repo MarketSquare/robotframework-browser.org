@@ -78,11 +78,6 @@ const onSamePage = useSamePageNav()
 /** On-this-page, from the headings themselves. See app/utils/toc.ts. */
 const toc = computed(() => tocFromBody(doc.value?.body?.value as MarkNode[] | undefined))
 
-useHead(() => ({
-  title: `${rendered.value?.title} — Robot Framework Browser`,
-  meta: [{ name: 'description', content: rendered.value?.description ?? '' }],
-}))
-
 /*
  * The renderer gets the document exactly as it is on disk.
  *
@@ -96,6 +91,15 @@ useHead(() => ({
  * reads it.
  */
 const rendered = computed(() => resolveTokens(doc.value))
+
+/*
+ * Must come after `rendered`: on a client-side navigation unhead calls this
+ * during setup, and reading a `const` above its declaration throws.
+ */
+useHead(() => ({
+  title: `${rendered.value?.title} — Robot Framework Browser`,
+  meta: [{ name: 'description', content: rendered.value?.description ?? '' }],
+}))
 </script>
 
 <template>
