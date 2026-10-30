@@ -92,8 +92,14 @@ onMounted(() => {
   width: 100%;
   height: auto;
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   background: var(--panel);
+}
+
+@supports (corner-shape: bevel) {
+  .video-media {
+    corner-shape: bevel;
+  }
 }
 
 .video-caption:empty {
