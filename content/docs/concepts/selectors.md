@@ -306,6 +306,56 @@ rows:
 All three behave identically. Pick the one your application emits and stay with
 it.
 
+### Also available: `label=` — the label a user reads
+
+Form fields are usually found by their label, and so can a selector be. `label=`
+does what Playwright's `getByLabel` does: it finds the element a label belongs
+to.
+
+```robot-repl
+Fill Text    label=Email address    jane@example.com
+Fill Text    label=Customer's name    Jane
+Check Checkbox    label="I agree"
+```
+
+An element counts as labelled by:
+
+- a `<label for="…">` pointing at it, or a `<label>` wrapping it;
+- the elements named in its `aria-labelledby`;
+- its `aria-label`, which also labels elements that are no form field, such as
+  a `<div aria-label="Map">` widget.
+
+The value is matched like `text=`:
+
+::doc-table
+---
+head:
+  - Selector
+  - Matches a label
+nowrap:
+  - 0
+rows:
+  - - "`label=Email`"
+    - containing `email`, in any case
+  - - "`label=\"Email\"i`"
+    - the same, written quoted
+  - - "`label=\"Email\"`"
+    - exactly `Email`, case and all
+  - - "`label=/^e-?mail/i`"
+    - matching the regular expression
+---
+::
+
+Whitespace is normalised in every form but the regular expression. An unquoted
+value may contain quotes — `label=Customer's name` — just like an unquoted
+`text=`. `label=` is a step of its own in a chain, `css=form >> label=Email`;
+it is not understood inside Playwright's nested selectors such as
+`internal:has="…"`.
+
+`label=` ranks with `role=` and `text=`: it is what the user reads. Where an
+element has both a role and a label, `role=textbox[name="Email"]` says more about
+what it is; where it has no role, `label=` is the readable way to reach it.
+
 ## How a strategy is used
 
 You can always be explicit with a `strategy=value` prefix. Spaces around the
@@ -576,9 +626,27 @@ No context switching, and no switching back afterwards — the frame boundary is
 just another step in the chain.
 
 Two rules it is easy to trip over. `>>>` must have **spaces around it**: written
-as `a>>>b` it is parsed as ordinary CSS and you get a timeout with no
-explanation. And the clause immediately before it must select the `<iframe>`
-element itself — under strict mode, exactly one of them.
+as `a>>>b` it is read as `a >> >b`, an ordinary chain with a child combinator,
+and you get a timeout with no explanation. And the clause immediately before it
+must select the `<iframe>` element itself — under strict mode, exactly one of
+them. A `>>>` inside quoted text, `text="Next >>> page"`, is text.
+
+### Any frame: a leading `>>>`
+
+When the element sits in some frame and naming every frame around it adds
+nothing, start the selector with `>>>`. Browser then searches every frame of the
+page, the main frame included:
+
+```robot-repl
+Click       >>> role=button[name="Save"]        # a button in any frame
+Get Text    >>> iframe#preview >>> h1          # the frame preview, wherever it is
+```
+
+The rest of the selector must match inside a single frame. If it matches
+elements in several frames, the keyword fails — also with strict mode off, and
+also in keywords that count or list, such as `Get Element Count`. With a selector
+prefix set, the prefix comes first and `>>>` enters the frame it selects; a
+prefix of only `>>>` makes every following selector search all frames.
 
 ## Shadow DOM
 
@@ -675,6 +743,8 @@ the value is already an ordinary selector, so it needs no strategy in front of i
 - `text=` is fine until you localise.
 - `css=` is acceptable; `id=` is less stable than it looks.
 - `xpath=` last, and never by document position.
+- `label=` reaches form fields the way a user does.
 - Two obvious selectors chained with `>>` beat one clever one.
+- `>>>` crosses into a frame; a leading `>>>` searches all of them.
 - `nth=` and `visible=` are filters, not strategies: they narrow the step
   before them, and their order in a chain changes the answer.
