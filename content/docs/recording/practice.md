@@ -92,7 +92,7 @@ head: [You see, Because, Do]
 rows:
   - ['`Recording needs a visible browser, but the active browser runs headless.`', 'The browser was opened headless, the default.', 'Open it with `New Browser` and `headless=False` before the page.']
   - ['No toolbar appears', 'The page belongs to another browser context than the active one.', '`Switch Context` to the context you want to record, then start again.']
-  - ['Clicks are not recorded', '*Pick locator* is on in Playwright''s toolbar — the recorder shows a banner.', 'Switch *Pick locator* off.']
+  - ['Clicks are not recorded', 'The toolbar is picking a selector — its panel replaces the Keyword Calls.', '*Use* or *Cancel* the pick; recording goes on.']
   - ['A navigation has no `Go To`', 'It followed a click, fill or key press within five seconds; it belongs to that action.', 'Nothing — the recorded click navigates when the keyword runs.']
   - ['The name is rejected', 'It exists in the file, was recorded in this session, shadows a keyword the suite can call, or is not a valid name.', 'Choose another name; the dialog says which rule it broke.']
   - ['The recording ended by itself', 'Nothing happened for `idle_timeout`.', 'Raise `idle_timeout`; what was recorded is saved.']

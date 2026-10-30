@@ -17,7 +17,7 @@ minimized toolbar's *Start* and *Save*.
 
 ## Reading the toolbar
 
-::doc-figure{src="/images/recorder/toolbar-recording.png" alt="The recorder toolbar recording Register At The Shop: three Keyword Calls with the keywords in teal, values in beige and the argument user in orange, the argument list showing user with its default, and the buttons Discard, Undo and Pause."}
+::doc-figure{src="/images/recorder/toolbar-recording.png" alt="The recorder toolbar recording Register At The Shop, with the button Pick in its header: three Keyword Calls with the keywords in teal, values in beige and the argument user in orange, the argument list showing user with its default, and the buttons Discard, Undo and Pause."}
 The header names the keyword being recorded and counts its Keyword Calls.
 ::
 
@@ -62,6 +62,7 @@ rows:
   - ['**Undo**', 'Body, recording', 'Removes the Keyword Calls of the last action — all of them, for an action that produced several, like a download.']
   - ['**⏸** / **▶ Resume**', 'Body, recording', 'Pauses the recording: nothing you do is recorded until *Resume*. Use it to set something up by hand in the middle of a keyword.']
   - ['**Discard**', 'Body, recording', 'Drops the keyword, also from the file. `Record Keyword` starts it again empty; `Record Keywords` returns to idle.']
+  - ['**Pick**', 'Header, recording', 'Picks an element on the page and adds its selector to the keyword as a comment — see [Picking a selector](#picking-a-selector).']
   - ['**–** / **+**', 'Header', 'Minimizes the toolbar to its header, or expands it.']
   - ['**Start** / **Save**', 'Header, minimized', 'The main action stays one click away while the toolbar is small.']
   - ['**✕**', 'Header', 'Ends the session. The keyword being recorded is saved.']
@@ -96,6 +97,31 @@ check that the toolbar lists what you expect before you go on.
 
 *Discard* throws the whole keyword away. In `Record Keywords` the session goes on,
 idle, so you can start the keyword again from a better starting point.
+
+### Picking a selector
+
+Some selectors are not for a click: an element the keyword should check or wait
+for later. **Pick** gets one without leaving the recording. The Keyword Calls
+make way for the panel of [Record Selector](/docs/recording/selectors) — Playwright's
+or a CSS selector, editable, with its count on the page — and nothing you do is
+recorded while it is open.
+
+- **Use** adds the selector to the keyword as a comment, ready for the line you
+  write by hand later. *Undo* removes it like a Keyword Call.
+- **Cancel** returns to recording without it.
+
+```robot
+*** Keywords ***
+Log In
+    Fill Text    role=textbox[name*="username"i]    demo
+    # Picked Selector    role=heading[name*="Welcome"i]
+```
+
+Recording goes on either way. Playwright's own *Pick locator* opens the same
+panel; while the toolbar is idle, it asks you to start a keyword first.
+Minimized, the header offers *Reselect* and *Use* once an element is picked and
+*Cancel* throughout; *Save*, *Discard*, *Undo* and *Pause* wait until the pick is
+used or cancelled.
 
 ## Naming keywords
 
@@ -161,5 +187,5 @@ the page. It cannot be hidden, and two of its tools are useful:
   [Assertions](/docs/recording/what-gets-recorded#assertions);
 - its **Record** button ends the session, like ✕.
 
-*Pick locator* switches Playwright's recorder off while it is active. The toolbar
-says so with a banner; nothing is recorded until you switch it off again.
+Its *Pick locator* opens the toolbar's own picker — see
+[Picking a selector](#picking-a-selector).

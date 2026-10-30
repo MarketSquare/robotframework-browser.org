@@ -186,8 +186,8 @@ Make it an argument without a default, so the keyword never holds a secret — s
 
 - **Hovering.** Playwright does not report it. Add `Hover` by hand where a menu
   needs it.
-- **Anything while *Pick locator* is on** in Playwright's toolbar. The recorder
-  shows a banner for as long as it is.
+- **Anything while the toolbar picks a selector** with *Pick* in the toolbar or *Pick
+  locator* in Playwright's — see [Picking a selector](/docs/recording/toolbar#picking-a-selector).
 - **Actions a later Playwright version adds.** Every action Playwright reports
   today has a Browser keyword. One without names itself in a notice; the keyword
   stays as it was.

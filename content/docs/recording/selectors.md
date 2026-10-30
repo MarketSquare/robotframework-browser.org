@@ -31,7 +31,7 @@ header showing the label you passed — `Login button` above — so you know wha
 
 ## The selector
 
-::doc-figure{src="/images/recorder/selector-picked.png" alt="The Record Selector toolbar for Login button: the buttons Playwright and CSS with Playwright chosen, the selector role=button[name*=&quot;login&quot;i] in colour, 1 match below it, and the buttons Highlight, Reselect and Use."}
+::doc-figure{src="/images/recorder/selector-picked.png" alt="The Record Selector toolbar for Login button: the buttons Playwright and CSS with Playwright chosen, the selector role=button[name*=&quot;login&quot;i] in colour, 1 match below it, and the buttons Highlight (an icon, switched on), Reselect and Use."}
 The picked login button, with Playwright's selector and one match on the page.
 ::
 
@@ -47,9 +47,15 @@ After the pick the toolbar shows the selector and counts the elements it finds:
 Switching between them keeps the picked element; start with the other one using
 `generator=css`. The selector is editable: shorten it, or drop a part that will
 change, and the count below follows as you type — one match is what most keywords
-need, several are shown as a warning, none as an error. *Highlight* marks the
-matches on the page, *Reselect* picks another element, and *Use* returns what is
-in the field, whatever it matches.
+need, several are shown as a warning, none as an error. Playwright highlights the
+matches on the page, and follows an edit once you pause typing; the dashed square
+before *Reselect* switches that highlight off and on. *Reselect* picks another
+element, and *Use* returns what is in the field, whatever it matches. Minimized,
+the header offers *Reselect* and *Use* too.
+
+The same panel picks a selector in the middle of a recording: *Pick* in the
+toolbar of `Record Keyword` adds it to the keyword as a comment — see
+[Picking a selector](/docs/recording/toolbar#picking-a-selector).
 
 ## Ending
 

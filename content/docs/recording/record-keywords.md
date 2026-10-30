@@ -1,15 +1,15 @@
 ---
 title: Recording keywords
 description: Click through the page and get a reusable user keyword, written into your suite while you work. Record Keyword and Record Keywords in five minutes.
-section: recording
 order: 1
+section: recording
 ---
 
 :since{version="20.7.0"} You click through the page; Browser writes what you did as a
 **user keyword** into your suite file — live, while you click, ready to call from any
 test.
 
-::doc-video{src="/videos/recorder/quick-start.mp4" poster="/videos/recorder/quick-start.jpg" alt="A browser shows robotframework-browser.org. The recorder toolbar sits in the bottom right corner. The pointer opens Keywords, types Get Text into the search field and opens the Get Text keyword; with every click a new Keyword Call appears in the toolbar. Finally the toolbar's close button ends the recording."}
+::doc-video{alt="A browser shows robotframework-browser.org. The recorder toolbar sits in the bottom right corner. The pointer opens Keywords, types Get Text into the search field and opens the Get Text keyword; with every click a new Keyword Call appears in the toolbar. Finally the toolbar's close button ends the recording." poster="/videos/recorder/quick-start.jpg" src="/videos/recorder/quick-start.mp4"}
 `Record Keyword` with the name `Find The Get Text Keyword` — three clicks and a search become four
 Keyword Calls.
 ::
@@ -25,12 +25,12 @@ the steps of one of them.
 That changes how you use it:
 
 - **You name the keyword while you record**, so it reads like your test design —
-  `Add Product To Cart`, not `Test 17`.
+`Add Product To Cart`, not `Test 17`.
 - **It starts where your test stands.** The setup is code you already have; the
-  recording begins after it.
+recording begins after it.
 - **Wrong steps are undone in place.** Click the wrong thing, press *Undo*, carry on.
 - **Values become arguments** with a click, so the keyword is reusable from the
-  first run — see [Keyword arguments](/docs/recording/arguments).
+first run — see [Keyword arguments](/docs/recording/arguments).
 
 ## Your first recording
 
@@ -54,13 +54,25 @@ Keyword Call the moment you make it:
 
 ::doc-table
 ---
-head: ['#', 'You do in the page', 'Recorded as']
-nowrap: [0]
+head:
+  - '#'
+  - You do in the page
+  - Recorded as
+nowrap:
+  - 0
 rows:
-  - ['1', 'Click *Keywords* in the header', '`Click` on the *Keywords* link']
-  - ['2', 'Click the search field', '`Click` on the search field']
-  - ['3', 'Type `Get Text`', '`Fill Text` with `Get Text`']
-  - ['4', 'Click *Get Text* in the keyword list', '`Click` on that entry']
+  - - '1'
+    - Click *Keywords* in the header
+    - '`Click` on the *Keywords* link'
+  - - '2'
+    - Click the search field
+    - '`Click` on the search field'
+  - - '3'
+    - Type `Get Text`
+    - '`Fill Text` with `Get Text`'
+  - - '4'
+    - Click *Get Text* in the keyword list
+    - '`Click` on that entry'
 ---
 ::
 
@@ -81,7 +93,13 @@ Find The Get Text Keyword
 The same happens on any page. A login on [car.keyword-driven.de](http://car.keyword-driven.de),
 recorded live — every click and every field becomes a Keyword Call the moment it happens:
 
-::doc-video{src="/videos/recorder/loop-login.mp4" poster="/videos/recorder/loop-login.jpg" alt="A login form. The pointer types demo as user name and secret as password and clicks login; the recorder toolbar next to the form lists Click, Fill Text, Click, Fill Text and Click as they happen." :controls="false"}
+::doc-video
+---
+alt: A login form. The pointer types demo as user name and secret as password and clicks login; the recorder toolbar next to the form lists Click, Fill Text, Click, Fill Text and Click as they happen.
+poster: /videos/recorder/loop-login.jpg
+src: /videos/recorder/loop-login.mp4
+controls: false
+---
 Five Keyword Calls in eight seconds: the toolbar shows each one as it is written.
 ::
 
@@ -95,11 +113,19 @@ reviewed yet — read them before you commit, as described in
 
 ::doc-table
 ---
-head: [Keyword, Records, Ends with]
-nowrap: [0]
+head:
+  - Keyword
+  - Records
+  - Ends with
+nowrap:
+  - 0
 rows:
-  - ['`Record Keyword` with a name', 'Exactly one keyword, named in the call. The toolbar records from the first moment.', '✕ in the toolbar']
-  - ['`Record Keywords`', 'Any number of keywords. Each is named and started in the toolbar, then saved; in between nothing is recorded, so you can move to the next starting point.', '✕ in the toolbar']
+  - - '`Record Keyword` with a name'
+    - Exactly one keyword, named in the call. The toolbar records from the first moment.
+    - ✕ in the toolbar
+  - - '`Record Keywords`'
+    - Any number of keywords. Each is named and started in the toolbar, then saved; in between nothing is recorded, so you can move to the next starting point.
+    - ✕ in the toolbar
 ---
 ::
 
@@ -117,20 +143,24 @@ Record Keywords    ${CURDIR}/shop.resource
 
 ## In this chapter
 
-:::card-grid
-::card{title="The toolbar" to="/docs/recording/toolbar"}
-Starting, saving, undoing and ending; naming rules; moving the toolbar out of the way.
+::card-grid
+  :::card{title="The toolbar" to="/docs/recording/toolbar"}
+  Starting, saving, undoing and ending; naming rules; moving the toolbar out of the way.
+  :::
+
+  :::card{title="Arguments" to="/docs/recording/arguments"}
+  Turn a typed value, a URL or part of a selector into an argument, with or without default.
+  :::
+
+  :::card{title="What gets recorded" to="/docs/recording/what-gets-recorded"}
+  Which Browser keyword each action becomes, popups, dialogs, downloads, uploads and assertions.
+  :::
+
+  :::card{title="Target files" to="/docs/recording/files"}
+  The suite file, a resource file, or only the log — and what the recorder never touches.
+  :::
+
+  :::card{title="Practice and limits" to="/docs/recording/practice"}
+  How to get keywords worth keeping, what the recorder cannot do, and what to do when it goes wrong.
+  :::
 ::
-::card{title="Arguments" to="/docs/recording/arguments"}
-Turn a typed value, a URL or part of a selector into an argument, with or without default.
-::
-::card{title="What gets recorded" to="/docs/recording/what-gets-recorded"}
-Which Browser keyword each action becomes, popups, dialogs, downloads, uploads and assertions.
-::
-::card{title="Target files" to="/docs/recording/files"}
-The suite file, a resource file, or only the log — and what the recorder never touches.
-::
-::card{title="Practice and limits" to="/docs/recording/practice"}
-How to get keywords worth keeping, what the recorder cannot do, and what to do when it goes wrong.
-::
-:::

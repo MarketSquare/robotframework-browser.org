@@ -25,37 +25,33 @@ Every project is different, and you should base your selector strategy on other 
 ::doc-table
 ---
 head:
-  - ""
+  - ''
   - Strategy
   - Reach for it when
 rows:
-  - - "1"
+  - - '1'
     - role=
-    - The element has a proper accessible role and name. This is the default
-      choice.
-  - - "2"
+    - The element has a proper accessible role and name. This is the default choice.
+  - - '2'
     - data-testid=
     - Stability matters more than testing the interface as a user meets it.
-  - - "3"
+  - - '3'
     - text=
-    - The visible text is the thing you actually mean, and the app is
-      single-language.
-  - - "4"
+    - The visible text is the thing you actually mean, and the app is single-language.
+  - - '4'
     - label=
-    - A form field, or a widget with an `aria-label`, has no role and name to
-      reach it by, but a label the user reads.
-  - - "5"
+    - A form field, or a widget with an `aria-label`, has no role and name to reach it by, but a label the user reads.
+  - - '5'
     - id=
     - You know the id is contractual, not incidental.
-  - - "6"
+  - - '6'
     - css=
     - None of the above identify the element.
-  - - "7"
+  - - '7'
     - xpath=
     - Genuinely nothing else can select it.
 ---
 ::
-
 
 ### Example: Our Landing Page
 
@@ -63,7 +59,7 @@ On our landing page, we have some buttons and links.
 
 One of them is a colour theme toggle, which is a button with a visible label and aria-label. It is the only button with that aria-label, so it is a perfect candidate for a `role=` selector. However, it also has a `data-testid` attribute, which is a good candidate for a `data-testid=` selector. The visible text is "DARK", which is a good candidate for a `text=` selector.
 
-::doc-figure{src="/images/color-toggle.png" alt="A toggle button labelled DARK in the top-right corner"}
+::doc-figure{alt="A toggle button labelled DARK in the top-right corner" src="/images/color-toggle.png"}
 Color toggle at top right
 ::
 
@@ -119,14 +115,14 @@ In that case, matching by substring or regex is a good compromise, e.g. `role=bu
 
 The following operators are available for matching the name:
 
-| Operator | Meaning | Example |
-| -------- | ------- | ------- |
-| `=` | exact match | `role=button[name="DARK-Mode colour theme. Activate to change."]` |
-| `*=` | contains substring | `role=button[name*="Activ"]` |
-| `^=` | starts with string | `role=button[name^="DARK"]` |
-| `$=` | ends with string | `role=button[name$="Activate to change."]` |
-| `~=` | contains one whole word | `role=button[name~="Activate"]` |
-| `\|=` | contains hyphenated word | `role=button[name\|="DARK"]` |
+| Operator | Meaning                  | Example                                                           |
+| -------- | ------------------------ | ----------------------------------------------------------------- |
+| `=`      | exact match              | `role=button[name="DARK-Mode colour theme. Activate to change."]` |
+| `*=`     | contains substring       | `role=button[name*="Activ"]`                                      |
+| `^=`     | starts with string       | `role=button[name^="DARK"]`                                       |
+| `$=`     | ends with string         | `role=button[name$="Activate to change."]`                        |
+| `~=`     | contains one whole word  | `role=button[name~="Activate"]`                                   |
+| `\|=`    | contains hyphenated word | `role=button[name\|="DARK"]`                                      |
 
 Regex is also supported when the expected text is surrounded by slashes,
 e.g. `role=button[name=/^(DARK|LIGHT|CONTRAST|AUTO)-Mode colour theme/]` matches the aria-label as a regex, case-sensitively.
@@ -190,7 +186,7 @@ An element counts as labelled by:
 - a `<label for="…">` pointing at it, or a `<label>` wrapping it;
 - the elements named in its `aria-labelledby`;
 - its `aria-label`, which also labels elements that are no form field, such as
-  a `<div aria-label="Map">` widget.
+a `<div aria-label="Map">` widget.
 
 The value is matched like `text=`:
 
@@ -199,17 +195,17 @@ The value is matched like `text=`:
 head:
   - Selector
   - Matches a label
+rows:
+  - - '`label=Email`'
+    - containing `email`, in any case
+  - - '`label="Email"i`'
+    - the same, written quoted
+  - - '`label="Email"`'
+    - exactly `Email`, case and all
+  - - '`label=/^e-?mail/i`'
+    - matching the regular expression
 nowrap:
   - 0
-rows:
-  - - "`label=Email`"
-    - containing `email`, in any case
-  - - "`label=\"Email\"i`"
-    - the same, written quoted
-  - - "`label=\"Email\"`"
-    - exactly `Email`, case and all
-  - - "`label=/^e-?mail/i`"
-    - matching the regular expression
 ---
 ::
 
@@ -346,15 +342,15 @@ the markup, not by preference:
 head:
   - Prefix
   - Matches
+rows:
+  - - '`data-testid=`'
+    - '`data-testid` — Playwright''s own default, and the most common in the wild'
+  - - '`data-test-id=`'
+    - '`data-test-id`'
+  - - '`data-test=`'
+    - '`data-test`'
 nowrap:
   - 0
-rows:
-  - - "`data-testid=`"
-    - "`data-testid` — Playwright's own default, and the most common in the wild"
-  - - "`data-test-id=`"
-    - "`data-test-id`"
-  - - "`data-test=`"
-    - "`data-test`"
 ---
 ::
 
@@ -444,15 +440,15 @@ head:
   - Kind
   - Does
   - Examples
-nowrap:
-  - 0
 rows:
   - - Strategy
     - Finds elements in the page
-    - "`css=`, `xpath=`, `text=`, `role=`, `id=`"
+    - '`css=`, `xpath=`, `text=`, `role=`, `id=`'
   - - Filter
     - Narrows what the step before it found
-    - "`nth=`, `visible=`"
+    - '`nth=`, `visible=`'
+nowrap:
+  - 0
 ---
 ::
 
@@ -538,10 +534,8 @@ filters, because they still describe *which* element you want:
 head:
   - Pseudo-class
   - Matches
-nowrap:
-  - 0
 rows:
-  - - "`:has(sel)`"
+  - - '`:has(sel)`'
     - An element that contains something matching `sel`
   - - '`:has-text("x")`'
     - An element containing that text anywhere inside it, case-insensitive
@@ -551,12 +545,14 @@ rows:
     - The smallest element whose text is exactly that
   - - '`:text-matches("re")`'
     - Text matching a regular expression
-  - - "`:visible`"
+  - - '`:visible`'
     - Only elements that are visible
-  - - "`:is(a, b)`"
+  - - '`:is(a, b)`'
     - An element matching *any* of the listed selectors
-  - - "`:nth-match(sel, n)`"
+  - - '`:nth-match(sel, n)`'
     - The n-th match, one-based, across the whole query
+nowrap:
+  - 0
 ---
 ::
 
@@ -752,4 +748,4 @@ the value is already an ordinary selector, so it needs no strategy in front of i
 - Two obvious selectors chained with `>>` beat one clever one.
 - `>>>` crosses into a frame; a leading `>>>` searches all of them.
 - `nth=` and `visible=` are filters, not strategies: they narrow the step
-  before them, and their order in a chain changes the answer.
+before them, and their order in a chain changes the answer.
