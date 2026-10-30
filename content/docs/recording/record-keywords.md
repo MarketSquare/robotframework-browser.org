@@ -5,7 +5,7 @@ order: 1
 section: recording
 ---
 
-:since{version="20.7.0"} You click through the page; Browser writes what you did as a
+:since{version="21.0.0"} You click through the page; Browser writes what you did as a
 **user keyword** into your suite file — live, while you click, ready to call from any
 test.
 
