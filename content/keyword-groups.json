@@ -18,6 +18,7 @@
     { "module": "pdf.py",                  "name": "PDF" },
     { "module": "device_descriptors.py",   "name": "Devices" },
     { "module": "crawling.py",             "name": "Crawling" },
+    { "module": "recorder.py",             "name": "Recorder" },
     { "module": "strict_mode.py",          "name": "Strict Mode" },
     { "module": "assertion_formatter.py",  "name": "Assertion Formatter" },
     { "module": "runonfailure.py",         "name": "Run On Failure" }
