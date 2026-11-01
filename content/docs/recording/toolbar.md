@@ -48,7 +48,7 @@ Idle: nothing is recorded until *Record keyword*.
    first; the test continues with the next line.
 
 `Record Keyword` skips step 1 — the name comes from the call — and records from
-the first moment; *✕* ends it.
+the first moment; *Save* or *✕* saves the keyword and ends the session.
 
 ## The buttons
 
@@ -58,13 +58,13 @@ head: [Button, Where, Does]
 nowrap: [0, 1]
 rows:
   - ['**Record keyword**', 'Body, idle', 'Names and starts the next keyword. `Record Keywords` only.']
-  - ['**Save** ✓', 'Body, recording', 'Saves the keyword and returns to idle. `Record Keywords` only.']
+  - ['**Save** ✓', 'Body, recording', 'Saves the keyword. `Record Keywords` returns to idle; `Record Keyword` ends the session.']
   - ['**Undo**', 'Body, recording', 'Removes the Keyword Calls of the last action — all of them, for an action that produced several, like a download.']
   - ['**⏸** / **▶ Resume**', 'Body, recording', 'Pauses the recording: nothing you do is recorded until *Resume*. Use it to set something up by hand in the middle of a keyword.']
   - ['**Discard**', 'Body, recording', 'Drops the keyword, also from the file. `Record Keyword` starts it again empty; `Record Keywords` returns to idle.']
   - ['**Pick**', 'Header, recording', 'Picks an element on the page and adds its selector to the keyword as a comment — see [Picking a selector](#picking-a-selector).']
   - ['**–** / **+**', 'Header', 'Minimizes the toolbar to its header, or expands it.']
-  - ['**Start** / **Save**', 'Header, minimized', 'The main action stays one click away while the toolbar is small.']
+  - ['**Start** / **Save**', 'Header, minimized', 'The main action stays one click away while the toolbar is small. *Start* is for `Record Keywords` only.']
   - ['**✕**', 'Header', 'Ends the session. The keyword being recorded is saved.']
 ---
 ::
@@ -117,8 +117,10 @@ Log In
     # Picked Selector    role=heading[name*="Welcome"i]
 ```
 
-Recording goes on either way. Playwright's own *Pick locator* opens the same
-panel; while the toolbar is idle, it asks you to start a keyword first.
+Recording goes on either way. The pick works in the tab whose toolbar you
+pressed it in. Playwright's own *Pick locator* opens the same panel, in the tab
+you last clicked in; while the toolbar is idle, it asks you to start a keyword
+first.
 Minimized, the header offers *Reselect* and *Use* once an element is picked and
 *Cancel* throughout; *Save*, *Discard*, *Undo* and *Pause* wait until the pick is
 used or cancelled.
@@ -143,7 +145,7 @@ Name keywords after what they do for the test — `Add Product To Cart`,
 ---
 head: [What ends it, The keyword being recorded]
 rows:
-  - ['**✕** in the toolbar', 'Saved']
+  - ['**✕** in the toolbar, or *Save* in `Record Keyword`', 'Saved']
   - ['Playwright''s **Record** button (the red circle at the top centre)', 'Saved']
   - ['No action and no toolbar command for `idle_timeout` (default 5 minutes)', 'Saved']
   - ['All pages of the context closed, or the context itself', 'Saved']
@@ -169,7 +171,9 @@ Minimized and idle: *Start* names the next keyword.
 ::
 
 Typing in the toolbar never reaches the page: its shortcuts and type-ahead do not
-fire while you name a keyword. A modal dialog of the page — one that disables
+fire while you name a keyword. Nor is anything you do in the toolbar recorded — a
+resize released over the page, or keys pressed after a click on the toolbar's
+text. A modal dialog of the page — one that disables
 clicks outside itself, traps the focus or closes on a click outside — does not
 block the toolbar either, and using the toolbar does not close it.
 

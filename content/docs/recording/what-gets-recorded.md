@@ -22,7 +22,7 @@ rows:
   - ['Tick or untick a checkbox', '`Check Checkbox` / `Uncheck Checkbox`']
   - ['Choose in a `<select>`', '`Select Options By` with `value` and the chosen options']
   - ['Navigate by URL or bookmark', '`Go To` with the URL']
-  - ['Close a tab', '`Close Page`']
+  - ['Close a tab', '`Close Page` — see [Working in several tabs](#working-in-several-tabs)']
 ---
 ::
 
@@ -53,6 +53,27 @@ them together with the action.
 Click    role=link[name="Open in new tab"s]
 Switch Page    NEW
 ```
+
+### Working in several tabs
+
+The recorder knows which tab every action happens in. When the next action is in
+another tab than the last one, it switches there first. `Switch Page` returns the
+id of the tab it leaves, so the keyword can come back to it; the recorder
+assigns that id to a variable once an action needs it:
+
+```robot-repl
+Click    role=link[name="Open in new tab"s]
+${page}=    Switch Page    NEW
+Fill Text    role=textbox[name*="Search"i]    shoes
+Switch Page    ${page}
+Click    role=button[name="Save"s]
+```
+
+Closing the active tab becomes `Close Page`; Browser then returns to the tab
+before it. Closing another tab closes it by its id: `Close Page` with `${page}`.
+A tab that was already open when the recording started, or that you opened by
+hand, has no id the keyword knows: an action there is recorded without a switch,
+and the toolbar says so.
 
 **An alert, confirm or prompt** gets its handler before the click that opens it.
 Playwright does not report whether you accepted it, so the recorder accepts:

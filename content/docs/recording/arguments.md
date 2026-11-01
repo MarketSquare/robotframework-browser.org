@@ -87,7 +87,7 @@ Open A Docs Chapter
 ```
 
 ```robot-repl
-Open A Docs Chapter    Selectors
+Open A Docs Chapter    Finding elements
 Open A Docs Chapter    chapter=Waiting and promises
 ```
 

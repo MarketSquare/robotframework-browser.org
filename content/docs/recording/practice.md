@@ -77,6 +77,13 @@ Log In
   the session and cannot be hidden.
 - **Native modal dialogs** (`showModal()`) make the toolbar inert until they are
   closed. Other modals — the usual `div` with a backdrop — do not.
+- **Tabs without an id.** A tab that was open before the recording started, or
+  that you opened by hand, cannot be switched to by the keyword; an action there
+  is recorded without `Switch Page`.
+- **A few pages show no toolbar.** A page whose Content-Security-Policy allows
+  only the Trusted Types policies it names, and a document without a body, such
+  as an SVG file. Pages that forbid inline styles or require Trusted Types —
+  YouTube, Google sign-in — work.
 - **The page can see the toolbar.** Scripts on the pages of the context can read
   what is recorded and send toolbar commands. Record against applications you
   trust, and review the result.
@@ -92,6 +99,7 @@ head: [You see, Because, Do]
 rows:
   - ['`Recording needs a visible browser, but the active browser runs headless.`', 'The browser was opened headless, the default.', 'Open it with `New Browser` and `headless=False` before the page.']
   - ['No toolbar appears', 'The page belongs to another browser context than the active one.', '`Switch Context` to the context you want to record, then start again.']
+  - ['No toolbar on one page only', 'Its Content-Security-Policy allows only the Trusted Types policies it names, or it is no HTML document, such as an SVG file.', 'Record the steps on another page, or write them by hand.']
   - ['Clicks are not recorded', 'The toolbar is picking a selector — its panel replaces the Keyword Calls.', '*Use* or *Cancel* the pick; recording goes on.']
   - ['A navigation has no `Go To`', 'It followed a click, fill or key press within five seconds; it belongs to that action.', 'Nothing — the recorded click navigates when the keyword runs.']
   - ['The name is rejected', 'It exists in the file, was recorded in this session, shadows a keyword the suite can call, or is not a valid name.', 'Choose another name; the dialog says which rule it broke.']
