@@ -25,33 +25,33 @@ Every project is different, and you should base your selector strategy on other 
 ::doc-table
 ---
 head:
-  - ""
+  - ''
   - Strategy
   - Reach for it when
 rows:
-  - - "1"
+  - - '1'
     - role=
-    - The element has a proper accessible role and name. This is the default
-      choice.
-  - - "2"
+    - The element has a proper accessible role and name. This is the default choice.
+  - - '2'
     - data-testid=
     - Stability matters more than testing the interface as a user meets it.
-  - - "3"
+  - - '3'
     - text=
-    - The visible text is the thing you actually mean, and the app is
-      single-language.
-  - - "4"
+    - The visible text is the thing you actually mean, and the app is single-language.
+  - - '4'
+    - label=
+    - A form field, or a widget with an `aria-label`, has no role and name to reach it by, but a label the user reads.
+  - - '5'
     - id=
     - You know the id is contractual, not incidental.
-  - - "5"
+  - - '6'
     - css=
     - None of the above identify the element.
-  - - "6"
+  - - '7'
     - xpath=
     - Genuinely nothing else can select it.
 ---
 ::
-
 
 ### Example: Our Landing Page
 
@@ -59,7 +59,7 @@ On our landing page, we have some buttons and links.
 
 One of them is a colour theme toggle, which is a button with a visible label and aria-label. It is the only button with that aria-label, so it is a perfect candidate for a `role=` selector. However, it also has a `data-testid` attribute, which is a good candidate for a `data-testid=` selector. The visible text is "DARK", which is a good candidate for a `text=` selector.
 
-::doc-figure{src="/images/color-toggle.png" alt="A toggle button labelled DARK in the top-right corner"}
+::doc-figure{alt="A toggle button labelled DARK in the top-right corner" src="/images/color-toggle.png"}
 Color toggle at top right
 ::
 
@@ -115,14 +115,14 @@ In that case, matching by substring or regex is a good compromise, e.g. `role=bu
 
 The following operators are available for matching the name:
 
-| Operator | Meaning | Example |
-| -------- | ------- | ------- |
-| `=` | exact match | `role=button[name="DARK-Mode colour theme. Activate to change."]` |
-| `*=` | contains substring | `role=button[name*="Activ"]` |
-| `^=` | starts with string | `role=button[name^="DARK"]` |
-| `$=` | ends with string | `role=button[name$="Activate to change."]` |
-| `~=` | contains one whole word | `role=button[name~="Activate"]` |
-| `\|=` | contains hyphenated word | `role=button[name\|="DARK"]` |
+| Operator | Meaning                  | Example                                                           |
+| -------- | ------------------------ | ----------------------------------------------------------------- |
+| `=`      | exact match              | `role=button[name="DARK-Mode colour theme. Activate to change."]` |
+| `*=`     | contains substring       | `role=button[name*="Activ"]`                                      |
+| `^=`     | starts with string       | `role=button[name^="DARK"]`                                       |
+| `$=`     | ends with string         | `role=button[name$="Activate to change."]`                        |
+| `~=`     | contains one whole word  | `role=button[name~="Activate"]`                                   |
+| `\|=`    | contains hyphenated word | `role=button[name\|="DARK"]`                                      |
 
 Regex is also supported when the expected text is surrounded by slashes,
 e.g. `role=button[name=/^(DARK|LIGHT|CONTRAST|AUTO)-Mode colour theme/]` matches the aria-label as a regex, case-sensitively.
@@ -169,7 +169,58 @@ whitespace**: edges trimmed and internal runs collapsed, so `"Sign in"` still
 matches `<p> Sign in </p>`. The regex form is the exception — it runs
 against the raw text, so `text=/^Sign in$/i` will not match a padded node.
 
-### 4. `id=` — less stable than it looks
+### 4. `label=` — the label a user reads
+
+Form fields are usually found by their label, and so can a selector be. `label=`
+does what Playwright's `getByLabel` does: it finds the element a label belongs
+to.
+
+```robot-repl
+Fill Text    label=Email address    jane@example.com
+Fill Text    label=Customer's name    Jane
+Check Checkbox    label="I agree"
+```
+
+An element counts as labelled by:
+
+- a `<label for="…">` pointing at it, or a `<label>` wrapping it;
+- the elements named in its `aria-labelledby`;
+- its `aria-label`, which also labels elements that are no form field, such as
+a `<div aria-label="Map">` widget.
+
+The value is matched like `text=`:
+
+::doc-table
+---
+head:
+  - Selector
+  - Matches a label
+rows:
+  - - '`label=Email`'
+    - containing `email`, in any case
+  - - '`label="Email"i`'
+    - the same, written quoted
+  - - '`label="Email"`'
+    - exactly `Email`, case and all
+  - - '`label=/^e-?mail/i`'
+    - matching the regular expression
+nowrap:
+  - 0
+---
+::
+
+Whitespace is normalised in every form but the regular expression. An unquoted
+value may contain quotes — `label=Customer's name` — just like an unquoted
+`text=`. `label=` is a step of its own in a chain, `css=form >> label=Email`;
+it is not understood inside Playwright's nested selectors such as
+`internal:has="…"`.
+
+`label=` ranks right after `text=`: like it, it is what the user reads, and like
+it, it is a translation away from failing once the app is localised. Where an
+element has both a role and a label, `role=textbox[name="Email"]` says more about
+what it is; where it has no role, `label=` is the readable way to reach it.
+
+### 5. `id=` — less stable than it looks
 
 ```robot-repl
 Click    id=submit-button
@@ -187,7 +238,7 @@ these particular ids are contractual.
 escaped as `\#submit-button`, or written as `id=submit-button`.
 ::
 
-### 5. `css=` — acceptable, not preferable
+### 6. `css=` — acceptable, not preferable
 
 ```robot-repl
 Click    button.toggle:has-text("DARK")   #button with the class "toggle" that contains the text "DARK"
@@ -210,7 +261,7 @@ CSS is the implicit default: a selector that is not obviously something else is 
 CSS is way more powerful than many realise. It can select by attribute, by position, by relationship, and even by text content. See [CSS Basics and Advanced](#css-basics-and-advanced) for a full reference.
 ::
 
-### 6. `xpath=` — the last resort
+### 7. `xpath=` — the last resort
 
 ```robot-repl
 Click    xpath=//button[contains(@class, "toggle") and contains(text(), 'DARK')]
@@ -291,15 +342,15 @@ the markup, not by preference:
 head:
   - Prefix
   - Matches
+rows:
+  - - '`data-testid=`'
+    - '`data-testid` — Playwright''s own default, and the most common in the wild'
+  - - '`data-test-id=`'
+    - '`data-test-id`'
+  - - '`data-test=`'
+    - '`data-test`'
 nowrap:
   - 0
-rows:
-  - - "`data-testid=`"
-    - "`data-testid` — Playwright's own default, and the most common in the wild"
-  - - "`data-test-id=`"
-    - "`data-test-id`"
-  - - "`data-test=`"
-    - "`data-test`"
 ---
 ::
 
@@ -309,8 +360,8 @@ it.
 ## How a strategy is used
 
 You can always be explicit with a `strategy=value` prefix. Spaces around the
-separator are ignored by `css=`, `xpath=` and `text=`, so `css=foo`, `css= foo`
-and `css = foo` are equivalent. They are **not** ignored by `id=` or the
+separator are ignored by `css=`, `xpath=`, `text=` and `label=`, so `css=foo`,
+`css= foo` and `css = foo` are equivalent. They are **not** ignored by `id=` or the
 test-id engines: the space becomes part of the value, so `id = save` silently
 matches nothing.
 
@@ -389,15 +440,15 @@ head:
   - Kind
   - Does
   - Examples
-nowrap:
-  - 0
 rows:
   - - Strategy
     - Finds elements in the page
-    - "`css=`, `xpath=`, `text=`, `role=`, `id=`"
+    - '`css=`, `xpath=`, `text=`, `role=`, `id=`'
   - - Filter
     - Narrows what the step before it found
-    - "`nth=`, `visible=`"
+    - '`nth=`, `visible=`'
+nowrap:
+  - 0
 ---
 ::
 
@@ -483,10 +534,8 @@ filters, because they still describe *which* element you want:
 head:
   - Pseudo-class
   - Matches
-nowrap:
-  - 0
 rows:
-  - - "`:has(sel)`"
+  - - '`:has(sel)`'
     - An element that contains something matching `sel`
   - - '`:has-text("x")`'
     - An element containing that text anywhere inside it, case-insensitive
@@ -496,12 +545,14 @@ rows:
     - The smallest element whose text is exactly that
   - - '`:text-matches("re")`'
     - Text matching a regular expression
-  - - "`:visible`"
+  - - '`:visible`'
     - Only elements that are visible
-  - - "`:is(a, b)`"
+  - - '`:is(a, b)`'
     - An element matching *any* of the listed selectors
-  - - "`:nth-match(sel, n)`"
+  - - '`:nth-match(sel, n)`'
     - The n-th match, one-based, across the whole query
+nowrap:
+  - 0
 ---
 ::
 
@@ -576,9 +627,27 @@ No context switching, and no switching back afterwards — the frame boundary is
 just another step in the chain.
 
 Two rules it is easy to trip over. `>>>` must have **spaces around it**: written
-as `a>>>b` it is parsed as ordinary CSS and you get a timeout with no
-explanation. And the clause immediately before it must select the `<iframe>`
-element itself — under strict mode, exactly one of them.
+as `a>>>b` it is read as `a >> >b`, an ordinary chain with a child combinator,
+and you get a timeout with no explanation. And the clause immediately before it
+must select the `<iframe>` element itself — under strict mode, exactly one of
+them. A `>>>` inside quoted text, `text="Next >>> page"`, is text.
+
+### Any frame: a leading `>>>`
+
+When the element sits in some frame and naming every frame around it adds
+nothing, start the selector with `>>>`. Browser then searches every frame of the
+page, the main frame included:
+
+```robot-repl
+Click       >>> role=button[name="Save"]        # a button in any frame
+Get Text    >>> iframe#preview >>> h1          # the frame preview, wherever it is
+```
+
+The rest of the selector must match inside a single frame. If it matches
+elements in several frames, the keyword fails — also with strict mode off, and
+also in keywords that count or list, such as `Get Element Count`. With a selector
+prefix set, the prefix comes first and `>>>` enters the frame it selects; a
+prefix of only `>>>` makes every following selector search all frames.
 
 ## Shadow DOM
 
@@ -675,6 +744,8 @@ the value is already an ordinary selector, so it needs no strategy in front of i
 - `text=` is fine until you localise.
 - `css=` is acceptable; `id=` is less stable than it looks.
 - `xpath=` last, and never by document position.
+- `label=` reaches form fields the way a user does.
 - Two obvious selectors chained with `>>` beat one clever one.
+- `>>>` crosses into a frame; a leading `>>>` searches all of them.
 - `nth=` and `visible=` are filters, not strategies: they narrow the step
-  before them, and their order in a chain changes the answer.
+before them, and their order in a chain changes the answer.

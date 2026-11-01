@@ -49,6 +49,13 @@ const props = defineProps<{
   display: block;
   max-width: 100%;
   height: auto;
+  border-radius: var(--radius);
+}
+
+@supports (corner-shape: bevel) {
+  .figure-img {
+    corner-shape: bevel;
+  }
 }
 
 /* An empty caption (image-only usage) leaves no stray gap. */

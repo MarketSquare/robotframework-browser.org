@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Create account</title>
+<style>
+  body { margin: 0; font: 15px/1.4 system-ui, sans-serif; background: #f4f4f1; color: #1d1d1b; }
+  form { width: 320px; margin: 40px 0 0 60px; padding: 24px; background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgb(0 0 0 / 10%); }
+  h1 { margin: 0 0 16px; font-size: 22px; }
+  label { display: block; margin: 10px 0 4px; font-weight: 600; font-size: 13px; }
+  input { box-sizing: border-box; width: 100%; padding: 8px 10px; border: 1px solid #c8c8c2; border-radius: 6px; font: inherit; }
+  button { margin-top: 18px; width: 100%; padding: 10px; border: 0; border-radius: 6px; background: #1a7f37; color: #fff; font: inherit; font-weight: 600; }
+</style>
+</head>
+<body>
+<form onsubmit="event.preventDefault()">
+  <h1>Create account</h1>
+  <label for="email">Email</label>
+  <input id="email" type="email">
+  <label for="email-confirm">Confirm email</label>
+  <input id="email-confirm" type="email">
+  <label for="password">Password</label>
+  <input id="password" type="password">
+  <label for="password-confirm">Confirm password</label>
+  <input id="password-confirm" type="password">
+  <button>Create account</button>
+</form>
+</body>
+</html>
