@@ -68,9 +68,14 @@ if (referencing.length) {
   failed = true
 }
 
-const heavyKb = Math.round(heavy.reduce((n, f) => n + statSync(join(DIR, f)).size, 0) / 1024)
+const heavyBytes = heavy.reduce((n, f) => n + statSync(join(DIR, f)).size, 0)
+const heavyKb = Math.round(heavyBytes / 1024)
 const kb = Math.round(total / 1024)
-const shipped = kb - heavyKb
+/*
+ * From the bytes, not `kb - heavyKb`: subtracting two rounded numbers can read
+ * 1 KB high, which is how Browser 21.0.0 failed at 410 while measuring 409.3.
+ */
+const shipped = Math.round((total - heavyBytes) / 1024)
 
 console.log(
   `client JS: ${kb} KB across ${chunks.length} chunks ` +
