@@ -1,8 +1,8 @@
 {
-  "stars": 658,
-  "releases": 191,
-  "contributors": 208,
-  "fetched": "2026-10-04",
+  "stars": 661,
+  "releases": 192,
+  "contributors": 211,
+  "fetched": "2026-11-01",
   "sources": {
     "stars": "https://github.com/MarketSquare/robotframework-browser",
     "releases": "https://pypi.org/project/robotframework-browser/"
