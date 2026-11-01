@@ -1,6 +1,7 @@
 {
-  "browser": "20.6.0",
+  "browser": "21.0.0",
   "documented": [
+    "21.0.0",
     "20.6.0",
     "20.4.0",
     "20.3.0",
@@ -16,11 +17,11 @@
     "19.12.5",
     "19.12.4"
   ],
-  "browserMinor": "20.6",
-  "browserMajor": "20",
-  "playwright": "1.63.0",
-  "node": "24.21.0",
-  "playwrightBundled": "1.63.0",
-  "playwrightDockerImage": "mcr.microsoft.com/playwright:v1.63.0-noble",
-  "playwrightDocker": "1.63.0"
+  "browserMinor": "21.0",
+  "browserMajor": "21",
+  "playwright": "1.64.1",
+  "node": "26.13.0",
+  "playwrightBundled": "1.64.1",
+  "playwrightDockerImage": "mcr.microsoft.com/playwright:v1.64.1-noble",
+  "playwrightDocker": "1.64.1"
 }

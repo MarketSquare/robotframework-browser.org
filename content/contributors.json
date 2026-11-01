@@ -1,7 +1,7 @@
 {
   "source": ".all-contributorsrc, maintained by the all-contributors bot",
-  "generated": "2026-10-04",
-  "total": 208,
+  "generated": "2026-11-01",
+  "total": 211,
   "core": [
     {
       "login": "aaltat",
@@ -1317,11 +1317,13 @@
       "avatar": "/avatars/d-biehl.jpg",
       "profile": "https://www.imbus.de",
       "ways": [
+        "code",
         "report"
       ],
       "contributions": [
         "bug",
-        "ideas"
+        "ideas",
+        "code"
       ]
     },
     {
@@ -2650,6 +2652,42 @@
       ],
       "contributions": [
         "bug"
+      ]
+    },
+    {
+      "login": "wesleyke2",
+      "name": "wesleyke2",
+      "avatar": "/avatars/wesleyke2.jpg",
+      "profile": "https://github.com/wesleyke2",
+      "ways": [
+        "report"
+      ],
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "ShryukGrandhi",
+      "name": "ShryukGrandhi",
+      "avatar": "/avatars/ShryukGrandhi.png",
+      "profile": "https://github.com/ShryukGrandhi",
+      "ways": [
+        "code"
+      ],
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Checkmk",
+      "name": "Checkmk",
+      "avatar": "/avatars/Checkmk.png",
+      "profile": "https://checkmk.com",
+      "ways": [
+        "support"
+      ],
+      "contributions": [
+        "financial"
       ]
     }
   ]
