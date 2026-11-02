@@ -46,6 +46,7 @@ const rendered = computed(() => resolveTokens(doc.value))
 useHead(() => ({
   title: `${rendered.value?.title} — Robot Framework Browser`,
   meta: [{ name: 'description', content: rendered.value?.tagline ?? '' }],
+  link: markdownAlternate(doc.value?.path),
 }))
 </script>
 

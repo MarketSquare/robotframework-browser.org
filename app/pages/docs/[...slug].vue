@@ -2,9 +2,8 @@
 /**
  * The Docs shell: sidebar, prev/next, on-this-page.
  *
- * Chapters and their order live here rather than in each file's frontmatter,
- * because ordering is a property of the whole set — deriving it from a number
- * in every file means renumbering several files to insert one page.
+ * Chapters and their order live in app/utils/doc-sections.ts rather than in
+ * each file's frontmatter, because ordering is a property of the whole set.
  */
 const route = useRoute()
 
@@ -15,15 +14,8 @@ const route = useRoute()
  */
 const path = computed(() => `/docs/${(route.params.slug as string[]).filter(Boolean).join('/')}`)
 
-/** Chapter order and display names. */
-const SECTIONS: { id: string; name: string }[] = [
-  { id: 'start', name: 'Getting started' },
-  { id: 'concepts', name: 'Core concepts' },
-  { id: 'recording', name: 'Recording keywords' },
-  { id: 'mobile', name: 'Mobile web' },
-  { id: 'extending', name: 'Extending Browser' },
-  { id: 'operations', name: 'Running it' },
-]
+/** Chapter order and display names; see app/utils/doc-sections.ts. */
+const SECTIONS = DOC_SECTIONS
 
 const { data: doc } = await useAsyncData(`doc-${path.value}`, async () => {
   // Server, plus the client in dev — see app/utils/content-guard.md
@@ -99,6 +91,7 @@ const rendered = computed(() => resolveTokens(doc.value))
 useHead(() => ({
   title: `${rendered.value?.title} — Robot Framework Browser`,
   meta: [{ name: 'description', content: rendered.value?.description ?? '' }],
+  link: markdownAlternate(doc.value?.path),
 }))
 </script>
 

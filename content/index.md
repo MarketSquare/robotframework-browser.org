@@ -150,6 +150,14 @@ sessions:
 
 Next: the [getting-started guide](/docs/start/getting-started), or the
 [keyword reference](/keywords).
+
+Writing your tests with an AI assistant? This site is also published for
+language models: [llms.txt](https://robotframework-browser.org/llms.txt) lists
+every page as Markdown,
+[llms-full.txt](https://robotframework-browser.org/llms-full.txt) holds all the
+docs in one file, and
+[keywords.md](https://robotframework-browser.org/keywords.md) the complete
+keyword reference. Point your assistant there.
 ::::
 
 ::::page-section{label="Community" title="Use. Benefit. Contribute." last}
