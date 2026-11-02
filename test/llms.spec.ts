@@ -7,7 +7,11 @@ import type { LibdocSpec } from '../lib/libdoc'
 
 const ROOT = process.cwd()
 const OUT = join(ROOT, '.output/public')
-const built = existsSync(join(OUT, 'llms.txt'))
+/*
+ * Built means the site was generated, not that llms.txt exists: a build that
+ * lost llms.txt must fail these tests, not skip them.
+ */
+const built = existsSync(join(OUT, 'index.html'))
 
 describe('keyword reference as Markdown', () => {
   const latest = readFileSync(join(ROOT, 'content/libdoc/LATEST'), 'utf8').trim()
@@ -70,6 +74,8 @@ describe.skipIf(!built)('prerendered LLM exports', () => {
     const md = read(file)
     expect(md).not.toMatch(/%%\w+%%/)
     expect(md).not.toContain('LLMRAWBLOCK')
+    // Read on its own, a file has no base URL: every link must be absolute.
+    expect(md.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '')).not.toMatch(/\]\((\/(?!\/)|#)/)
     // Component tags, which the exports rewrite into Markdown.
     expect(md.replace(/```[\s\S]*?```/g, '')).not.toMatch(/<\/?[a-z]+-[a-z-]+[ >]/)
   })

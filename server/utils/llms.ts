@@ -17,7 +17,7 @@ import { queryCollection } from '@nuxt/content/server'
 import type { MinimarkNode } from 'minimark'
 import { stringify } from 'minimark/stringify'
 
-import { RawBlocks, simplify } from './llms-components'
+import { RawBlocks, absoluteUrl, simplify } from './llms-components'
 
 import { DOC_SECTIONS } from '../../app/utils/doc-sections'
 import { resolveTokens } from '../../app/utils/version-tokens'
@@ -135,9 +135,11 @@ function releaseFacts(doc: Record<string, unknown>): MinimarkNode[] {
  */
 export async function documentMarkdown({ collection, doc }: Doc): Promise<string> {
   const resolved = resolveTokens(doc) as typeof doc & Record<string, unknown>
+  const url = `${SITE}${pageUrl(collection, resolved)}`
   const raw = new RawBlocks()
   const body = await simplify(resolved.body.value as MinimarkNode[], {
     raw,
+    pageUrl: url,
     example: async path => (await useStorage('assets:examples').getItem<string>(path)) ?? null,
   })
 
@@ -145,26 +147,22 @@ export async function documentMarkdown({ collection, doc }: Doc): Promise<string
   if ((body[0] as unknown[] | undefined)?.[0] !== 'h1') head.push(['h1', {}, String(resolved.title)])
   const description = summary(collection, resolved)
   if (description) head.push(['blockquote', {}, description])
-  const url = `${SITE}${pageUrl(collection, resolved)}`
   head.push(['p', {}, 'Source: ', ['a', { href: url }, url]])
   if (collection === 'releases') head.push(...releaseFacts(resolved))
 
-  const markdown = stringify({ type: 'minimark', value: [...head, ...body].map(absoluteLinks) }, { format: 'markdown/html' })
+  const value = [...head, ...body].map(node => absoluteLinks(node, url))
+  const markdown = stringify({ type: 'minimark', value }, { format: 'markdown/html' })
   return raw.splice(markdown).replace(/\n{3,}/g, '\n\n')
 }
 
-/**
- * `/docs/x` → `https://robotframework-browser.org/docs/x`, in links and media.
- * A Markdown file read on its own — pasted into a chat, fetched by an agent —
- * has no base URL to resolve a site-relative link against.
- */
-function absoluteLinks(node: MinimarkNode): MinimarkNode {
+/** `absoluteUrl` (llms-components.ts) over every link and media source in a node. */
+function absoluteLinks(node: MinimarkNode, url: string): MinimarkNode {
   if (typeof node === 'string') return node
   const [tag, props, ...children] = node
   const fixed: Record<string, unknown> = { ...props }
   for (const key of ['href', 'src', 'to', 'poster']) {
     const v = fixed[key]
-    if (typeof v === 'string' && v.startsWith('/') && !v.startsWith('//')) fixed[key] = `${SITE}${v}`
+    if (typeof v === 'string') fixed[key] = absoluteUrl(v, url)
   }
-  return [tag, fixed, ...children.map(absoluteLinks)] as MinimarkNode
+  return [tag, fixed, ...children.map(c => absoluteLinks(c, url))] as MinimarkNode
 }

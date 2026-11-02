@@ -36,6 +36,28 @@ export class RawBlocks {
   }
 }
 
+/**
+ * Makes a site-relative link absolute, against the page's HTML URL.
+ *
+ * `/docs/x` gets the site's origin: a Markdown file read on its own — pasted
+ * into a chat, fetched by an agent — has no base URL to resolve it against.
+ * `#start` gets the page itself: the exports do not keep the HTML's anchor ids
+ * (a `page-section`'s `id` becomes a plain heading), and in `llms-full.txt`
+ * one document's `#x` would otherwise point into whichever document has it.
+ */
+export function absoluteUrl(href: string, pageUrl: string): string {
+  if (href.startsWith('#') || (href.startsWith('/') && !href.startsWith('//'))) return new URL(href, pageUrl).href
+  return href
+}
+
+/** `absoluteUrl` over every `[text](link)` in Markdown, leaving code spans alone. */
+export function absoluteMarkdownLinks(markdown: string, pageUrl: string): string {
+  return markdown
+    .split(/(`[^`]*`)/)
+    .map((part, i) => (i % 2 ? part : part.replace(/\]\(([^)\s]+)\)/g, (_, href: string) => `](${absoluteUrl(href, pageUrl)})`)))
+    .join('')
+}
+
 /** Reads a prop given inline (`kind="note"`) or as YAML block props (`:rows` holds JSON). */
 function prop<T>(props: Props, name: string): T | undefined {
   if (props[name] !== undefined) return props[name] as T
@@ -114,6 +136,8 @@ const NOTE_LABEL: Record<string, string> = { note: 'Note', warning: 'Watch out',
 
 export interface SimplifyContext {
   raw: RawBlocks
+  /** The page's HTML URL, which links in props are resolved against. */
+  pageUrl: string
   /** An example source by its path under examples/, for `::comparison`. */
   example: (path: string) => Promise<string | null>
 }
@@ -135,7 +159,11 @@ async function simplifyNode(node: MinimarkNode, ctx: SimplifyContext): Promise<M
       return [['blockquote', {}, ['p', {}, ['strong', {}, `${NOTE_LABEL[prop<string>(props, 'kind') ?? 'note'] ?? 'Note'}:`]], ...await inner()]]
 
     case 'doc-table':
-      return [ctx.raw.add(table(prop<unknown[]>(props, 'head') ?? [], prop<unknown[][]>(props, 'rows') ?? []))]
+      // Cells are Markdown that bypasses the node walk in llms.ts, so their links are fixed here.
+      return [ctx.raw.add(absoluteMarkdownLinks(
+        table(prop<unknown[]>(props, 'head') ?? [], prop<unknown[][]>(props, 'rows') ?? []),
+        ctx.pageUrl,
+      ))]
 
     case 'terminal-block':
       return [ctx.raw.add(terminal(prop<TerminalSession[]>(props, 'sessions') ?? [], prop<string>(props, 'title')))]
