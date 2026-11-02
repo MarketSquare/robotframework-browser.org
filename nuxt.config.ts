@@ -41,6 +41,23 @@ const releaseRoutes = readdirSync('content/releases')
  */
 const keywordRoutes = (VERSIONS.documented as unknown as string[]).map(v => `/keywords/${v}`)
 
+/*
+ * The Markdown twin of every page a reader can reach, `/raw/<path>.md`, which
+ * `/llms.txt` links to (server/utils/llms.ts). Nothing links to them from the
+ * HTML, so the crawler would never find them. Read from the same directories
+ * as the collections in content.config.ts — `gallery` is left out with the
+ * styleguide it feeds.
+ */
+function markdownFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true, recursive: true })
+    .filter(e => e.isFile() && e.name.endsWith('.md'))
+    .map(e => `${e.parentPath}/${e.name}`.replace(/^content\//, '').replace(/\.md$/, ''))
+}
+const rawRoutes = [
+  ...readdirSync('content').filter(f => f.endsWith('.md')).map(f => f.replace(/\.md$/, '')),
+  ...['docs', 'why', 'releases'].flatMap(d => markdownFiles(`content/${d}`)),
+].map(p => `/raw/${p}.md`)
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-08-08',
   /*
@@ -48,7 +65,39 @@ export default defineNuxtConfig({
    * mounted by the dev server. Dev only on purpose: it is an authoring tool,
    * and the deployed site is a static build with no editing surface.
    */
-  modules: ['@nuxt/content', ...(process.env.NODE_ENV === 'production' ? [] : ['nuxt-studio'])],
+  modules: ['@nuxt/content', 'nuxt-llms', ...(process.env.NODE_ENV === 'production' ? [] : ['nuxt-studio'])],
+
+  /*
+   * Nuxt Content's own llms.txt integration is off: it prints `%%browser%%`
+   * unresolved, lists the docs out of reading order and serves the styleguide
+   * demos. server/plugins/llms.ts and server/routes/raw/ replace it.
+   */
+  content: { llms: false },
+
+  /*
+   * `/llms.txt` and `/llms-full.txt` (https://llmstxt.org). nuxt-llms owns the
+   * two routes and the header below; the sections are filled in by
+   * server/plugins/llms.ts, in docs reading order.
+   */
+  llms: {
+    domain: 'https://robotframework-browser.org',
+    title: 'Robot Framework Browser',
+    description:
+      'Browser is a Robot Framework library for web testing and browser automation, powered by Playwright. '
+      + 'It drives Chromium, Firefox and WebKit, waits automatically, and builds assertions into the keywords '
+      + 'that read from the page.',
+    notes: [
+      `These pages describe Browser ${VERSIONS.browser}, tested against Playwright ${VERSIONS.playwright}. Install with \`pip install "robotframework-browser[bb]"\` and \`rfbrowser install\` (Node.js bundled), or \`pip install robotframework-browser\` and \`rfbrowser init\` with your own Node.js.`,
+      'Every link above is the Markdown of a page; the "Source" line at its top is the same page as HTML.',
+      'Keyword documentation for older versions is at https://robotframework-browser.org/keywords/<version>, e.g. /keywords/20.6.0.',
+      'Source code and issues: https://github.com/MarketSquare/robotframework-browser.',
+    ],
+    full: {
+      title: 'Robot Framework Browser — full documentation',
+      description: 'The landing page, every docs page in reading order and the comparisons, as one Markdown document.',
+    },
+    sections: [],
+  },
 
   devtools: { enabled: false },
 
@@ -68,9 +117,14 @@ export default defineNuxtConfig({
   // Static output for GitHub Pages. No server, no runtime API.
   ssr: true,
   nitro: {
+    /* The libdoc JSON for `/keywords.md`, and the comparison sources `::comparison` shows. */
+    serverAssets: [
+      { baseName: 'libdoc', dir: '../content/libdoc' },
+      { baseName: 'examples', dir: '../examples' },
+    ],
     // 151 keyword + 81 type routes are discovered by crawling /keywords.
     preset: 'github-pages',
-    prerender: { crawlLinks: true, routes: ['/', ...releaseRoutes, ...keywordRoutes], failOnError: true },
+    prerender: { crawlLinks: true, routes: ['/', ...releaseRoutes, ...keywordRoutes, ...rawRoutes, '/keywords.md'], failOnError: true },
   },
 
   /*

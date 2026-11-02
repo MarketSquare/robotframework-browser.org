@@ -232,6 +232,8 @@ useHead({
       content: `All ${index.length} keywords and ${types.length} argument types in the Robot Framework Browser library, version ${version}.`,
     },
   ],
+  // Only the current release has a Markdown twin.
+  link: isLatest ? markdownAlternate('/keywords.md') : [],
 })
 </script>
 

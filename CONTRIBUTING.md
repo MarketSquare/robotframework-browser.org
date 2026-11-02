@@ -151,6 +151,35 @@ its `import.meta.server` guard — hoisting one out of the guard once took the
 bundle from 391 KB to 1050 KB. `pnpm check:bundle` fails the build if that
 happens again.
 
+## The site for language models
+
+Every build also publishes the site as Markdown, following
+[llmstxt.org](https://llmstxt.org):
+
+| URL | Is |
+|---|---|
+| `/llms.txt` | The index: every page with a one-line summary, docs in reading order |
+| `/llms-full.txt` | Landing page, all docs and the comparisons as one document |
+| `/raw/<path>.md` | Each page on its own, e.g. `/raw/docs/concepts/selectors.md` |
+| `/keywords.md` | The keyword reference of the current release |
+
+Every HTML page with a Markdown twin points to it with
+`<link rel="alternate" type="text/markdown">` (`app/utils/markdown-alternate.ts`),
+and the landing page names `llms.txt` in its prose, so crawlers that only read
+the HTML find it too.
+
+Nothing here needs maintaining by hand — a new page appears in all of them. The
+parts are `nuxt-llms` (the two `llms` routes, header and notes: the `llms`
+block in `nuxt.config.ts`), `server/plugins/llms.ts` (the sections),
+`server/utils/llms.ts` (page → Markdown) and `lib/libdoc-markdown.ts` (Libdoc
+JSON → Markdown). Nuxt Content's own llms integration is switched off, because
+it prints `%%browser%%` unresolved.
+
+**A new MDC component needs a line in `server/utils/llms-components.ts`** if its
+content lives in its props (a table, a terminal session) — otherwise only the
+prose inside it reaches the Markdown. `test/llms.spec.ts` fails on any
+component tag left in the built files.
+
 ## Layout
 
 | | |

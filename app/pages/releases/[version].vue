@@ -46,6 +46,7 @@ const isLatest = computed(() => sorted.value[0]?.version === version.value)
 useHead(() => ({
   title: `Browser ${version.value} release notes — Robot Framework Browser`,
   meta: [{ name: 'description', content: doc.value?.headline || `What changed in Browser ${version.value}.` }],
+  link: markdownAlternate(doc.value?.path),
 }))
 
 /*

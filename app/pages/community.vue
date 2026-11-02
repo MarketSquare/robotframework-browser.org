@@ -22,6 +22,7 @@ if (!doc.value) {
 useHead(() => ({
   title: `${doc.value?.title} — Robot Framework Browser`,
   meta: [{ name: 'description', content: doc.value?.description ?? '' }],
+  link: markdownAlternate('/community'),
 }))
 
 </script>
