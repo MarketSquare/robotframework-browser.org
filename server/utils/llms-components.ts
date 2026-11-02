@@ -15,6 +15,8 @@
  */
 import type { MinimarkNode } from 'minimark'
 
+import { absoluteMarkdownLinks } from './llms-links'
+
 import DEVICES from '../../app/generated/devices.json'
 import { resolveTokenString } from '../../app/utils/version-tokens'
 
@@ -25,37 +27,24 @@ type Props = Record<string, unknown>
 export class RawBlocks {
   private blocks: string[] = []
 
-  /** A paragraph holding only a token, which stringify leaves alone. */
+  /** `pageUrl`: the page's HTML URL, which links in the blocks are resolved against. */
+  constructor(private readonly pageUrl: string) {}
+
+  /**
+   * A paragraph holding only a token, which stringify leaves alone.
+   *
+   * The block's links are made absolute here, because it bypasses the node
+   * walk in llms.ts that does it for everything else — table cells, the notes
+   * under a comparison, whatever a future component builds.
+   */
   add(markdown: string): MinimarkNode {
-    this.blocks.push(markdown.trim())
+    this.blocks.push(absoluteMarkdownLinks(markdown.trim(), this.pageUrl))
     return ['p', {}, `LLMRAWBLOCK${this.blocks.length - 1}END`]
   }
 
   splice(markdown: string): string {
     return markdown.replace(/LLMRAWBLOCK(\d+)END/g, (_, i: string) => this.blocks[Number(i)]!)
   }
-}
-
-/**
- * Makes a site-relative link absolute, against the page's HTML URL.
- *
- * `/docs/x` gets the site's origin: a Markdown file read on its own — pasted
- * into a chat, fetched by an agent — has no base URL to resolve it against.
- * `#start` gets the page itself: the exports do not keep the HTML's anchor ids
- * (a `page-section`'s `id` becomes a plain heading), and in `llms-full.txt`
- * one document's `#x` would otherwise point into whichever document has it.
- */
-export function absoluteUrl(href: string, pageUrl: string): string {
-  if (href.startsWith('#') || (href.startsWith('/') && !href.startsWith('//'))) return new URL(href, pageUrl).href
-  return href
-}
-
-/** `absoluteUrl` over every `[text](link)` in Markdown, leaving code spans alone. */
-export function absoluteMarkdownLinks(markdown: string, pageUrl: string): string {
-  return markdown
-    .split(/(`[^`]*`)/)
-    .map((part, i) => (i % 2 ? part : part.replace(/\]\(([^)\s]+)\)/g, (_, href: string) => `](${absoluteUrl(href, pageUrl)})`)))
-    .join('')
 }
 
 /** Reads a prop given inline (`kind="note"`) or as YAML block props (`:rows` holds JSON). */
@@ -136,8 +125,6 @@ const NOTE_LABEL: Record<string, string> = { note: 'Note', warning: 'Watch out',
 
 export interface SimplifyContext {
   raw: RawBlocks
-  /** The page's HTML URL, which links in props are resolved against. */
-  pageUrl: string
   /** An example source by its path under examples/, for `::comparison`. */
   example: (path: string) => Promise<string | null>
 }
@@ -159,11 +146,7 @@ async function simplifyNode(node: MinimarkNode, ctx: SimplifyContext): Promise<M
       return [['blockquote', {}, ['p', {}, ['strong', {}, `${NOTE_LABEL[prop<string>(props, 'kind') ?? 'note'] ?? 'Note'}:`]], ...await inner()]]
 
     case 'doc-table':
-      // Cells are Markdown that bypasses the node walk in llms.ts, so their links are fixed here.
-      return [ctx.raw.add(absoluteMarkdownLinks(
-        table(prop<unknown[]>(props, 'head') ?? [], prop<unknown[][]>(props, 'rows') ?? []),
-        ctx.pageUrl,
-      ))]
+      return [ctx.raw.add(table(prop<unknown[]>(props, 'head') ?? [], prop<unknown[][]>(props, 'rows') ?? []))]
 
     case 'terminal-block':
       return [ctx.raw.add(terminal(prop<TerminalSession[]>(props, 'sessions') ?? [], prop<string>(props, 'title')))]

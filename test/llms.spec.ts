@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { demote, libdocToMarkdown } from '../lib/libdoc-markdown'
+import { absoluteMarkdownLinks, absoluteUrl } from '../server/utils/llms-links'
 import type { LibdocSpec } from '../lib/libdoc'
 
 const ROOT = process.cwd()
@@ -12,6 +13,16 @@ const OUT = join(ROOT, '.output/public')
  * lost llms.txt must fail these tests, not skip them.
  */
 const built = existsSync(join(OUT, 'index.html'))
+
+/** What a reader sees as text: code fences and code spans removed. */
+const prose = (md: string) => md.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '')
+
+/**
+ * A link a file read on its own cannot follow: a Markdown link, reference
+ * definition or HTML attribute whose target has no scheme. `//host` counts as
+ * absolute.
+ */
+const RELATIVE_LINK = /\]\((?![a-z][a-z0-9+.-]*:|\/\/)|^\[[^\]]+\]:\s*(?![a-z][a-z0-9+.-]*:|\/\/)|\b(?:href|src)="(?![a-z][a-z0-9+.-]*:|\/\/)/im
 
 describe('keyword reference as Markdown', () => {
   const latest = readFileSync(join(ROOT, 'content/libdoc/LATEST'), 'utf8').trim()
@@ -28,10 +39,9 @@ describe('keyword reference as Markdown', () => {
   })
 
   it('leaves no HTML and no in-page anchors behind', () => {
-    const prose = md.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '')
-    expect(prose).not.toMatch(/<(p|a|pre|table|code)[ >]/)
-    expect(prose).not.toMatch(/\]\(#/)
-    expect(prose).not.toContain('Comment >>')
+    expect(prose(md)).not.toMatch(/<(p|a|pre|table|code)[ >]/)
+    expect(prose(md)).not.toMatch(/\]\(#/)
+    expect(prose(md)).not.toContain('Comment >>')
   })
 
   it('marks named-only arguments, which a signature alone does not show', () => {
@@ -45,9 +55,50 @@ describe('demote', () => {
   })
 })
 
+describe('absolute links', () => {
+  const page = 'https://robotframework-browser.org/docs/start/installation'
+
+  it.each([
+    ['/docs/x', 'https://robotframework-browser.org/docs/x'],
+    ['#start', `${page}#start`],
+    ['../concepts/selectors', 'https://robotframework-browser.org/docs/concepts/selectors'],
+    ['getting-started', 'https://robotframework-browser.org/docs/start/getting-started'],
+    ['?q=1', `${page}?q=1`],
+    ['https://playwright.dev/', 'https://playwright.dev/'],
+    ['mailto:a@b.c', 'mailto:a@b.c'],
+    ['//cdn.example/x', '//cdn.example/x'],
+  ])('%s → %s', (href, expected) => {
+    expect(absoluteUrl(href, page)).toBe(expected)
+  })
+
+  it('rewrites Markdown links, keeping titles and leaving code alone', () => {
+    const md = '| [a](/x "T") | `[b](/y)` |\n\n```\n[c](/z)\n```'
+    expect(absoluteMarkdownLinks(md, page)).toBe(
+      '| [a](https://robotframework-browser.org/x "T") | `[b](/y)` |\n\n```\n[c](/z)\n```',
+    )
+  })
+
+  it('the export check catches every relative form', () => {
+    for (const bad of ['[a](/x)', '[a](#x)', '[a](../x)', '[a]: /x', '<a href="/x">', '<img src="x.png">']) {
+      expect(bad, bad).toMatch(RELATIVE_LINK)
+    }
+    for (const ok of ['[a](https://x.org/)', '[a](mailto:a@b.c)', '<a href="https://x.org">']) {
+      expect(ok, ok).not.toMatch(RELATIVE_LINK)
+    }
+  })
+})
+
 describe.skipIf(!built)('prerendered LLM exports', () => {
   const read = (p: string) => readFileSync(join(OUT, p), 'utf8')
-  const llms = built ? read('llms.txt') : ''
+  /*
+   * Read here only if it is there, so a build that lost llms.txt fails the
+   * test below with a clear message rather than the whole file at collection.
+   */
+  const llms = built && existsSync(join(OUT, 'llms.txt')) ? read('llms.txt') : ''
+
+  it('built llms.txt, llms-full.txt and keywords.md', () => {
+    for (const f of ['llms.txt', 'llms-full.txt', 'keywords.md']) expect(existsSync(join(OUT, f)), f).toBe(true)
+  })
   const links = [...llms.matchAll(/\]\(https:\/\/robotframework-browser\.org(\/[^)]+)\)/g)].map(m => m[1]!)
 
   it('links only to files that were built', () => {
@@ -74,10 +125,13 @@ describe.skipIf(!built)('prerendered LLM exports', () => {
     const md = read(file)
     expect(md).not.toMatch(/%%\w+%%/)
     expect(md).not.toContain('LLMRAWBLOCK')
-    // Read on its own, a file has no base URL: every link must be absolute.
-    expect(md.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '')).not.toMatch(/\]\((\/(?!\/)|#)/)
     // Component tags, which the exports rewrite into Markdown.
-    expect(md.replace(/```[\s\S]*?```/g, '')).not.toMatch(/<\/?[a-z]+-[a-z-]+[ >]/)
+    expect(prose(md)).not.toMatch(/<\/?[a-z]+-[a-z-]+[ >]/)
+  })
+
+  // Read on its own, a file has no base URL to resolve a relative link against.
+  it.each([...files, 'keywords.md'])('%s links only absolutely', (file) => {
+    expect(prose(read(file))).not.toMatch(RELATIVE_LINK)
   })
 })
 

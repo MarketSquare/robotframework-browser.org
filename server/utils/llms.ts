@@ -17,7 +17,8 @@ import { queryCollection } from '@nuxt/content/server'
 import type { MinimarkNode } from 'minimark'
 import { stringify } from 'minimark/stringify'
 
-import { RawBlocks, absoluteUrl, simplify } from './llms-components'
+import { RawBlocks, simplify } from './llms-components'
+import { absoluteUrl } from './llms-links'
 
 import { DOC_SECTIONS } from '../../app/utils/doc-sections'
 import { resolveTokens } from '../../app/utils/version-tokens'
@@ -136,10 +137,9 @@ function releaseFacts(doc: Record<string, unknown>): MinimarkNode[] {
 export async function documentMarkdown({ collection, doc }: Doc): Promise<string> {
   const resolved = resolveTokens(doc) as typeof doc & Record<string, unknown>
   const url = `${SITE}${pageUrl(collection, resolved)}`
-  const raw = new RawBlocks()
+  const raw = new RawBlocks(url)
   const body = await simplify(resolved.body.value as MinimarkNode[], {
     raw,
-    pageUrl: url,
     example: async path => (await useStorage('assets:examples').getItem<string>(path)) ?? null,
   })
 
@@ -155,7 +155,7 @@ export async function documentMarkdown({ collection, doc }: Doc): Promise<string
   return raw.splice(markdown).replace(/\n{3,}/g, '\n\n')
 }
 
-/** `absoluteUrl` (llms-components.ts) over every link and media source in a node. */
+/** `absoluteUrl` (llms-links.ts) over every link and media source in a node. */
 function absoluteLinks(node: MinimarkNode, url: string): MinimarkNode {
   if (typeof node === 'string') return node
   const [tag, props, ...children] = node
