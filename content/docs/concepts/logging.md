@@ -101,6 +101,67 @@ rfbrowser show-trace output/browser/traces/trace_context=<id>.zip
 or drop it on [trace.playwright.dev](https://trace.playwright.dev/), which runs
 entirely in your browser.
 
+### Trace groups
+
+Each keyword that runs becomes a group in the trace viewer, and the Playwright
+calls it made nest under it. The `tracing_group_mode` import argument decides
+which keywords get a group: `Full`, the default, gives one to every keyword that
+runs, `Browser` only to Browser keywords, and `Playwright` to none. See
+[`TracingGroupMode`](/keywords#type--tracinggroupmode).
+
+:since{version="21.1.0"} **With several traced contexts, a trace shows only the
+keywords that ran on its own context.** A keyword goes to the traces of the
+contexts it acts on:
+
+::doc-table
+---
+head: [Keyword, Goes to the trace of]
+rows:
+  - ['`Click`, `Get Title` and most others', 'The active context']
+  - ['`Switch Context`, `Switch Browser`', 'The context it switches to']
+  - ['`Close Context`, `Close Browser`, `Stop Tracing`', 'The contexts it closes or stops']
+  - ['`Log`, `Should Be Equal` and others that act on no context', 'The context active when the keyword ends']
+---
+::
+
+A keyword that acts on no context is written when it ends, so it shows as a
+short group at that point: a `Sleep` appears after the wait, not around it.
+
+Callers come along. A user keyword's group appears in a trace from the first
+keyword under it that acts on that context, so a trace shows its keywords under
+the same parents as `log.html`. A trace started in the middle of a keyword, by
+the `tracing` argument of `New Context` or by `Start Tracing`, starts inside the
+keywords that are running.
+
+Here two contexts are traced, A for its whole life and B for a moment:
+
+```robot
+*** Test Cases ***
+Two Traced Contexts
+    ${a} =    New Context    tracing=${OUTPUT_DIR}/a.zip
+    New Page    about:blank
+    ${b} =    New Context
+    New Page    about:blank
+    Start Tracing
+    Switch Context    ${a}
+    Get Title
+    Switch Context    ${b}
+    Stop Tracing    path=b.zip
+    Close Context    ${a}
+```
+
+::doc-table
+---
+head: [Trace, Groups it shows]
+rows:
+  - ['`a.zip`', '`New Context`, `New Page`, `Switch Context` to A, `Get Title`, `Close Context`']
+  - ['`b.zip`', '`Start Tracing`, `Switch Context` to B, `Stop Tracing`']
+---
+::
+
+The `New Context` and `New Page` that create B are in neither: B is not traced
+yet, and they do not act on A.
+
 ## Coverage
 
 Browser can collect code coverage from the pages it drives — data from
