@@ -64,6 +64,12 @@ export interface LibdocSpec {
   docFormat: string
   keywords: LibdocKeyword[]
   typedocs: LibdocTypedoc[]
+  /**
+   * The library's `__init__`: what Robot's own HTML renders as "Importing".
+   * Keyword-shaped; only `args` and `doc` are used. Empty for a library that
+   * takes no import arguments.
+   */
+  inits?: LibdocKeyword[]
 }
 
 /** What the site renders. */
@@ -136,12 +142,24 @@ export interface GroupEntry {
   count: number
 }
 
+/** How the library is imported: libdoc's "Importing" section. */
+export interface ResolvedImporting {
+  /** Sanitized, link-rewritten, syntax-highlighted HTML. */
+  doc: string
+  args: ResolvedArg[]
+}
+
+/** The anchor Robot's HTML gives the section, which the intro links to. */
+export const IMPORTING_SLUG = 'importing'
+
 export interface TransformResult {
   version: string
   libraryName: string
   /** The library-level documentation: selectors, assertions, waiting. */
   intro: string
   introSections: { title: string; slug: string; level: number }[]
+  /** Null when the library has no `__init__` to document. */
+  importing: ResolvedImporting | null
   keywords: ResolvedKeyword[]
   types: ResolvedType[]
   index: IndexEntry[]
@@ -284,6 +302,44 @@ function decodeEntities(s: string): string {
     .replace(/&amp;/g, '&')
 }
 
+/**
+ * Libdoc arguments -> table rows. Shared by keywords and the library import.
+ * `onTypePage` is told about every argument type that has its own typedoc,
+ * which is how keywords build the reverse type index.
+ */
+async function resolveArgs(
+  libdocArgs: LibdocArg[],
+  typeNames: Set<string>,
+  ctx: RewriteContext,
+  highlight: TransformOptions['highlight'],
+  onTypePage?: (typedoc: string) => void,
+): Promise<ResolvedArg[]> {
+  const args: ResolvedArg[] = []
+  for (const arg of libdocArgs) {
+    // The bare `*` separator: everything after it is named-only. It is a
+    // marker, not an argument, and must not become a table row.
+    if (arg.kind === 'NAMED_ONLY_MARKER') continue
+
+    const typedoc = arg.type?.typedoc ?? null
+    const hasPage = typedoc !== null && typeNames.has(typedoc)
+    if (hasPage) onTypePage?.(typedoc)
+
+    args.push({
+      name: arg.name,
+      repr: arg.repr,
+      typeName: arg.type?.name ?? null,
+      typeHref: hasPage ? `#${typeAnchor(typedoc)}` : null,
+      defaultValue: arg.defaultValue,
+      required: arg.required,
+      variadic:
+        arg.kind === 'VAR_POSITIONAL' ? 'positional' : arg.kind === 'VAR_NAMED' ? 'named' : null,
+      namedOnly: arg.kind === 'NAMED_ONLY',
+      doc: await renderDoc(arg.doc ?? '', ctx, highlight),
+    })
+  }
+  return args
+}
+
 export async function transform(
   spec: LibdocSpec,
   options: TransformOptions,
@@ -322,41 +378,11 @@ export async function transform(
       groupName.set(module, group)
     }
 
-    const args: ResolvedArg[] = []
-    let namedOnly = false
-
-    for (const arg of kw.args) {
-      // The bare `*` separator: everything after it is named-only. It is a
-      // marker, not an argument, and must not become a table row.
-      if (arg.kind === 'NAMED_ONLY_MARKER') {
-        namedOnly = true
-        continue
-      }
-      if (arg.kind === 'NAMED_ONLY') namedOnly = true
-
-      const typeName = arg.type?.name ?? null
-      const typedoc = arg.type?.typedoc ?? null
-      const hasPage = typedoc !== null && typeNames.has(typedoc)
-
-      if (hasPage) {
-        const list = typeUsage.get(typedoc) ?? []
-        if (!list.some(e => e.name === kw.name)) list.push({ name: kw.name, slug: slug(kw.name) })
-        typeUsage.set(typedoc, list)
-      }
-
-      args.push({
-        name: arg.name,
-        repr: arg.repr,
-        typeName,
-        typeHref: hasPage ? `#${typeAnchor(typedoc)}` : null,
-        defaultValue: arg.defaultValue,
-        required: arg.required,
-        variadic:
-          arg.kind === 'VAR_POSITIONAL' ? 'positional' : arg.kind === 'VAR_NAMED' ? 'named' : null,
-        namedOnly: arg.kind === 'NAMED_ONLY',
-        doc: await renderDoc(arg.doc ?? '', ctx, options.highlight),
-      })
-    }
+    const args = await resolveArgs(kw.args, typeNames, ctx, options.highlight, typedoc => {
+      const list = typeUsage.get(typedoc) ?? []
+      if (!list.some(e => e.name === kw.name)) list.push({ name: kw.name, slug: slug(kw.name) })
+      typeUsage.set(typedoc, list)
+    })
 
     /*
      * Spec 3 wrote `returnType: null` for a keyword annotated `-> None`; spec 4
@@ -386,7 +412,6 @@ export async function transform(
           : null,
       lineno: kw.lineno,
     })
-    void namedOnly
   }
 
   const types: ResolvedType[] = await Promise.all(
@@ -450,11 +475,32 @@ export async function transform(
     return `<${tag} id="${id}"${attrs}>${inner}</${tag}>`
   })
 
+  /*
+   * Robot's HTML places "Importing" between the introduction and the
+   * keywords, built from `inits` rather than from `doc` — so it is easy to
+   * lose, and the introduction links to it. Here it closes the Documentation
+   * part, after the intro's own sections, because it is not a keyword.
+   */
+  const init = spec.inits?.[0]
+  const importing: ResolvedImporting | null = init
+    ? {
+        doc: await renderDoc(init.doc ?? '', ctx, options.highlight),
+        args: await resolveArgs(init.args, typeNames, ctx, options.highlight),
+      }
+    : null
+  if (importing) {
+    if (usedSlugs.has(IMPORTING_SLUG)) {
+      throw new Error(`the library introduction already has a section "${IMPORTING_SLUG}"`)
+    }
+    introSections.push({ title: 'Importing', slug: IMPORTING_SLUG, level: 2 })
+  }
+
   return {
     version: spec.version,
     libraryName: spec.name,
     intro,
     introSections,
+    importing,
     keywords,
     types,
     index,

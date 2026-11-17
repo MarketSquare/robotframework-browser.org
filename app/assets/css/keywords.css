@@ -124,6 +124,12 @@
 
 .intro-section h2 {
   font-size: var(--step-2);
+  /*
+   * For #importing, an anchor target outside .doc (whose h2s doc.css already
+   * offsets). Matching those too is harmless here and gives them the phone
+   * offset below.
+   */
+  scroll-margin-top: 5rem;
   padding-bottom: var(--sp-2);
   border-bottom: 2px solid var(--red);
 }
@@ -482,6 +488,7 @@ table.args td.a-doc .doc > :last-child {
 @media (max-width: 900px) {
   .kw,
   .intro-section,
+  .intro-section h2,
   .group-heading,
   .anchor-top {
     scroll-margin-top: calc(var(--header-h) + 3.6rem);

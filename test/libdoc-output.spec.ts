@@ -118,6 +118,39 @@ describe.skipIf(!ready)('generated payloads', () => {
   })
 
   /*
+   * Every in-page link in every version lands on something. This is how the
+   * missing Importing section went unnoticed (issue #5575): the introduction
+   * links to `#importing` eight times, and the site rendered no such section
+   * for any version, because libdoc builds it from `inits` rather than `doc`.
+   */
+  const versions = ready
+    ? readdirSync(join(ROOT, 'app/generated/full')).filter(f => f.endsWith('.json'))
+    : []
+
+  it.each(versions)('%s: every in-page link resolves to an anchor on the page', file => {
+    const payload = JSON.parse(readFileSync(join(ROOT, 'app/generated/full', file), 'utf8')) as {
+      keywords: { slug: string }[]
+      types: { anchor: string }[]
+      introSections: { slug: string }[]
+      importing: { doc: string } | null
+    }
+    const anchors = new Set([
+      // KeywordPanels' landmarks.
+      'introduction', 'keywords', 'types',
+      ...payload.keywords.map(k => k.slug),
+      ...payload.types.map(t => t.anchor),
+      ...payload.introSections.map(s => s.slug),
+    ])
+    // A Documentation entry for Importing must come with something to render.
+    if (anchors.has('importing')) expect(payload.importing, 'importing body').toBeTruthy()
+
+    const links = [...JSON.stringify(payload).matchAll(/href=\\"#([^"\\]+)\\"/g)].map(m => m[1]!)
+    expect(links.length).toBeGreaterThan(0)
+    const dead = [...new Set(links.filter(l => !anchors.has(l)))]
+    expect(dead, `${file}: links with no target`).toEqual([])
+  })
+
+  /*
    * The payloads nothing fetched. Regenerating must not bring them back: they
    * were 2747 files and 14 MB on every deploy, and they are what stopped Nuxt
    * Studio from loading, since it scans all of public/.

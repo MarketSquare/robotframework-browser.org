@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import {
+  IMPORTING_SLUG,
   type LibdocSpec,
   SPEC_VERSIONS,
   moduleToName,
@@ -102,6 +103,26 @@ describe('transform over the real spec', () => {
       transform({ ...SPEC, specversion: 5 }, { highlight: async c => c, groups: GROUPS }),
     ).rejects.toThrow(/specversion 5 is not one of 3, 4/)
     expect(SPEC_VERSIONS).toContain(SPEC.specversion)
+  })
+
+  /*
+   * Robot's own HTML builds "Importing" from `inits`, not from the library
+   * doc, so a renderer that only reads `doc` silently drops it — and the
+   * introduction's links to `#importing` then lead nowhere. Issue #5575.
+   */
+  it('renders the library import as an Importing section of the documentation', () => {
+    const init = SPEC.inits![0]!
+    expect(result.importing).not.toBeNull()
+    expect(result.importing!.args.map(a => a.name)).toEqual(init.args.map(a => a.name))
+    expect(result.importing!.doc).toContain('Browser library can be taken into use')
+    expect(result.introSections.at(-1)).toEqual({ title: 'Importing', slug: IMPORTING_SLUG, level: 2 })
+  })
+
+  it('links import argument types and keyword mentions like any keyword', () => {
+    const level = result.importing!.args.find(a => a.name === 'auto_closing_level')!
+    expect(level.typeHref).toBe('#type--autoclosinglevel')
+    const strict = result.importing!.args.find(a => a.name === 'strict')!
+    expect(strict.doc).toContain('href="#set-strict-mode"')
   })
 
   it('resolves every keyword', () => {
@@ -390,7 +411,9 @@ describe('single-page anchors', () => {
     // instead, which is what the sanitizer can break.
     expect(result.introSections.length).toBeGreaterThan(0)
     expect(result.intro).toMatch(/<h2 id="[^"]+"/)
-    for (const s of result.introSections) {
+    // Importing is a Documentation section too, but it is built from `inits`
+    // and rendered after the intro, not inside it.
+    for (const s of result.introSections.filter(s => s.slug !== IMPORTING_SLUG)) {
       expect(result.intro, s.slug).toContain(` id="${s.slug}"`)
     }
   })
