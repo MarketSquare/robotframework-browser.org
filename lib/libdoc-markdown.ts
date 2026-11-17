@@ -12,8 +12,6 @@ import { tables } from 'turndown-plugin-gfm'
 
 import type { LibdocArg, LibdocKeyword, LibdocSpec, LibdocTypedoc } from './libdoc.ts'
 
-/** The library's import arguments; not in `LibdocSpec`, which the site never needed. */
-interface InitSpec { inits?: { args: LibdocArg[]; doc: string }[] }
 
 export interface KeywordMarkdownOptions {
   /** The HTML reference this document mirrors, for the "Source" line. */
@@ -131,7 +129,7 @@ export function demote(md: string, level: number): string {
   }).join('\n')
 }
 
-export function libdocToMarkdown(spec: LibdocSpec & InitSpec, opts: KeywordMarkdownOptions): string {
+export function libdocToMarkdown(spec: LibdocSpec, opts: KeywordMarkdownOptions): string {
   const td = converter()
   const init = spec.inits?.[0]
 

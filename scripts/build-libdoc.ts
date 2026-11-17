@@ -121,6 +121,7 @@ for (const file of specFiles) {
     libraryName: result.libraryName,
     intro: result.intro,
     introSections: result.introSections,
+    importing: result.importing,
     keywords: result.keywords,
     types: result.types,
     groups: result.groups,
