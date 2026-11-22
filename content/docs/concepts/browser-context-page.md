@@ -123,6 +123,9 @@ New Context    tracing=True
 New Context    recordVideo={'dir': '${OUTPUT_DIR}/video'}
 ```
 
+Route rules, which make matching requests fail, can live on a context or on a
+single page. See [Route rules](/docs/concepts/route-rules#context-or-page).
+
 ### Logging in once, and reusing it
 
 A context starts empty: no cookies, no `localStorage`, nobody logged in. Doing

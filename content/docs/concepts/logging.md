@@ -63,6 +63,10 @@ they cannot stop Playwright's own debug log, and the value also lands in
 enable this on a run that touches real credentials.
 ::
 
+It is also where each request that a
+[route rule](/docs/concepts/route-rules#seeing-what-a-rule-did) matched is
+logged, with the rule id. `log.html` only shows that the rule was added.
+
 Each run replaces the file. If the old one cannot be deleted — still open on
 Windows, for instance — the new log is written beside it as
 `playwright-log-<nanoseconds>.txt`.
