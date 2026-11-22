@@ -5,16 +5,15 @@ section: concepts
 order: 7
 ---
 
-Sometimes a test needs requests to fail: to check an error path, to keep
+:since{version="21.1.0"} Sometimes a test needs requests to fail: to check an error path, to keep
 analytics and ads out of a run, or to simulate an outage and then check that the
 app recovers. Browser does this with **route rules**.
 
 ## What a route rule is
 
 A route rule sits on a context or a page and decides what happens to matching
-requests before they reach the network. In this release a rule can only abort
-them. Later releases add rules that answer with a mock response, or that change
-the request or the real response.
+requests before they reach the network: it aborts them, so they fail with a
+network error.
 
 ```robot-repl
 Abort Requests    **/analytics/**
