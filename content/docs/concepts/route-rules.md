@@ -688,13 +688,13 @@ Added route rule 7a2e…: mock **/api/orders with status 200 and json body, time
 `Modify Responses` logs what it changes, with header names only, as shown
 under [Tokens and secrets](#tokens-and-secrets).
 
-Each request a rule matches, aborted, answered or changed, is logged on the Node side
+Each time a rule runs for a request, aborting, answering or changing it, it is logged on the Node side
 only, in [`playwright-log.txt`](/docs/concepts/logging#playwright-logtxt),
 together with the rule id. Like the library's other Node messages it is a JSON line, and its
 `msg` field reads:
 
 ```text
-Route rule 3f1c… matched GET https://example.com/api/orders
+Route rule 3f1c… ran for GET https://example.com/api/orders
 ```
 
 That keeps `log.html` readable when a rule blocks hundreds of analytics calls.
