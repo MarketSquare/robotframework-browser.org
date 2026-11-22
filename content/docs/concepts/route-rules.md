@@ -98,13 +98,14 @@ This is the trap. When a suite shares one context across its tests, a Context
 rule added in one test still aborts requests in the next, and that test fails
 for a reason its own steps do not show.
 
-There are two ways out. Open a `New Context` per test, which is the cheap clean
+There are two ways out. Open a [`New Context`](/keywords#new-context) per test, which is the cheap clean
 slate it always is, or call `Remove All Route Rules` in the test teardown.
 ::
 
 With the default `auto_closing_level=TEST`, a context opened inside a test closes
 when the test ends, and its rules go with it. The trap is a context opened in
-suite setup.
+suite setup, as in the teardown example under
+[Removing rules](#removing-rules).
 
 ## Simulating an outage and recovery
 
@@ -127,8 +128,9 @@ Orders Recover After Two Failures
     Get Text          id=orders-status    ==    loaded
 ```
 
-This fits an app that retries on its own: it sees two failures and then
-succeeds, without the test doing anything in between.
+The clicks stand in for retries. An app that retries by itself gets the same
+outage with no clicks at all: two failures, then success, while the test only
+waits for the result.
 
 `times` must be 1 or more. `times=0` fails before the browser is involved.
 
@@ -169,15 +171,25 @@ example when you first want to check the error message it shows.
 rules of the active context and the Page rules of every page in it. It waits
 for running handlers in the same way, and logs how many Context and Page rules
 it removed. With no rules, or no context open, it logs and passes, so it works
-in a teardown that runs after `Close Context`:
+in a teardown that runs after `Close Context`.
+
+Here the suite shares one context, so without the teardown the first test's
+rule would still abort requests in the second:
 
 ```robot
+*** Settings ***
+Suite Setup      New Context
+Test Teardown    Remove All Route Rules
+
 *** Test Cases ***
-Analytics Stay Out Of The Run
-    New Page          about:blank
-    Abort Requests    **/analytics/**
-    Go To             ${APP_URL}
-    [Teardown]        Remove All Route Rules
+Orders Show An Error During An Outage
+    Abort Requests    **/api/orders
+    New Page          ${APP_URL}
+    Get Text          id=orders-status    ==    error
+
+Orders Load Normally
+    New Page          ${APP_URL}
+    Get Text          id=orders-status    ==    loaded
 ```
 
 It removes only the rules this library added. A route that a plugin or a
@@ -236,7 +248,7 @@ that checks the browser's error text runs in Chromium only.
 
 An unknown `errorCode` fails before anything reaches the browser.
 
-## Things that never reach a route rule
+## Service workers and the HTTP cache
 
 **Requests a service worker answers.** A service worker sits between the page
 and the network, and a request it answers itself never becomes a network
@@ -263,7 +275,8 @@ Added route rule 3f1c…: abort **/api/orders with failed, times=2, on=Context.
 
 Each request a rule matches is logged on the Node side only, in
 [`playwright-log.txt`](/docs/concepts/logging#playwright-logtxt), together with
-the rule id:
+the rule id. Like the library's other Node messages it is a JSON line, and its
+`msg` field reads:
 
 ```text
 Route rule 3f1c… matched GET https://example.com/api/orders
