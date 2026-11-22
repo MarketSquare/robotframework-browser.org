@@ -1,6 +1,6 @@
 ---
 title: Route rules
-description: Make requests fail or answer them with a mock response — what a route rule is, where it lives and when it ends.
+description: Make requests fail, answer them with a mock response, or change the real request and response — what a route rule is, where it lives and when it ends.
 section: concepts
 order: 7
 ---
@@ -9,14 +9,21 @@ order: 7
 analytics and ads out of a run, or to simulate an outage and then check that the
 app recovers. Other times it needs an answer the real server would not give, or
 not on demand: to test the frontend apart from the backend, or to get a `500`
-exactly once. Browser does both with **route rules**.
+exactly once. And sometimes the real server should answer, but with something
+changed: another backend, an extra header, or one field of the JSON set to an
+edge case. Browser does all three with **route rules**.
 
 ## What a route rule is
 
 A route rule sits on a context or a page and decides what happens to matching
-requests before they reach the network. It either aborts them, so they fail
-with a network error, or answers them with a **mock response**, so they never
-reach the server.
+requests before they reach the network. It aborts them, so they fail with a
+network error, answers them with a **mock response**, so they never reach the
+server, or sends them on and changes the request and the real response on the
+way.
+
+::doc-figure{src="/images/route-rules/traffic.svg" alt="Three rows, one per keyword, each with the columns Page, Route rule and Server. Abort Requests: the request goes from the page to the rule, which sends a network error back; the server is not reached. Mock Responses: the rule sends a mock response back; the server is not reached. Modify Responses: the rule sends a changed request to the server, gets the real response, and sends a changed response back to the page."}
+Where a request goes under each kind of rule.
+::
 
 ```robot-repl
 Abort Requests    **/analytics/**
@@ -54,6 +61,17 @@ Every matching request now gets a `200` with `${orders}` as its JSON body, and
 the server never sees it. `Mock Responses` takes the same `matcher`, `times` and
 `on`, returns a rule id in the same way, and its rules end and are removed in
 the same ways. What it answers with is under [Mock responses](#mock-responses).
+
+[`Modify Responses`](/keywords#modify-responses) adds a rule that lets the
+request through and changes what you name:
+
+```robot-repl
+Modify Responses    **/api/orders    status=500    headers={"Retry-After": "5"}
+```
+
+The server gets the request and answers as usual, and the page gets that
+answer with the status `500` and one more header. The same `matcher`, `times`
+and `on` apply. See [Modify responses](#modify-responses).
 
 ## Matching requests
 
@@ -285,6 +303,228 @@ plain string still shows in the keyword's arguments in `log.html`.
 - A Secret used inside text, such as `body={"token": "${token}"}`, becomes the
   literal text `<secret>`. Give the whole body as the Secret instead.
 
+## Modify responses
+
+### Modify or mock
+
+Mock when the server should not be involved at all: the backend is not there
+yet, or the test must not depend on its data. Modify when the real answer is
+mostly right and one part should be different, or when the request should go
+somewhere else:
+
+- point `/api` at a staging host or a fixture server;
+- add an `Authorization` header, or change the method or body the server gets;
+- set one field of the real JSON to an edge case the backend would not produce
+  on demand;
+- give back a real response with another status;
+- strip a header such as `Content-Security-Policy`.
+
+Every change is optional and keeps the real value when you leave it out, but
+the keyword needs at least one. The page always keeps the URL it asked for.
+
+::doc-table
+---
+head: [Argument, Changes]
+nowrap: [0]
+rows:
+  - ['`request_url`', 'Where the request goes: an absolute URL, or one relative to the original request URL']
+  - ['`request_method`', 'The method the server gets']
+  - ['`request_headers`', 'Merged onto the real request headers']
+  - ['`request_body`', 'The body the server gets, as UTF-8 text']
+  - ['`status`', 'The status the page gets, from 100 to 599']
+  - ['`headers`', 'Merged onto the real response headers']
+  - ['`body`, `json`, `path`', 'Replace the real body, exactly as in [Mock responses](#payloads-and-content-types)']
+  - ['`json_patch`', 'Changes fields of the real JSON body']
+---
+::
+
+### Another backend
+
+`request_url` sends the request somewhere else. A relative URL resolves against
+the original request URL, so the host stays and only the path changes:
+
+```robot-repl
+Modify Responses    **/api/orders    request_url=/api/v2/orders
+```
+
+An absolute URL moves the request to another host:
+
+```robot-repl
+Modify Responses    **/api/**    request_url=https://staging.example.com/api/orders
+```
+
+The server at the new URL gets the cookies the context holds **for that URL**,
+the same ones the browser would send if the page called it directly. The
+original `Cookie` and `Host` headers are not forwarded. That keeps all three
+browsers alike: left alone, Chromium and Firefox would send the old cookies to
+the new host, and Firefox the old `Host` too. To send a cookie to the new host,
+add it to the context with [`Add Cookie`](/keywords#add-cookie) for that URL.
+
+### Method and body
+
+`request_method` changes the method and `request_body` the body. The
+Content-Type of the original request stays unless `request_headers` sets a new
+one, and the length is recalculated:
+
+```robot-repl
+Modify Responses    **/api/search    request_method=POST    request_body={"q": "robot"}    request_headers={"Content-Type": "application/json"}
+```
+
+Changing to `GET` or `HEAD` without `request_body` sends no body, so a form post
+turned into a `GET` does not carry its old form data along.
+
+### Adding and removing headers
+
+`headers` and `request_headers` merge onto the real headers instead of
+replacing them:
+
+- names are compared case-insensitively;
+- a value you give wins over the real one;
+- an empty string removes the header.
+
+Stripping the Content Security Policy from a page, for example to inject a
+script that the policy would block:
+
+```robot-repl
+Modify Responses    **/app.html    headers={"Content-Security-Policy": ""}
+```
+
+Adding a token that only the test knows, given as a Secret (see
+[Tokens and secrets](#tokens-and-secrets)):
+
+```robot
+*** Test Cases ***
+Orders Load With The Service Token
+    VAR    ${token: Secret} =    %{SERVICE_TOKEN}
+    VAR    &{auth} =    Authorization=${token}
+    Modify Responses    **/api/orders    request_headers=${auth}
+    New Page    ${APP_URL}
+    Get Text    id=orders-status    ==    loaded
+```
+
+### Replacing the body
+
+`body`, `json` and `path` replace the real body with a payload of your own, and
+the Content-Type follows the same table as for a mock response. The difference
+from `Mock Responses` is that the request still reaches the server, so the real
+status and headers stay, along with whatever the server did with the request.
+
+```robot-repl
+Modify Responses    **/api/orders    json=${{ [] }}
+```
+
+When the body changes, the real `Content-Encoding` and `Content-Length` are
+dropped. The page gets the new body already decoded, and a stale `gzip` or
+length would not match it. Some browsers then set a `Content-Length` of their
+own, which is the length of the new body.
+
+### Changing fields of the JSON
+
+`json_patch` changes the real JSON body with an
+[RFC 7386 JSON Merge Patch](https://www.rfc-editor.org/rfc/rfc7386). Its rules
+fit in three lines:
+
+- dictionaries merge, key by key and at every depth;
+- `${None}` deletes a key;
+- anything else, a list included, replaces the value whole.
+
+::doc-table
+---
+head: [Real body, json_patch, Page gets]
+nowrap: [0, 1, 2]
+rows:
+  - ['`{"id": 7, "state": "open"}`', '`{"state": "cancelled"}`', '`{"id": 7, "state": "cancelled"}`']
+  - ['`{"id": 7, "note": "x"}`', '`{"note": None}`', '`{"id": 7}`']
+  - ['`{"order": {"id": 7, "total": 12}}`', '`{"order": {"total": 0}}`', '`{"order": {"id": 7, "total": 0}}`']
+  - ['`{"items": [1, 2, 3]}`', '`{"items": [4]}`', '`{"items": [4]}`']
+  - ['`{"id": 7}`', '`{"tags": ["new"]}`', '`{"id": 7, "tags": ["new"]}`']
+---
+::
+
+In Robot Framework the patch is a dictionary:
+
+```robot
+*** Test Cases ***
+Cancelled Order Shows No Total
+    VAR    &{order} =    state=cancelled    total=${None}
+    VAR    &{patch} =    order=${order}
+    Modify Responses    **/api/orders/7    json_patch=${patch}
+    New Page    ${APP_URL}/orders/7
+    Get Text    id=order-state    ==    cancelled
+    Get Element Count    id=order-total    ==    0
+```
+
+A list cannot be patched item by item, so to change one order in a list,
+give the whole list. To replace the whole body, use `json` instead: a patch
+that is not a dictionary would do the same, so `json_patch` takes only a
+dictionary.
+
+The real Content-Type stays. If the real body is not JSON, the page request
+fails, as under [Failures and timeouts](#failures-and-timeouts).
+
+### Redirects
+
+The real request follows redirects, up to 20, before the rule changes anything.
+The page gets the final response at the URL it asked for, and it never sees the
+redirect. The redirect target does not pass through route rules, so a rule
+that matches only the target does not see it.
+
+### Failures and timeouts
+
+`Modify Responses` itself passes as soon as the rule is added. A problem with
+the real request shows up later, when a request fires:
+
+- the server cannot be reached;
+- the real request takes longer than the timeout;
+- `json_patch` meets a body that is not JSON.
+
+The page request then fails as a network error, like one from
+`Abort Requests`, and the error is logged in
+[`playwright-log.txt`](/docs/concepts/logging#playwright-logtxt) with the rule
+id. The log leaves out Playwright's call log, because it lists the request
+headers.
+
+The timeout is the browser timeout in effect **when the rule is added**, not
+when a request fires. To give one rule a shorter timeout, change it around the
+keyword:
+
+```robot
+*** Test Cases ***
+Slow Orders Fail Fast
+    ${old} =    Set Browser Timeout    1s
+    TRY
+        Modify Responses    **/api/orders    status=200
+    FINALLY
+        Set Browser Timeout    ${old}
+    END
+    New Page    ${APP_URL}
+    Get Text    id=orders-status    ==    error
+```
+
+The same timeout bounds how long `Remove Route Rule` waits for a request the
+rule is handling.
+
+### Tokens and secrets
+
+Header values, `request_url`, `request_body` and `body` can be Robot Framework
+[Secrets](https://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#secret-variables).
+The keyword logs header names but never their values, a Secret `request_url` as
+`<secret>`, and only *that* a body changes:
+
+```text
+Added route rule 9c4d…: modify **/api/orders, request: url=<secret>, headers=[Authorization]; response: status=500, json_patch, times=None, on=Context.
+```
+
+The same limits as for [mock tokens](#tokens) apply: a plain string still shows
+in the keyword's arguments in `log.html`, and `enable_playwright_debug` shows
+the values in the Playwright debug log.
+
+### Size
+
+A replaced body and `request_body` travel from Python to the library's Node
+process in one message, so payloads over about 4 MB fail. A `json_patch` is
+small however large the real body is, because Node applies it to the real body.
+
 ## Rule order
 
 When several rules match a request, the **newest rule wins**, and a Page rule
@@ -321,7 +561,7 @@ The preflight `OPTIONS` request never reaches a route rule, or the server.
 ## Removing rules
 
 [`Remove Route Rule`](/keywords#remove-route-rule) takes the id from
-`Abort Requests` or `Mock Responses` and removes that rule.
+`Abort Requests`, `Mock Responses` or `Modify Responses` and removes that rule.
 
 - It finds the rule in any context, so a Page rule can be removed while another
   page, or another context, is active.
@@ -332,8 +572,8 @@ The preflight `OPTIONS` request never reaches a route rule, or the server.
   middle of handling one, the keyword waits for it to finish first.
 
 [`Remove All Route Rules`](/keywords#remove-all-route-rules) removes the Context
-rules of the active context and the Page rules of every page in it, the ones
-that abort and the ones that answer alike. It waits for running handlers in
+rules of the active context and the Page rules of every page in it, whichever
+kind they are. It waits for running handlers in
 the same way, and logs how many Context and Page rules it removed. With no rules, or no context open, it logs and passes, so it works
 in a teardown that runs after `Close Context`.
 
@@ -445,7 +685,10 @@ payload, `times` and `on`. It never logs the body or header values:
 Added route rule 7a2e…: mock **/api/orders with status 200 and json body, times=None, on=Context.
 ```
 
-Each request a rule matches, aborted or answered, is logged on the Node side
+`Modify Responses` logs what it changes, with header names only, as shown
+under [Tokens and secrets](#tokens-and-secrets).
+
+Each request a rule matches, aborted, answered or changed, is logged on the Node side
 only, in [`playwright-log.txt`](/docs/concepts/logging#playwright-logtxt),
 together with the rule id. Like the library's other Node messages it is a JSON line, and its
 `msg` field reads:
@@ -455,13 +698,16 @@ Route rule 3f1c… matched GET https://example.com/api/orders
 ```
 
 That keeps `log.html` readable when a rule blocks hundreds of analytics calls.
-When you need to know whether a particular request was aborted or mocked, search
+When you need to know whether a particular request was aborted, mocked or changed, search
 `playwright-log.txt` for the rule id that `log.html` shows.
 
 ## In short
 
-- `Abort Requests` makes matching requests fail, and `Mock Responses` answers
-  them with a mock response. Both return the rule id.
+- `Abort Requests` makes matching requests fail, `Mock Responses` answers
+  them with a mock response, and `Modify Responses` lets them through and
+  changes the request and the real response. All three return the rule id.
+- `Modify Responses` merges headers, `""` removes one, and `json_patch`
+  changes fields of the real JSON.
 - A mock response takes at most one of `body`, `json` and `path`, and a
   Content-Type in `headers` always wins.
 - When several rules match, the newest wins, and a Page rule wins over a Context

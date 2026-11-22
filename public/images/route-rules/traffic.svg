@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="372" viewBox="0 0 800 372" font-family="system-ui, -apple-system, Segoe UI, sans-serif" font-size="14">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#b91c1c"/>
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="800" height="372" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="24" y="84" font-weight="600" fill="#0f172a">Abort Requests</text>
+  <text x="24" y="174" font-weight="600" fill="#0f172a">Mock Responses</text>
+  <text x="24" y="274" font-weight="600" fill="#0f172a">Modify Responses</text>
+  <g transform="translate(40 0)">
+
+  <g font-weight="600" fill="#0f172a" text-anchor="middle">
+    <text x="190" y="34">Page</text>
+    <text x="400" y="34">Route rule</text>
+    <text x="640" y="34">Server</text>
+  </g>
+
+  <!-- Abort Requests -->
+  <rect x="140" y="64" width="100" height="36" rx="6" fill="#ffffff" stroke="#334155"/>
+  <text x="190" y="87" text-anchor="middle" fill="#0f172a">request</text>
+  <line x1="240" y1="76" x2="344" y2="76" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="350" y1="90" x2="246" y2="90" stroke="#b91c1c" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-red)"/>
+  <rect x="350" y="64" width="100" height="36" rx="6" fill="#fee2e2" stroke="#b91c1c"/>
+  <text x="400" y="87" text-anchor="middle" fill="#7f1d1d">abort</text>
+  <rect x="590" y="64" width="100" height="36" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4 3"/>
+  <text x="640" y="87" text-anchor="middle" fill="#64748b">not reached</text>
+  <text x="295" y="118" text-anchor="middle" fill="#7f1d1d" font-size="13">network error</text>
+
+  <!-- Mock Responses -->
+  <rect x="140" y="154" width="100" height="36" rx="6" fill="#ffffff" stroke="#334155"/>
+  <text x="190" y="177" text-anchor="middle" fill="#0f172a">request</text>
+  <line x1="240" y1="166" x2="344" y2="166" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="350" y1="180" x2="246" y2="180" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)"/>
+  <rect x="350" y="154" width="100" height="36" rx="6" fill="#ccfbf1" stroke="#0f766e"/>
+  <text x="400" y="177" text-anchor="middle" fill="#134e4a">mock</text>
+  <rect x="590" y="154" width="100" height="36" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-dasharray="4 3"/>
+  <text x="640" y="177" text-anchor="middle" fill="#64748b">not reached</text>
+  <text x="295" y="208" text-anchor="middle" fill="#134e4a" font-size="13">mock response</text>
+
+  <!-- Modify Responses -->
+  <rect x="140" y="254" width="100" height="36" rx="6" fill="#ffffff" stroke="#334155"/>
+  <text x="190" y="277" text-anchor="middle" fill="#0f172a">request</text>
+  <line x1="240" y1="266" x2="344" y2="266" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="350" y1="280" x2="246" y2="280" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)"/>
+  <rect x="350" y="254" width="100" height="36" rx="6" fill="#fef3c7" stroke="#b45309"/>
+  <text x="400" y="277" text-anchor="middle" fill="#78350f">modify</text>
+  <line x1="450" y1="266" x2="584" y2="266" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="590" y1="280" x2="456" y2="280" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="590" y="254" width="100" height="36" rx="6" fill="#ffffff" stroke="#334155"/>
+  <text x="640" y="277" text-anchor="middle" fill="#0f172a">answers</text>
+  <text x="520" y="250" text-anchor="middle" fill="#334155" font-size="13">changed request</text>
+  <text x="520" y="304" text-anchor="middle" fill="#334155" font-size="13">real response</text>
+  <text x="295" y="308" text-anchor="middle" fill="#134e4a" font-size="13">changed response</text>
+  <text x="400" y="344" text-anchor="middle" fill="#475569" font-size="13">Only the parts you name change; the page keeps its original URL.</text>
+
+  </g>
+</svg>
