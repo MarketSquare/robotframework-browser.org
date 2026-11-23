@@ -10,6 +10,7 @@
 export const DOC_SECTIONS: { id: string; name: string }[] = [
   { id: 'start', name: 'Getting started' },
   { id: 'concepts', name: 'Core concepts' },
+  { id: 'http', name: 'HTTP traffic' },
   { id: 'recording', name: 'Recording keywords' },
   { id: 'mobile', name: 'Mobile web' },
   { id: 'extending', name: 'Extending Browser' },
