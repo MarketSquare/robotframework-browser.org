@@ -124,7 +124,7 @@ New Context    recordVideo={'dir': '${OUTPUT_DIR}/video'}
 ```
 
 Route rules, which make matching requests fail or answer them with a mock
-response, can live on a context or on a single page. See [Route rules](/docs/concepts/route-rules#context-or-page).
+response, can live on a context or on a single page. See [Route rules](/docs/http/route-rules#context-or-page).
 
 ### Logging in once, and reusing it
 

@@ -257,7 +257,7 @@ rows:
   - ['An animation or transition to finish', '`Wait For Function`']
   - ['Application state that never reaches the DOM', '`Wait For Function`']
   - ['The page to finish loading', '`Wait For Load State`']
-  - ['A request or response to happen', '`Wait For Response` / `Wait For Request` — and promise it, see below']
+  - ['A request or response to happen', '`Wait For Response` / `Wait For Request` — and promise it, see below and [Waiting for traffic](/docs/http/waiting)']
   - ['A navigation caused by a click', '`Wait For Navigation` — promise it too']
 ---
 ::
