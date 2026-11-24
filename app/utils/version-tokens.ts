@@ -1,4 +1,4 @@
-import LIBDOC from '~/generated/libdoc.json'
+import LIBDOC from '~/generated/libdoc-meta.json'
 import VERSIONS from '~/generated/versions.json'
 import PROJECT from '~/../content/project.json'
 
@@ -34,9 +34,10 @@ const TOKEN = /%%(\w+)%%/g
  *
  * versions.json is the library's own numbers; project.json the two that live on
  * someone else's server, refreshed by hand with `pnpm project`; and the keyword
- * count is simply the length of the index the reference page already ships, so
- * it cannot drift from the reference itself. Nothing here adds to the client
- * bundle that was not in it already.
+ * count comes from libdoc-meta.json, which scripts/build-libdoc.ts writes from
+ * the same index the reference page ships, so it cannot drift from it. Not
+ * from libdoc.json itself: that would load the whole index on every page that
+ * renders a token.
  */
 const TABLE: Record<string, unknown> = {
   ...(VERSIONS as unknown as Record<string, unknown>),
@@ -48,7 +49,7 @@ const TABLE: Record<string, unknown> = {
   stars: String(PROJECT.stars),
   releases: String(PROJECT.releases),
   contributors: String(PROJECT.contributors),
-  keywords: String(LIBDOC.index.length),
+  keywords: String(LIBDOC.keywords),
 }
 
 /** Every `%%name%%` in `text` that names a version we hold. */

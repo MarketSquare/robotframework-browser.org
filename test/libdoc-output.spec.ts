@@ -65,6 +65,11 @@ describe.skipIf(!ready)('generated payloads', () => {
     expect(full.types.length).toBe(gen.types.length)
   })
 
+  it('writes a meta file that agrees with the index', () => {
+    const meta = JSON.parse(readFileSync(join(ROOT, 'app/generated/libdoc-meta.json'), 'utf8'))
+    expect(meta).toEqual({ version: gen.version, keywords: gen.index.length })
+  })
+
   it('keeps the build-time index small enough to ship on every page', () => {
     // It is imported into the client bundle, so this is a real budget.
     expect(readFileSync(GEN, 'utf8').length).toBeLessThan(120_000)
