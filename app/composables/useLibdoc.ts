@@ -15,7 +15,6 @@ export interface IndexEntry {
   name: string
   slug: string
   shortdoc: string
-  shortdocHtml: string
   group: string
   groupSlug: string
   tags: string[]

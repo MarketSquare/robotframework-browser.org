@@ -174,4 +174,15 @@ write(join(GEN, 'libdoc.json'), {
   })),
 })
 
+/*
+ * The two facts prose needs: `%%keywords%%` in app/utils/version-tokens.ts.
+ * Content components on every page resolve tokens, so importing libdoc.json
+ * there put the whole index (45 KB) on every docs, release and landing page
+ * just to read its length.
+ */
+write(join(GEN, 'libdoc-meta.json'), {
+  version: latestResult.version,
+  keywords: latestResult.index.length,
+})
+
 console.log(`latest = ${latest}`)
