@@ -11,24 +11,9 @@ import { describe, expect, it } from 'vitest'
  * cosmetic: it reindents nested blocks, reorders frontmatter keys, and rewraps
  * YAML scalars. Those are all reversible and mean the same thing.
  *
- * One rewrite is not cosmetic. Studio collapses a run of spaces inside an
- * inline code span:
- *
- *     `New Browser    chromium    headless=False`
- *     `New Browser chromium headless=False`
- *
- * Robot Framework separates arguments with **two or more** spaces, so the
- * second line is not the same command — it is a keyword call with one long
- * argument, and it does not run. A reader copying it gets an error that has
- * nothing to do with what the page is teaching.
- *
- * This is source normalisation, not rendering, so no component can defend
- * against it. The rule is therefore about how content is written: keep runs of
- * spaces out of inline code, and put the full call in a fenced block instead —
- * fenced content round-trips through Studio untouched, which is how the
- * `docker pull` examples survive with their tokens intact.
- *
- * Twelve spans were fixed when this test was added, across seven files.
+ * Runs of spaces inside inline code, the Robot Framework argument separator,
+ * used to be collapsed to one. nuxt-studio 1.8.0 keeps them, so inline code
+ * may hold a full keyword call again.
  */
 const ROOT = process.cwd()
 
@@ -42,48 +27,10 @@ function markdown(dir = join(ROOT, 'content')): string[] {
   )
 }
 
-/**
- * Inline code spans on a line, skipping fenced blocks.
- *
- * Fences are exempt on purpose: their content is preserved verbatim, and a
- * Robot Framework snippet in a fence is exactly where the four-space separator
- * belongs.
- */
-function inlineCode(source: string): { line: number; text: string }[] {
-  const out: { line: number; text: string }[] = []
-  let fenced = false
-  source.split('\n').forEach((line, i) => {
-    if (/^\s*```/.test(line)) {
-      fenced = !fenced
-      return
-    }
-    if (fenced) return
-    for (const m of line.matchAll(/`([^`]+)`/g)) out.push({ line: i + 1, text: m[1]! })
-  })
-  return out
-}
-
 const files = markdown()
 
-describe('content survives a Studio round-trip', () => {
-  it('has content to check', () => {
-    expect(files.length).toBeGreaterThan(10)
-  })
-
-  it.each(files.map(f => [f.slice(ROOT.length + 1), f]))(
-    '%s keeps multi-space runs out of inline code',
-    (_name, file) => {
-      for (const { line, text } of inlineCode(readFileSync(file, 'utf8'))) {
-        expect(
-          text,
-          `line ${line}: \`${text}\` relies on a run of spaces inside inline code. `
-          + 'Nuxt Studio collapses those to one when it rewrites the file, which breaks a '
-          + 'Robot Framework argument separator. Write it as "`Keyword` with `arg`", or put '
-          + 'the whole call in a fenced block.',
-        ).not.toMatch(/\S {2,}\S/)
-      }
-    },
-  )
+it('has content to check', () => {
+  expect(files.length).toBeGreaterThan(10)
 })
 
 describe('no editor placeholder reaches the content', () => {

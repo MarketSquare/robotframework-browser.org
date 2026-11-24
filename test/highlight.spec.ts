@@ -1,3 +1,6 @@
+// @vitest-environment node
+// Shiki >= 4.6 loads its wasm with `Response.bytes()`, which Node has and
+// happy-dom's Response does not. Nothing here needs a DOM.
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
