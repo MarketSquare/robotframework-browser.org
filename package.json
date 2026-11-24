@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@nuxt/content": "^3.17.0",
-    "minimark": "^0.2.0",
+    "minimark": "^1.0.0",
     "nuxt": "^4.6.4",
     "nuxt-llms": "^0.3.2",
     "shiki": "^4.6.0",
