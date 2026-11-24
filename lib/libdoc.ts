@@ -128,7 +128,6 @@ export interface IndexEntry {
   name: string
   slug: string
   shortdoc: string
-  shortdocHtml: string
   group: string
   groupSlug: string
   tags: string[]
@@ -432,7 +431,6 @@ export async function transform(
     name: k.name,
     slug: k.slug,
     shortdoc: k.shortdoc,
-    shortdocHtml: k.shortdocHtml,
     group: k.group,
     groupSlug: k.groupSlug,
     tags: k.tags,

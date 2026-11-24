@@ -360,9 +360,9 @@ describe('renderInline', () => {
     expect(renderInline('snake_case_name')).toBe('snake_case_name')
   })
 
-  it('leaves no raw double-backticks anywhere in the index', async () => {
+  it('leaves no raw double-backticks in any short doc', async () => {
     const result = await transform(SPEC, { highlight: async c => c, groups: GROUPS })
-    for (const k of result.index) {
+    for (const k of result.keywords) {
       expect(k.shortdocHtml, k.name).not.toContain('``')
     }
   })
