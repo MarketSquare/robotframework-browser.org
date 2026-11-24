@@ -1,6 +1,6 @@
 {
   "source": ".all-contributorsrc, maintained by the all-contributors bot",
-  "generated": "2026-11-01",
+  "generated": "2026-11-24",
   "total": 211,
   "core": [
     {
@@ -2660,10 +2660,12 @@
       "avatar": "/avatars/wesleyke2.jpg",
       "profile": "https://github.com/wesleyke2",
       "ways": [
+        "code",
         "report"
       ],
       "contributions": [
-        "bug"
+        "bug",
+        "code"
       ]
     },
     {
