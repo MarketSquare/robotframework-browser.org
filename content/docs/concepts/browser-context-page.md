@@ -78,6 +78,36 @@ deliberately:
 New Browser    chromium    reuse_existing=False
 ```
 
+### Connect to an existing Chromium browser
+
+When a browser is already running and exposes Chrome DevTools Protocol (CDP),
+pass its complete browser-level WebSocket URL to `Connect To Browser`. For a
+hosted endpoint, that can be a `wss://` URL with a path and query string. Keep
+both when setting `BROWSER_CDP_URL` in the test environment. For an example of
+obtaining a browser-scoped URL, see the
+[Cloudbrowser virtual browser setup guide](https://cloudbrowser.tv/virtual-browser).
+
+The example opens a new context so the test does not use the attached browser's
+existing tabs or signed-in state. The data URL lets you check the connection
+without navigating to another website.
+
+```robot
+*** Settings ***
+Library    Browser    enable_playwright_debug=disabled
+
+*** Test Cases ***
+Check an existing Chromium browser
+    Connect To Browser    %{BROWSER_CDP_URL}    use_cdp=True
+    New Context
+    New Page    data:text/html,%3Ctitle%3EConnected%3C%2Ftitle%3E
+    Get Title    ==    Connected
+    Close Context
+```
+
+A credential-bearing URL can appear in the default Playwright log.
+`enable_playwright_debug=disabled` disables that log. Keep any other debug
+output and test artifacts private when using a credential-bearing URL.
+
 ## The context
 
 A context is an independent session inside an already-running browser: its own
